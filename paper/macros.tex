@@ -1,0 +1,163 @@
+% Paper-side notation. Mirrors the notation half of blueprint/src/macros.tex (below its rule)
+% so that statements shared verbatim with the blueprint compile here unchanged. Keep the two
+% files in sync by hand; a drifted macro shows up as a compile error or a visibly different
+% rendering, never silently. The notation itself is the shared header of the spatial modules
+% (hub RELEASES.md rule 3): it changes only by a versioned decision, never locally.
+%
+% \sscite is the blueprint's citation macro (framework-owned there); here it is plain \cite.
+
+\newcommand{\sscite}[1]{\cite{#1}}
+
+% -- Notation (mirrored from the blueprint) -------------------------------------------------
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\CC}{\mathbb{C}}
+\newcommand{\NN}{\mathbb{N}}
+\newcommand{\ZZ}{\mathbb{Z}}
+\newcommand{\Lone}{L^1}
+\newcommand{\Tr}[1]{T_{#1}}              % translation by #1
+\newcommand{\Dil}[1]{D_{#1}}             % dilation by #1
+\newcommand{\Phis}[2]{\Phi_{#1,#2}}      % the cascade operator from scale #1 to #2
+\newcommand{\NDs}{\mathrm{ND}_{\mathrm{s}}}   % symmetric continuous negative definite functions
+\newcommand{\LEs}{\mathrm{LE}_{\mathrm{s}}}   % the same class named by its Levy-Khintchine form
+\newcommand{\IDs}{\mathrm{ID}_{\mathrm{s}}}   % symmetric infinitely divisible laws
+\newcommand{\SDs}{\mathrm{SD}_{\mathrm{s}}}   % symmetric self-decomposable laws
+\newcommand{\GGCs}{\mathrm{GGC}_{\mathrm{s}}} % the symmetric Thorin subclass
+\newcommand{\Cin}{\operatorname{Cin}}
+\newcommand{\Ein}{\operatorname{Ein}}
+\newcommand{\Lap}{\operatorname{Lap}}
+\newcommand{\Expo}{\operatorname{Exp}}   % the one-sided exponential kernel
+\newcommand{\supp}{\operatorname{supp}}
+\newcommand{\sgn}{\operatorname{sgn}}
+\newcommand{\erfc}{\operatorname{erfc}}
+\newcommand{\Rea}{\operatorname{Re}}
+\newcommand{\Log}{\operatorname{Log}}    % the principal branch of the complex logarithm
+% The Schwartz class, written with \mathscr since 2026-09-19 (the author's decision D7): the
+% letter S in \mathcal is the subordinated slice of \S4, and the two classes had the same glyph.
+% mathrsfs is loaded here because main.tex inputs this file in its preamble.
+\usepackage{mathrsfs}
+\newcommand{\Sch}{\mathscr{S}(\RR)}      % the Schwartz class on the line
+\newcommand{\FT}{\mathcal{F}}            % the Fourier transform
+\newcommand{\seq}{\stackrel{d}{=}}       % equality in distribution
+\newcommand{\Levy}{L\'evy}               % the name, accented through one macro in both files
+                                         % (statements avoid raw accents for the render pipeline)
+\newcommand{\Matern}{Mat\'ern}           % the same device for the second member's name
+% Brownian motion: W in this paper, where B is the symbol of the generator (the author's decision D3 at the external review, 2026-09-19); the blueprint's macro prints B.
+\newcommand{\BM}{W}
+                                         % (2026-09-14; mirrored from blueprint/src/macros.tex)
+
+% -- Paper-only convenience -----------------------------------------------------------------
+\newcommand{\Ex}{\mathbb{E}}
+% The blueprint's \ledger{A17} names a ledger entry inside a statement (first occurrence in a
+% shared statement: prop:thorin-subclass, module B). The comparison key of `linkage check` strips
+% the macro with its argument on both sides, so the paper may render it as it likes; it prints
+% the entry's id, which Table 1 of the introduction lists beside each cited fact.
+\newcommand{\ledger}[1]{ledger entry~#1}
+
+% Equations are cited with \ref in the blueprint (its render allowlist has no \eqref), and a
+% statement shared verbatim must cite them the same way. So the paper wraps \ref: a label
+% beginning `eq:` prints in parentheses, as \eqref would have; every other label is untouched.
+% Installed at \begin{document}, after hyperref has finished redefining \ref. Use \ref for
+% equations throughout the paper, never \eqref (it would print double parentheses).
+\usepackage{xstring}
+% Declared robust: a caption is a moving argument, and the xstring test must not be expanded
+% into the .lof entry (it errored with "Illegal parameter number" at the first figure).
+% The original is copied with \NewCommandCopy, not \let: the kernel's \ref is itself robust
+% (\ref expands to \protect\ref<space>), so \let would copy only that wrapper, and
+% \DeclareRobustCommand would then overwrite the inner macro the copy points at -- an
+% infinite loop at the first \ref (it hung a build for 43 minutes).
+%
+% Module B (2026-09-15). Statements shared verbatim with the blueprint cite the line paper's
+% nodes by their blueprint labels (`\ref{thm:main-characterization}`), and this document does
+% not define those labels: the line paper is a released module, cited as its version (hub
+% RELEASES.md, "Dependencies between modules": the released version and the statement number
+% as of that version, never a draft). So the wrapper below carries a table of the line paper's
+% labels with their numbers as printed in v0.1 (read from the v0.1 build's .aux, 2026-09-15),
+% and a \ref to one of them prints "7.3 of [n]" -- with the prose's own environment word before
+% it, "Theorem~7.3 of [n]" -- while a local label prints as before. The comparison key of
+% `linkage check` strips the environment word before a \ref (LINKAGE.md rule 4), so the prose
+% may add it inside a shared statement. Two labels of the line paper's appendix, lem:cin-rays
+% and prop:matern-exponent, are NOT in the table: they are nodes of this module's own chapters
+% and are transcribed here. The table changes only with a new release of the line paper.
+%
+% 2026-09-16, the author's review of section 2: the statements the later sections read are
+% RESTATED in section 2 (verbatim, under shared markers, the line paper's number in the title),
+% so their labels are local and are commented out of the table below: def:cascade-family,
+% prop:sd-exponents, eq:sd-profile, lem:profile-integrability, rem:displacement-dictionary
+% (copied), thm:main-characterization, cor:semigroup-case, lem:admissible-cone,
+% prop:kernel-regularity, eq:levy-khintchine and eq:symbol (displays reproduced in prose). A
+% \ref to any of them prints the local number; every other label still prints "n of [line]".
+\newcommand{\linepaper}{fagerstrom2026spatial}
+\newcommand{\lineref}[2]{\expandafter\gdef\csname lineno@#1\endcsname{#2}}
+% The bare number of a line-paper label, for prose that has already said "the line paper's":
+% "the line paper's Lemmas~\linenum{lem:additivity} and~\linenum{lem:nonvanishing}" (a \ref
+% would print "of [n]" after each). Only for labels in the table; a restated label has none.
+\newcommand{\linenum}[1]{\csname lineno@#1\endcsname}
+\lineref{def:positive-definite}{2.1}
+\lineref{def:symmetric-negdef}{2.2}
+\lineref{prop:fourier-toolbox}{2.3}
+\lineref{rem:pd-nd-intuition}{2.4}
+\lineref{def:levy-exponents}{2.5}
+% restated in section 2: \lineref{rem:displacement-dictionary}{2.6}
+\lineref{prop:fourier-uniqueness}{2.7}
+\lineref{prop:levy-continuity}{2.8}
+\lineref{rem:levy-continuity-general}{2.9}
+\lineref{lem:quadratic-growth}{2.10}
+\lineref{lem:lattice-zero}{2.11}
+\lineref{def:self-decomposable}{2.12}
+% restated in section 2: \lineref{prop:sd-exponents}{2.13}
+\lineref{rem:displacement-profile-log}{2.14}
+% restated in section 2: \lineref{lem:profile-integrability}{2.15}
+% restated in section 2: \lineref{def:cascade-family}{3.1}
+\lineref{rem:provenance-pauwels}{3.2}
+\lineref{prop:two-members}{3.3}
+\lineref{prop:no-positivity-no-classification}{3.4}
+\lineref{rem:signed-levy-uniqueness}{3.5}
+\lineref{lem:convolution-representation}{4.1}
+\lineref{lem:nonvanishing}{4.2}
+\lineref{rem:modulation-transfer}{4.3}
+\lineref{rem:wendel}{4.4}
+\lineref{lem:additivity}{5.1}
+\lineref{thm:increments-levy}{5.2}
+\lineref{cor:monotonicity}{5.3}
+\lineref{rem:lattice-family}{5.4}
+\lineref{cor:smoothed-transmittance}{5.6}
+\lineref{lem:covariance-fourier}{6.1}
+\lineref{lem:no-lattice}{6.2}
+\lineref{lem:dilation-invariance}{6.3}
+\lineref{lem:action-rigidity}{6.4}
+\lineref{lem:dilation-atom}{6.5}
+\lineref{prop:canonical-gauge}{6.6}
+\lineref{rem:gauge-freedom}{6.7}
+\lineref{lem:selfdecomposable-exponents}{7.1}
+\lineref{rem:sato-process}{7.2}
+% restated in section 2: \lineref{thm:main-characterization}{7.3}
+% restated in section 2: \lineref{cor:semigroup-case}{7.4}
+\lineref{rem:boundary}{7.5}
+% restated in section 2: \lineref{lem:admissible-cone}{7.6}
+\lineref{rem:gaussian-extreme}{7.7}
+\lineref{prop:strict-positivity}{7.8}
+% restated in section 2: \lineref{prop:kernel-regularity}{7.9}
+\lineref{rem:scale-evolution-preview}{7.10}
+\lineref{eq:transform}{2.1}
+% restated in section 2: \lineref{eq:levy-khintchine}{2.2}
+% restated in section 2: \lineref{eq:sd-profile}{2.3}
+\lineref{eq:pairing}{4.1}
+\lineref{eq:increment-levy}{5.1}
+\lineref{eq:truncation}{5.2}
+\lineref{eq:sinc-lower}{5.3}
+\lineref{eq:similarity}{6.1}
+\lineref{eq:gauge}{6.2}
+\lineref{eq:dilation-difference}{7.1}
+\lineref{eq:dilation-decrease}{7.2}
+\lineref{eq:cin-superposition}{7.3}
+% restated in section 2: \lineref{eq:symbol}{7.4}
+\AtBeginDocument{%
+  \NewCommandCopy{\paperOrigRef}{\ref}%
+  \DeclareRobustCommand{\ref}[1]{%
+    \ifcsname lineno@#1\endcsname
+      \IfBeginWith{#1}{eq:}{\textup{(\csname lineno@#1\endcsname)}}{\csname lineno@#1\endcsname}
+      \ of \sscite{\linepaper}%
+    \else
+      \IfBeginWith{#1}{eq:}{\textup{(\paperOrigRef{#1})}}{\paperOrigRef{#1}}%
+    \fi}%
+}

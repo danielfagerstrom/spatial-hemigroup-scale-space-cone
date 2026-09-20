@@ -1,0 +1,425 @@
+% §2 What the line paper settled --- the recap of the released line paper
+% (\sscite{fagerstrom2026spatial}, v0.1, concept DOI 10.5281/zenodo.22761631): the notation
+% table, the axioms, the exponent and its profile, the characterization theorem, and the one
+% chapter-2 node of the blueprint that paper did not print.
+%
+% Rewritten 2026-09-16 at the author's review. The first draft (2026-09-15) cited everything and
+% restated nothing, "the minimum the later sections need to resolve"; the author's decision is
+% that this paper is readable on its own, so what the later sections read is restated here:
+% the statements verbatim from the blueprint (the text of record, `% shared with blueprint`
+% markers, guarded by `linkage check`), each with the line paper's statement number in its
+% title and its proof left in the line paper; the rest --- the gauge, the folded profile, the
+% symbol, the hemigroup --- in prose. Restated labels are local and are commented out of the
+% line-number table in macros.tex; every other \ref to the line paper still prints "n of [line]".
+% The notation table is the programme's shared header (hub RELEASES.md rule 3), reproduced with
+% the bridge rows added, which is a versioned change recorded in the hub log; the line paper
+% picks the rows up at its next release. Nothing here is proved except the last proposition.
+%
+% Contents:
+%   2.1 notation (spaces, actions, convolution; Table 2);
+%   2.2 the axioms (def:cascade-family; a stage; hemigroup versus semigroup);
+%   2.3 exponents and profiles (the Levy-Khintchine form, self-decomposability, prop:sd-exponents,
+%       the folded profile, lem:profile-integrability, admissible pairs, the displacement
+%       dictionary copied from the line paper's Remark 2.6, the symbol B);
+%   2.4 the characterization theorem (the canonical gauge; thm:main-characterization,
+%       cor:semigroup-case, lem:admissible-cone, prop:kernel-regularity);
+%   2.5 what the line paper takes on trust;
+%   2.6 prop:laplace-uniqueness-locally-finite (blueprint chapter 2), [T] and \leanok on Lean
+%       core, with its proof: the line paper left it out because its consumers are here.
+
+\section{What the line paper settled}\label{sec:line}
+
+This paper continues the line paper \sscite{fagerstrom2026spatial}, and is written to be read
+on its own. The main things the later sections use of that paper are restated in this section:
+its axioms, the form of its exponents, and its characterization theorem, together with the
+notation. A restated statement carries the line paper's statement number in its title, and its
+proof is at that number. Further results are used and only cited, in the form
+``Lemma~\ref{lem:selfdecomposable-exponents}'' with the number of that paper's first release.
+Four are used throughout:
+the Fourier toolbox (Bochner's theorem and the \Levy--Khintchine representation,
+Proposition~\ref{prop:fourier-toolbox}), the
+quadratic growth of an exponent (Lemma~\ref{lem:quadratic-growth}), the uniqueness of the
+transform of a measure (Proposition~\ref{prop:fourier-uniqueness}), and \Levy's
+continuity theorem (Proposition~\ref{prop:levy-continuity}). The others are used once or twice
+each: the differentiability of a self-decomposable exponent and its representation
+(Lemma~\ref{lem:selfdecomposable-exponents}, in \S\S\ref{sec:generator}
+and~\ref{sec:implementation}), the two members that are not stable
+(Proposition~\ref{prop:two-members}, in \S\S\ref{sec:bridge} and~\ref{sec:corners}), the zero
+set of an exponent and the absence of lattice kernels (Lemmas~\ref{lem:lattice-zero}
+and~\ref{lem:no-lattice}, in \S\ref{sec:bridge}), and the additivity of the stage exponents with
+the nonvanishing of the transforms (Lemmas~\ref{lem:additivity} and~\ref{lem:nonvanishing}, in
+\S\ref{sec:implementation}). One classical inequality is used from inside a proof of the line
+paper, that of Theorem~\ref{thm:increments-levy}, and is restated here because
+Lemma~\ref{lem:cin-delay-equation} rests on it. For a symmetric probability measure $\mu$ and
+$\eta > 0$,
+\begin{equation}\label{eq:truncation-b}
+  \int \Bigl(1 - \frac{\sin\eta x}{\eta x}\Bigr)\,\mu(dx)
+   = \frac1\eta\int_0^\eta \bigl(1 - \hat\mu(\omega)\bigr)\,d\omega,
+  \qquad
+  1 - \frac{\sin u}{u} \ge \frac{2}{3\pi^2}\,\bigl(1 \wedge u^2\bigr),
+\end{equation}
+the first by Fubini's theorem and the second elementary. Together they give the truncation
+inequality $\mu\{|x| \ge 1/\eta\} \le \tfrac{3\pi^2}{2}\,\eta^{-1}\int_0^\eta(1 - \hat\mu)$. When
+$\hat\mu = e^{-F}$ with $F(\omega) \le C\omega^2$ near the origin, the right-hand side is
+$O(\eta^2)$, since $1 - e^{-F} \le F$, so $\mu\{|x| > R\} = O(R^{-2})$ and $\mu$ has a finite
+first absolute moment. The section ends with
+one elementary proposition of the line paper's preliminaries that the line paper did not
+print, because its uses are in this module; that one is proved.
+
+\subsection{Notation}\label{sec:notation}
+
+Space runs over $\RR$ with coordinate $x$, the wavenumber is $\omega$, and scale is $t$.
+Table~\ref{tab:notation} is the notation table shared by the spatial modules, the line paper's
+Table~2 with the
+letters of the bridge added; the letters of \S\S\ref{sec:corners}--\ref{sec:implementation}
+are introduced where they are used.
+
+\emph{Spaces.} $\Lone = L^1(\RR, dx)$, real, with positive cone $L^1_+$ and
+$\int f := \int_\RR f(x)\,dx$; $M_+(\RR)$ is the finite positive Borel measures on $\RR$, of
+total mass $\|\mu\| = \mu(\RR)$. \emph{Actions.} Translations are $(\Tr{a} f)(x) = f(x-a)$.
+The reflection is $(Rf)(x) = f(-x)$, extended to measures as the pushforward under
+$x \mapsto -x$, and a measure is \emph{symmetric} when $R\mu = \mu$. Dilations act on
+functions by $(\Dil{\lambda} f)(x) = \lambda^{-1} f(x/\lambda)$, $\lambda > 0$, which
+preserves mass, and on measures by the pushforward under $x \mapsto \lambda x$.
+\emph{Convolution and transform.} $(\mu * f)(x) = \int f(x-y)\,\mu(dy)$ for $\mu \in M_+(\RR)$
+and $f \in \Lone$. Both actions are compatible with convolution. The transform of a symmetric
+measure is $\hat\mu(\omega) = \int \cos(\omega x)\,\mu(dx)$, real and even, and the transform
+of a stage's kernel is written $\hat\mu_{s,t}$. It is the restriction to symmetric measures of
+$\hat\rho(\omega) = \int e^{-i\omega x}\,\rho(dx)$, the convention for a finite measure, positive
+or signed, that is not symmetric. The sign matters in one place, the proof of
+Lemma~\ref{lem:cin-delay-equation}, where a translate has the transform
+$e^{i\omega\tau}\hat\nu(\omega)$, and the uniqueness of the transform
+(Proposition~\ref{prop:fourier-uniqueness}) is stated in the line paper for every finite Borel
+measure on $\RR$ in this convention.
+
+\begin{table}[!htb]
+\centering
+\caption{Notation: the symbol, where it is defined, and the letter the causal article
+uses for the same object. The rows above the rule are the line paper's Table~2; the rows
+below it are the letters of the bridge, \S\ref{sec:bridge}, where the causal article's
+Laplace variable is written $\sigma$, $s$ being a scale here. Brownian motion is written $\BM$, the letter $B$ being
+the symbol of the exponent.}
+\label{tab:notation}
+\footnotesize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}lll@{}}
+\toprule
+object & here & the causal article \\
+\midrule
+signal coordinate & $x$ (space) & $t$ (time) \\
+transform variable & $\omega$ (Fourier) & $s$ (Laplace) \\
+scales in a stage & $r \le s \le t$ & $x \le y \le z$ \\
+stage operator and its kernel & $\Phis{s}{t}$, $\mu_{s,t}$ & $\Phi_{x,y}$, $\mu_{x,y}$ \\
+exponent of a stage & $g_{s,t}(\omega) = -\log\hat\mu_{s,t}(\omega)$ & $g_{x,y}(s)$ \\
+kernel from the origin, accumulated exponent & $\mu_{0,t}$, $G(t,\omega) = g_{0,t}(\omega)$ & $\mu_{0,x}$, $G(x,s)$ \\
+canonical gauge & $\chi(t)$ (\S\ref{sec:characterization-recap}) & $\chi(x)$ \\
+the family's exponent and its pair & $F(\omega)$; Gaussian coefficient $a$, profile $k$ & $F(s)$; drift $b_0$, profile $k$ \\
+\Levy{} measure, tail measure of the profile & $\nu$ \ref{eq:levy-khintchine}, $\varpi = -dk$ \ref{eq:symbol} & $\nu$, $\varpi$ \\
+symbol of the exponent & $B(\omega) = \omega F'(\omega)$ \ref{eq:symbol} & $B(s) = sF'(s)$ \\
+dilation ratio, action, orbit coordinate & $\lambda$, $S_\lambda$, $c(\lambda)$ & $\sigma$, $S_\sigma$, $c(\sigma)$ \\
+random displacement, random delay & $X_{s,t}$ & $T_{x,y}$ \\
+function space & $\Lone = L^1(\RR,dx)$ & $X = L^1(\RR,dt)$ \\
+translation, reflection & $\Tr{a}$, $R$ & $\tau_a$, --- \\
+exponents by definition, by representation & $\NDs$, $\LEs$ (\S\ref{sec:exponents-recap}) & $\mathrm{BF}_0$, $\mathrm{LE}$ \\
+\midrule
+standard Brownian motion, its law at time $u$ & $\BM$, $g_u$ & --- \\
+the causal exponent and its data & $F_{\mathrm I}(\sigma)$; $(b_0, k_{\mathrm I})$ (Def.~\ref{def:causal-admissible}) & $F(s)$; $(b_0, k)$ \\
+the random delay of the bridge & $T_1$, with exponent $F_{\mathrm I}$ & $T_{0,1}$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{The axioms}\label{sec:axioms-recap}
+
+The line paper's object is a family of operators indexed by pairs of scales. A pair of scales
+$s \le t$ is a \emph{stage}: the operator $\Phis{s}{t}$ of the stage takes the signal at scale
+$s$ to the signal at scale $t$, and its kernel $\mu_{s,t}$, which the line paper's
+representation lemma supplies (its Lemma~\linenum{lem:convolution-representation}), is the
+law of the random displacement the stage adds. The axioms are these.
+
+% shared with blueprint def:cascade-family
+\begin{definition}[symmetric cascade measurement family, Definition~3.1 of the line paper]\label{def:cascade-family}
+A family of linear operators $\Phis{s}{t} : \Lone \to \Lone$, $0 \le s \le t < \infty$, is a
+\emph{symmetric cascade measurement family} if:
+\begin{enumerate}
+\item[(A1)] \emph{Boundedness.} Each $\Phis{s}{t}$ is a bounded operator on $\Lone$.
+\item[(A2)] \emph{Translation covariance.} $\Phis{s}{t}\,\Tr{a} = \Tr{a}\,\Phis{s}{t}$ for
+every $a \in \RR$.
+\item[(A3)] \emph{Reflection symmetry.} $\Phis{s}{t}\,R = R\,\Phis{s}{t}$.
+\item[(A4)] \emph{Positivity.} $\Phis{s}{t}\,L^1_+ \subseteq L^1_+$.
+\item[(A5)] \emph{Unit mass.} $\int \Phis{s}{t} f = \int f$ for every $f \in L^1_+$.
+\item[(A6)] \emph{Cascade (hemigroup).} $\Phis{t}{t} = \mathrm{Id}$, and
+$\Phis{s}{t}\,\Phis{r}{s} = \Phis{r}{t}$ for all $r \le s \le t$.
+\item[(A7)] \emph{Continuity.} For every $f \in \Lone$ the map $(s,t) \mapsto \Phis{s}{t}f$ is
+continuous from $\{0 \le s \le t\}$ to $\Lone$.
+\item[(A8)] \emph{Scale covariance.} There is a family $(S_\lambda)_{\lambda > 0}$ of
+increasing bijections of $[0,\infty)$ with
+$\Dil{\lambda}\,\Phis{s}{t} = \Phi_{S_\lambda s,\,S_\lambda t}\,\Dil{\lambda}$ for all
+$0 \le s \le t$ and all $\lambda > 0$.
+\item[(ND)] \emph{Nondegeneracy.} $\Phis{s}{t} \ne \mathrm{Id}$ whenever $s < t$.
+\end{enumerate}
+\end{definition}
+
+A family satisfying the nine is called \emph{admissible} throughout this paper. The word is
+also used of a pair $(a,k)$ and of an exponent, in the senses fixed in
+\S\ref{sec:exponents-recap} and after Theorem~\ref{thm:main-characterization}.
+
+\emph{Hemigroup versus semigroup.} The axiom that separates this class from the classical one
+is (A6). The scale-space axioms of \sscite{pauwels1995extended} ask for a one-parameter family
+with $K_s K_t = K_{s+t}$, so that a stage depends on the difference $t - s$ of its scales
+only: the family is a convolution semigroup, and the kernel at scale $t$ is the law at time
+$t$ of a process with stationary independent increments. Axiom (A6) asks only that the stages
+compose. The stage from $r$ to $t$ is the stage from $s$ to $t$ after the stage from $r$
+to $s$; how the stage from $s$ to $t$ depends on the two scales is left free. The family is
+then the family of increment laws of a process with independent increments that need not be
+stationary in scale, and scale covariance (A8) fixes what those increments are:
+the process is self-similar, and its marginals are self-decomposable. That is the difference
+in the composition axiom, and it is the reason the class here has a profile $k$
+where the semigroup class has one index $\alpha$
+(Corollary~\ref{cor:semigroup-case}). The hemigroup form of the axioms comes from the
+time-causal article \sscite{fagerstrom2026hemigroup}, whose stages run over time on the
+half-line; the line paper carried them to the reflection-symmetric line, and
+\S\ref{sec:bridge} is where the two meet.
+
+\subsection{Exponents and profiles}\label{sec:exponents-recap}
+
+Under the axioms, every stage is a convolution, $\Phis{s}{t} f = \mu_{s,t} * f$, with a
+symmetric probability measure $\mu_{s,t}$ whose transform does not vanish, and the
+\emph{exponent} of the stage is $g_{s,t} = -\log\hat\mu_{s,t}$ (the line paper's
+Lemmas~\linenum{lem:convolution-representation} and~\linenum{lem:nonvanishing}). The
+exponents add along the cascade, and each is a symmetric continuous negative definite
+function. Such a function is a continuous even $\psi \ge 0$ with $\psi(0) = 0$ for which
+$e^{-\tau\psi}$ is the transform of a symmetric probability measure for every $\tau > 0$.
+They form the class $\NDs$ of the line paper's Definition~\linenum{def:symmetric-negdef},
+whose members are exactly the functions below. This is the symmetric \Levy--Khintchine
+representation, clause~(3) of Proposition~\ref{prop:fourier-toolbox}, which asserts the
+representation, its converse and the uniqueness of the pair:
+\begin{equation}\label{eq:levy-khintchine}
+  \psi(\omega) \;=\; a\,\omega^2 + \int_{(0,\infty)} \bigl(1 - \cos\omega x\bigr)\,\nu(dx),
+  \qquad a \ge 0, \quad \int_{(0,\infty)} (1 \wedge x^2)\,\nu(dx) < \infty,
+\end{equation}
+with the pair $(a,\nu)$ unique. The line paper names the class by this representation,
+$\LEs$ (its Definition~\linenum{def:levy-exponents}), so that $\NDs = \LEs$, and this paper
+uses both names for the one class. In the representation $a$ is the
+\emph{Gaussian coefficient} and $\nu$ the \emph{\Levy{} measure}. The measure $\nu$ lives on
+the positive half-line by a convention that matters for constants: the \Levy{} measure of a
+symmetric law on $\RR$ is a symmetric measure $\nu_2$ on $\RR \setminus \{0\}$, and $\nu$ is
+its image under $x \mapsto |x|$, the two directions of a displacement of a given size counted
+together.
+
+A symmetric law $\mu$ is \emph{self-decomposable} (the line paper's
+Definition~\linenum{def:self-decomposable}) if for every $0 < c < 1$ there is a law $\rho_c$ with
+$\mu = (\Dil{c}\mu) * \rho_c$: a random displacement with law $\mu$ is, for every contraction
+ratio, a contracted copy of itself plus an independent residual. The characterization theorem
+below says that the kernels of an admissible family are of this kind, and this is the class
+that has a profile.
+
+% shared with blueprint prop:sd-exponents
+\begin{proposition}[symmetric self-decomposable exponents, Proposition~2.13 of the line paper]\label{prop:sd-exponents}
+A symmetric infinitely divisible law with pair $(a,\nu)$ is self-decomposable if and only if
+its \Levy{} measure has the form $\nu(dx) = k(x)\,x^{-1}dx$ on $(0,\infty)$ with
+$k : (0,\infty) \to [0,\infty)$ nonincreasing, so that its exponent is
+\begin{equation}\label{eq:sd-profile}
+  \psi(\omega) \;=\; a\,\omega^2
+  + \int_0^\infty \bigl(1 - \cos\omega x\bigr)\,\frac{k(x)}{x}\,dx,
+  \qquad a \ge 0, \quad k \ge 0 \ \text{nonincreasing}.
+\end{equation}
+Self-decomposability imposes no restriction on the Gaussian coefficient $a$.
+\end{proposition}
+
+The function $k$ is the \emph{folded profile} of the law, or its profile for short. It is
+folded because $\nu$ is: a two-sided \Levy{} density written $h(|x|)/|x|$, the form of
+\sscite{sato1999levy}, Cor.~15.11, p.~95, has folded profile $k = 2h$, and the factor is the
+one place a
+constant is easily lost in carrying a statement from a source into this paper. The profile
+is the object of this paper. It is a nonincreasing function on the half-line, and the
+representation reads it as an intensity: displacements of size about $x$ arrive at rate
+$k(x)\,x^{-1}dx$, so $k$ is that rate per unit of $\log x$, and self-decomposability says
+that the intensity of a displacement never grows with its size. The Gaussian is the member
+with no profile, $k = 0$; every other member is described by the shape of $k$, and
+\S\ref{sec:cone} describes the set of all shapes, \S\ref{sec:bridge} the shapes that come
+from a causal delay, \S\ref{sec:corners} the shapes of the named families.
+
+The integrability condition in \ref{eq:levy-khintchine}, read for a profile, is the following
+criterion.
+
+% shared with blueprint lem:profile-integrability
+\begin{lemma}[the integrability criterion for a profile, Lemma~2.15 of the line paper]\label{lem:profile-integrability}
+Let $k : (0,\infty) \to [0,\infty)$ be measurable and put $\nu(dx) := k(x)\,x^{-1}dx$. Then
+\[
+  \int_{(0,\infty)} (1 \wedge x^2)\,\nu(dx) < \infty
+  \qquad\Longleftrightarrow\qquad
+  \int_0^1 x\,k(x)\,dx < \infty \ \ \text{and} \ \
+  \int_1^\infty \frac{k(x)}{x}\,dx < \infty .
+\]
+Consequently, by Proposition~\ref{prop:fourier-toolbox}(3), the right-hand pair of conditions
+is necessary and sufficient for \ref{eq:sd-profile} to define a member of $\NDs$.
+\end{lemma}
+
+A pair $(a,k)$ with $a \ge 0$, $k : (0,\infty) \to [0,\infty)$ nonincreasing and the two
+integrals of the criterion finite is called \emph{admissible}, and so is the exponent
+\ref{eq:sd-profile} it defines; profiles equal almost everywhere define the same exponent.
+The zero exponent is admissible as an exponent, and it is the one exponent that (ND) excludes
+as a family.
+
+The representation reads a kernel as a Gaussian part plus a catalogue of jumps. The reading is
+the line paper's Remark~2.6, reproduced here because the cone section leans on it.
+
+% line paper rem:displacement-dictionary (Remark 2.6 of v0.1, the number written out above
+% since the label is local here), copied; the blueprint's remark
+% of that label is the source of both halves of the line paper's split, and the paper's first
+% half is what is reproduced here.
+\begin{remark}[the displacement dictionary]\label{rem:displacement-dictionary}
+A symmetric kernel is the law of a \emph{random displacement}: $\Phis{s}{t}f$ reports the
+signal at a randomly displaced position $x - X_{s,t}$ with $X_{s,t} \sim \mu_{s,t}$. Its
+transform $\hat\mu_{s,t}(\omega) = \Ex\cos(\omega X_{s,t})$ is the contrast that a
+sinusoidal probe of wavenumber $\omega$ retains after the random displacement, the stage's
+modulation transfer function (Remark~\ref{rem:modulation-transfer}). The exponent
+$\psi = -\log\hat\mu$ adds along the cascade. In \ref{eq:levy-khintchine} the Gaussian
+coefficient $a$ is the \emph{diffusive part}, a Gaussian displacement of variance $2a$, the
+one term the time-causal axis deletes and
+the only one Gaussian scale space uses. The measure $\nu$ is a \emph{catalogue of jump
+displacements}. Three objects describe it in this paper, and they are kept apart by name: the
+catalogue itself, the measure $\nu(dx) = k(x)\,dx/x$ on the half-line; the \emph{profile} $k$,
+its density against $dx/x$; and the \emph{tail measure} $\varpi = -dk$ of \S\ref{sec:cone},
+which says how much of each unit step the profile contains. Displacements of size about $x$
+arrive as a Poisson stream, that is at
+independent random moments with a constant rate, and $\nu(dx)$ is that rate; the streams of
+different sizes are independent, and each event of size $x$ costs the probe the phase
+deficit $1 - \cos\omega x$. So a symmetric infinitely divisible displacement is a Gaussian
+part plus an independent sum of jumps of all sizes, and the representation says that every
+such displacement decomposes in this way.
+\end{remark}
+
+\emph{The symbol.} An admissible exponent, written $F$ from here on, is $C^1$ away from the
+origin, and the line paper
+writes its derivative through the \emph{symbol}
+\begin{equation}\label{eq:symbol}
+  B(\omega) = \omega F'(\omega)
+   = 2a\,\omega^2 + \int_{(0,\infty)} \bigl(1 - \cos\omega u\bigr)\,\varpi(du),
+\end{equation}
+where $\varpi = -dk$ is the \emph{tail measure} of the profile, the Stieltjes measure of the
+nonincreasing function $k$ (the line paper's Lemma~\linenum{lem:selfdecomposable-exponents}).
+The symbol is the
+rate at which the exponent grows along a dilation, $B(\omega) = \partial_\lambda
+F(\lambda\omega)|_{\lambda = 1}$, and it is itself an exponent of the form
+\ref{eq:levy-khintchine}, with pair $(2a,\varpi)$. It is the object the scale evolution is
+written in. In the canonical gauge of \S\ref{sec:characterization-recap} the kernel at scale
+$t$ has transform $e^{-F(t\omega)}$, whose logarithmic derivative in $t$ is $-B(t\omega)/t$,
+one equation for every wavenumber.
+\S\ref{sec:generator} makes that equation an operator on the signal.
+
+\subsection{The characterization theorem}\label{sec:characterization-recap}
+
+\emph{The canonical gauge.} Scale covariance (A8) says that dilating space by $\lambda$
+relabels the scales by a bijection $S_\lambda$, and it says nothing about what that bijection
+is. The line paper shows (its Proposition~\linenum{prop:canonical-gauge}) that
+$c(\lambda) := S_\lambda 1$ is a continuous strictly increasing bijection of $(0,\infty)$ with
+$c(1) = 1$, and defines the \emph{canonical gauge} as its inverse, $\chi := c^{-1}$, extended
+by $\chi(0) = 0$. In the coordinate $\chi(t)$ the relabelling is dilation itself,
+$\chi(S_\lambda t) = \lambda\,\chi(t)$, and the accumulated exponent is
+$G(t,\omega) = F(\chi(t)\,\omega)$ with $F := G(1,\cdot)$. A family is \emph{in canonical
+gauge} when $\chi$ is the identity, that is when the kernel at scale $\lambda t$ is the
+dilation by $\lambda$ of the kernel at scale $t$. Every admissible family is brought to
+canonical gauge by reparametrizing its scale, and the gauge is unique once $\chi(1) = 1$ is
+fixed. In canonical gauge the family is generated by one law: the kernel at scale $t$ is
+the law of $t X_1$, where $X_1$ is the random displacement from scale $0$ to scale $1$.
+
+% shared with blueprint thm:main-characterization
+\begin{theorem}[main theorem, Theorem~7.3 of the line paper]\label{thm:main-characterization}
+A family $(\Phis{s}{t})_{0 \le s \le t}$ satisfies (A1)--(A8) and (ND) \emph{if and only if}
+there are an increasing bijection $\chi$ of $[0,\infty)$, the gauge, and a function $F$ of the
+form \ref{eq:sd-profile} with $F \not\equiv 0$, such that
+\[
+  \Phis{s}{t} f = \mu_{s,t} * f, \qquad
+  \hat\mu_{s,t}(\omega) = \exp\bigl[-\bigl(F(\chi(t)\,\omega) - F(\chi(s)\,\omega)\bigr)\bigr].
+\]
+In the canonical gauge the kernel at scale $t$ is the symmetric probability measure $\phi_t$
+with $\hat\phi_t = e^{-F(t\,\cdot)}$, and the pair $(\chi,F)$ is unique up to the normalization
+$\chi(1) = 1$.
+\end{theorem}
+
+So an admissible family is, in its canonical gauge, an admissible pair $(a,k)$ and nothing
+else: a Gaussian coefficient and a nonincreasing displacement profile. The word \emph{admissible},
+said of an exponent $F$ in this paper, means of the form \ref{eq:sd-profile} with an
+admissible pair, and the \emph{admissible cone} of \S\ref{sec:cone} is the set of such
+exponents. The theorem rests on two cited facts, Bochner's theorem in the forward direction
+and the symmetric \Levy--Khintchine representation at its converse and uniqueness clauses
+(\S\ref{sec:machine-checked}).
+
+The semigroup class is the case where the stages depend only on the difference of their
+scales, and the theorem recovers it.
+
+% shared with blueprint cor:semigroup-case
+\begin{corollary}[recovering the semigroup case, Corollary~7.4 of the line paper]\label{cor:semigroup-case}
+Assume in addition that the family is one-parameter, that is, $\Phis{s}{t}$ depends only on
+$t - s$. Then, after the normalization $g_{0,1}(1) = 1$,
+\[
+  F(\omega) = |\omega|^\alpha \quad \text{for some } 0 < \alpha \le 2 :
+\]
+the kernels are exactly the symmetric stable densities, which are the members of the extended
+semigroup class of \sscite{pauwels1995extended} with positive kernels. Here $\alpha = 2$ is the
+Gaussian, and $0 < \alpha < 2$ has Gaussian coefficient $0$ and profile
+$k(x) = C_\alpha^{-1}x^{-\alpha}$ with
+$C_\alpha := \int_0^\infty (1 - \cos u)\,u^{-1-\alpha}du \in (0,\infty)$.
+\end{corollary}
+
+Two consequences of the theorem are used throughout: the admissible exponents form a cone, and
+the kernels have densities.
+
+% shared with blueprint lem:admissible-cone
+\begin{lemma}[the admissible exponents form a convex cone, Lemma~7.6 of the line paper]\label{lem:admissible-cone}
+If $F_1, F_2$ are admissible in the sense of Theorem~\ref{thm:main-characterization}, of the
+form \ref{eq:sd-profile} with Gaussian coefficients $a_1, a_2 \ge 0$ and nonincreasing profiles
+$k_1, k_2$, then so are $F_1 + F_2$, with data $(a_1+a_2, k_1+k_2)$, and $c\,F_1$ for $c \ge 0$,
+with data $(c\,a_1, c\,k_1)$. So the admissible exponents form a convex cone, and the
+correspondence with the pairs $(a,k)$ is linear.
+\end{lemma}
+
+% shared with blueprint prop:kernel-regularity
+\begin{proposition}[regularity of the kernels from the origin, Proposition~7.9 of the line paper]\label{prop:kernel-regularity}
+Let $(\Phis{s}{t})$ satisfy (A1)--(A8) and (ND). Then for every $t > 0$ the kernel $\mu_{0,t}$
+is absolutely continuous, and its density is unimodal with mode at the origin.
+\end{proposition}
+
+The proposition rests on two cited facts about self-decomposable laws: absolute continuity
+(\sscite{sato1999levy}, Thm.~27.13, p.~181) and unimodality
+(\sscite{yamazato1978unimodality}, Thm.~1, p.~523). The theorem does not use them. It is
+stated for measures, so that it rests only on Bochner's theorem and the \Levy--Khintchine
+representation. A reader who wants the density reads the theorem and the proposition together.
+
+\subsection{What the line paper takes on trust}\label{sec:line-trust}
+
+The line paper rests its theorems on cited facts about positive definite functions and
+self-decomposable laws, and this paper inherits them where it reads its statements.
+\S\ref{sec:machine-checked} lists them, with what this paper adds, and the page each rests on
+is printed before the statement that uses it.
+
+\subsection{One proposition the line paper did not print}\label{sec:laplace-uniqueness}
+
+The one result of the line paper's preliminaries that is stated here and not cited is the
+uniqueness of the Laplace transform of a measure on the half-line, in the form that allows the
+measure to be infinite. It is used twice. In \S\ref{sec:corners} it identifies the mixing
+measure of a profile that is a mixture of exponentials, its Thorin measure. In
+\S\ref{sec:bridge} it rules out a causal ancestor. The result is elementary once finiteness of
+the transform is used to reduce to finite measures, and its proof uses finiteness at \emph{one}
+point of $(\tau_0,\infty)$, which is weaker than the hypothesis stated.
+
+% shared with blueprint prop:laplace-uniqueness-locally-finite
+\begin{proposition}[uniqueness of the Laplace transform of a locally finite measure]
+\label{prop:laplace-uniqueness-locally-finite}
+Let $m, m'$ be Borel measures on $(0,\infty)$, not necessarily finite, and suppose that
+$\int e^{-\tau u}\,m(du) = \int e^{-\tau u}\,m'(du) < \infty$ for every $\tau$ in some
+interval $(\tau_0,\infty)$. Then $m = m'$.
+\end{proposition}
+
+\begin{proof}
+Fix $\tau_1 > \tau_0$. Both transforms being finite at $\tau_1$, the measures
+$e^{-\tau_1 u}m(du)$ and $e^{-\tau_1 u}m'(du)$ are finite, and they have equal Laplace
+transforms on $(0,\infty)$ after the shift $\tau \mapsto \tau + \tau_1$; so it is enough to
+treat finite measures. For finite $m$, the map $u \mapsto e^{-u}$ carries $(0,\infty)$
+homeomorphically onto $(0,1)$, and $\int e^{-n u}\,m(du)$, $n \in \NN$, is the $n$-th moment
+of the image measure on $[0,1]$. A finite measure on a bounded interval is determined by its
+moments, the polynomials being dense in the continuous functions there. So the image measures
+agree, and so do $m$ and $m'$.
+\end{proof}

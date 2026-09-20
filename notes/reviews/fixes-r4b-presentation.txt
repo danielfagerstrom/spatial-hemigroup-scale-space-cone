@@ -1,0 +1,44 @@
+Review response R4b, presentation items 18 and 19 of the presentation review and two consequences of earlier batches (the bottom row of Figure 9 has two panels now; W is Brownian motion in this paper, so the truncation frequency of the threshold check is written Lambda). Applied with scripts/apply-anchors.py. The sentence "this reading is a reading" is in a copied blueprint remark and was changed at the blueprint and in the copy by a script.
+
+@@@ FILE paper-b/03-cone.tex
+@@@ OLD
+$e^{-\Cin(\tau\omega)}$, has no closed form. What it has is an equation. A \emph{delay
+@@@ NEW
+$e^{-\Cin(\tau\omega)}$, has no closed form, and it satisfies a delay equation. A \emph{delay
+@@@ END
+
+@@@ FILE paper-b/04-bridge.tex
+@@@ OLD
+= e^{-F_{\mathrm I}(\omega^2/2)}$. Three things are to be shown about $\Psi$, and the lemma shows
+them. It is admissible, that is of the form \ref{eq:sd-profile}: its Gaussian coefficient is
+@@@ NEW
+= e^{-F_{\mathrm I}(\omega^2/2)}$. The lemma shows three things about $\Psi$. It is admissible,
+that is of the form \ref{eq:sd-profile}: its Gaussian coefficient is
+@@@ END
+
+@@@ FILE paper-b/07-implementation.tex
+@@@ OLD
+kernel obtained by inverting its transform has the tail power $-1.99$ against $-2$. The
+middle panel of the bottom row shows the three regimes on logarithmic axes.
+@@@ NEW
+kernel obtained by inverting its transform has the tail power $-1.99$ against $-2$. The
+right panel of the bottom row shows the three regimes on logarithmic axes.
+@@@ END
+
+@@@ FILE paper-b/07-implementation.tex
+@@@ OLD
+the origin is the limit of $\pi^{-1}\int_0^W e^{-F(\omega)}\,d\omega$ as $W$ grows. The table
+gives that integral at three values of $W$ for six members, with $c = k(0{+})$.
+\begin{center}
+\begin{tabular}{lcccc}
+member & $c$ & $W = 10^2$ & $W = 10^4$ & $W = 10^6$ \\ \hline
+@@@ NEW
+the origin is the limit of $\pi^{-1}\int_0^\Lambda e^{-F(\omega)}\,d\omega$ as the truncation
+frequency $\Lambda$ grows. The table gives that truncated inversion integral at three values of
+$\Lambda$ for six members at canonical scale $1$, grouped by $c = k(0{+})$; the members with
+two atoms have the Thorin measure $w_1\delta_1 + w_2\delta_3$, so their ranges are $1$ and
+$\tfrac13$ and their profile is $w_1e^{-x} + w_2e^{-3x}$ with $c = w_1 + w_2$.
+\begin{center}
+\begin{tabular}{lcccc}
+member & $c$ & $\Lambda = 10^2$ & $\Lambda = 10^4$ & $\Lambda = 10^6$ \\ \hline
+@@@ END

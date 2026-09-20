@@ -1,0 +1,34 @@
+{
+  "title": "Spatial scale space from hemigroup axioms: the admissible cone, its corners and their implementation",
+  "upload_type": "publication",
+  "publication_type": "preprint",
+  "description": "<p>Gaussian scale space is the classical answer to the question of which smoothing kernels can serve a multi-scale representation. A companion paper showed that on the line the answer is much larger when the semigroup requirement of the axioms is weakened to a cascade, a two-parameter hemigroup: the admissible kernels are the symmetric self-decomposable laws, each given by a Gaussian coefficient and a nonincreasing profile of displacement sizes. This paper describes that class for a reader who computes with it, in three steps. The first is its shape. The admissible exponents form a convex cone in which every member is a unique superposition of the Gaussian and the members whose profile is a unit step. Subordination maps the time-causal scale spaces of the same axioms injectively into the cone, and the image consists of the members whose radial extension is self-decomposable in every dimension. The second is the familiar families in it: the Matérn kernels of spatial statistics, the Student-t laws and the symmetric stable laws are located and compared by their moments, their tails and their behaviour at the origin. The third is computation. For signals on the line the cascade composes exactly over any finite set of scales, and the Matérn families of integer index are exactly those whose stages are cascades of identical first-order recursive filters, run forward and backward. The families computed in this way do not reach the stable members even in the limit, and the sampling of the signal is a separate approximation. A numerical example checks the statements and finds that the continuous prototypes of two recursive Gaussian filters in common use are the kernels of no such cascade. Locality and the non-creation of local extrema are outside the paper. Most of the results of the first two steps are machine-checked in Lean 4, and those of the third are proved in prose.</p><p>This deposit is the article's verification export: the PDF, its LaTeX source, the Lean 4 modules its statements rest on, the trust boundary with the ledger of cited facts, the blueprint chapters, the process account and the external reviews.</p>",
+  "creators": [
+    {
+      "name": "Fagerström, Daniel",
+      "orcid": "0009-0001-0165-1978"
+    }
+  ],
+  "version": "0.1",
+  "publication_date": "2026-09-20",
+  "license": "cc-by-4.0",
+  "keywords": [
+    "scale space",
+    "hemigroup",
+    "self-decomposable laws",
+    "Lean 4",
+    "formal verification"
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "10.5281/zenodo.22761631",
+      "relation": "continues",
+      "scheme": "doi"
+    },
+    {
+      "identifier": "https://github.com/danielfagerstrom/spatial-hemigroup-scale-space-cone",
+      "relation": "isSupplementedBy",
+      "scheme": "url"
+    }
+  ]
+}

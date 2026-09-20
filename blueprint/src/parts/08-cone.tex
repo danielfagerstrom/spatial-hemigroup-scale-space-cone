@@ -1,0 +1,1061 @@
+% !TEX root = ../print.tex
+% Draft \S8 --- The admissible cone: the Gaussian ray and the Cin rays
+%
+% Source: draft/spatial-hemigroup-scale-space.md, \S8 (lines 479-520).
+%
+% CHANGED (lem:cin-rays): the draft states the expansion at infinity as
+% Cin(z) = log z + gamma_E + O(1/z), with a check asking for a table anchor for gamma_E.
+% The node states instead that there IS a finite constant C with Cin(z) = log z + C + O(1/z),
+% which is proved here in three lines from the convergence of the cosine integral, and names
+% the value C = gamma_E in a following remark with its citation. Nothing in the chapter, and
+% nothing later, uses the value: prop:choquet-cone needs only the two growth rates. This
+% keeps a [T] node from resting on an unproved numerical identity.
+%
+% prop:cin-origin-singularity is the one [A] node here. The draft leaves the origin
+% behaviour of the Cin kernels as prose; it is a real claim resting on two theorems of Sato,
+% and it supports prop:jet-regularity(4), so it is stated as a cited interface rather than
+% asserted in a remark. Its ledger entry carries an unresolved reading, recorded there.
+
+\chapter{The admissible cone: the Gaussian ray and the $\Cin$ rays}
+\label{ch:cone}
+
+\ref{thm:main-characterization} attaches to every admissible family a pair $(a,k)$, and
+\ref{lem:admissible-cone} says the pairs form a convex cone that the exponents inherit
+linearly. This chapter gives the cone its coordinates. The half-line cone had one
+distinguished ray, the drift, sitting as a degenerate boundary; the line's cone has the
+Gaussian ray, a genuine smoothing member, and it is extreme. The other extreme rays are the
+exponents of the unit-step profiles.
+
+% draft: Lemma 8.1
+% twin: hcs lem:dickman-superposition (Hemigroup.dickman_superposition) --- same statement
+% with Ein in place of Cin and the one-sided profile in place of the folded one.
+\begin{lemma}[the $\Cin$ rays and the superposition]\label{lem:cin-rays}
+\uses{lem:profile-integrability}
+\lean{SpatialLine.cin_ray, SpatialLine.cin_elementary, SpatialLine.cin_expansion_zero,
+SpatialLine.cin_expansion_top, SpatialLine.cin_superposition,
+SpatialLine.cin_superposition_exists}\leanok
+\notes{dickman-cin-rays}
+Write $\Cin(z) := \int_0^z (1 - \cos v)\,v^{-1}dv$ for $z \ge 0$, extended evenly to $\RR$.
+\begin{enumerate}
+\item \emph{(The rays.)} For $\tau > 0$ the profile $k = \mathbf 1_{(0,\tau)}$ is admissible,
+with Gaussian coefficient $0$, and its exponent is $\omega \mapsto \Cin(\tau\omega)$. The
+function $\Cin$ is even and nondecreasing on $[0,\infty)$, with $\Cin(z) \le z^2/4$ and
+$\Cin(z) = \tfrac14 z^2 + O(z^4)$ as $z \to 0$; and there is a finite constant $C$ with
+$\Cin(z) = \log z + C + O(1/z)$ as $z \to \infty$.
+\item \emph{(The superposition.)} Every admissible $F$, with Gaussian coefficient $a$ and
+profile $k$, satisfies
+\begin{equation}\label{eq:cone-superposition}
+  F(\omega) = a\,\omega^2 + \int_{(0,\infty)} \Cin(\tau\omega)\,\varpi(d\tau),
+  \qquad \omega \in \RR,
+\end{equation}
+where $\varpi$ is any positive measure on $(0,\infty)$ with $\varpi((x,\infty)) = k(x)$ for
+almost every $x > 0$; such a $\varpi$ exists.
+\end{enumerate}
+\statusT\quad\emph{(Elementary throughout. The value $C = \gamma_E$ is
+\ref{rem:cin-constant}; the article uses only that $C$ is finite, since what
+\ref{prop:choquet-cone} needs is the two growth rates $z^2$ and $\log z$ and nothing else.)}
+\end{lemma}
+
+% CHANGED (proof of record 2026-09-09): rewritten to the machine-checked route, and two
+% \uses edges removed with it. The printed proof reached admissibility through
+% prop:fourier-toolbox(3) and the existence of varpi through lem:selfdecomposable-exponents.
+% Neither is needed for what this lemma asserts. Admissibility here is exactly the two
+% integrability conditions on the pair (a,k), which for a bounded compactly supported k are
+% immediate; the passage to LE_s is lem:profile-integrability's own consequence clause and no
+% clause of THIS node asks for it. And the tail measure is built by a quantile transform that
+% consumes only "k nonincreasing" and "k vanishing at infinity" -- the second of which is
+% FORCED by the integrability at infinity, not supplied by chapter 7. So the node is
+% independent of chapters 2(3) and 7, and prop:choquet-cone inherits the shorter route.
+% CHANGED (2026-09-11, draft sync, R101): the last paragraph said the tail measure of a BOUNDED
+% profile puts infinite mass near the origin. It is the other way about: varpi((0,eps]) =
+% k(0+) - k(eps), finite when k is bounded, so only an UNBOUNDED profile's tail measure has
+% infinite mass there. Now "unbounded", as the draft already read. (The atom the quantile
+% transform leaves at the origin when k is bounded, paragraph (2), is a different object and is
+% rightly "bounded".)
+\begin{proof}
+\leanok
+(1) Evenness of $\Cin$ needs no stipulation: the integrand $v \mapsto (1 - \cos v)/v$ is odd,
+so the integral from $0$ is even, and $\Cin(-z) = \Cin(z)$. Monotonicity on $[0,\infty)$ is the
+positivity of that integrand there. From $1 - \cos v \le v^2/2$ we get
+$\Cin(z) \le \int_0^z v/2\,dv = z^2/4$ for $z \ge 0$, and for $z < 0$ by evenness, so the bound
+holds on $\RR$. For the expansion at the origin, $|\cos v - (1 - v^2/2)| \le \tfrac{5}{96}v^4$
+for $|v| \le 1$ gives $|(1-\cos v)/v - v/2| \le \tfrac{5}{96}v^3$ on $(0,1]$, and integrating
+over $[0,z]$,
+\[
+  \Bigl|\Cin(z) - \tfrac14 z^2\Bigr| \ \le\ \tfrac{5}{96}\,z^4,
+  \qquad |z| \le 1,
+\]
+which is the asserted $\Cin(z) = \tfrac14z^2 + O(z^4)$. The constant $\tfrac5{96}$ is not sharp:
+the series gives $\Cin(z) = \tfrac14z^2 - \tfrac1{96}z^4 + O(z^6)$, so $\tfrac1{96}$ is the best
+constant in the display, and the elementary $|\cos v - (1 - v^2/2)| \le v^4/24$ integrates to it.
+It is kept because it is the constant the machine-checked proof carries, which it takes from the
+library's cosine bound, and because nothing reads the value: what the statement asserts is
+$O(z^4)$. For the expansion at infinity, split at
+$v = 1$:
+\[
+  \Cin(z) = \Cin(1) + \log z - \int_1^z \frac{\cos v}{v}\,dv , \qquad z \ge 1,
+\]
+using $(1-\cos v)/v = v^{-1} - v^{-1}\cos v$ on $[1,z]$; and integrating by parts against the
+primitive $\sin v/v$,
+$\int_1^z v^{-1}\cos v\,dv = \sin z/z - \sin 1 + \int_1^z v^{-2}\sin v\,dv$. The last integrand
+is dominated by $v^{-2}$, so $\int_1^\infty v^{-2}\sin v\,dv$ converges absolutely and, with
+\[
+  C := \Cin(1) + \sin 1 - \int_1^\infty \frac{\sin v}{v^2}\,dv ,
+\]
+one gets $\Cin(z) - \log z - C = -\sin z/z + \int_z^\infty v^{-2}\sin v\,dv$, whence
+$|\Cin(z) - \log z - C| \le 2/z$ for $z \ge 1$. That is the expansion, with an explicit
+constant in the error.
+
+For the ray, $k = \mathbf 1_{(0,\tau)}$ is nonnegative and nonincreasing on $(0,\infty)$ and
+satisfies both integrability conditions of \ref{lem:profile-integrability} at once, being
+bounded by $1$ and supported in $(0,\tau)$: $\int_0^1 x\,k(x)\,dx \le \tfrac12$ and
+$\int_1^\infty k(x)\,x^{-1}dx \le \tau$. So $(0,k)$ is a pair of the form \ref{eq:sd-profile},
+and its exponent is
+$\int_0^\tau (1-\cos\omega x)\,x^{-1}dx = \Cin(\tau\omega)$ by the substitution $v = \omega x$,
+valid for every real $\omega$ because both sides vanish at $\omega = 0$ and $\Cin$ is even.
+
+(2) A positive measure $\varpi$ on $(0,\infty)$ with $\varpi((x,\infty)) = k(x)$ for almost
+every $x > 0$ is the image of Lebesgue measure on $(0,\infty)$ under the generalised inverse
+$y \mapsto \sup\{u > 0 : k(u) > y\}$, restricted to $(0,\infty)$ to discard the atom the
+transform leaves at the origin when $k$ is bounded. Only two properties of $k$ are used: it is
+nonincreasing, and it tends to $0$ at infinity --- and the second is forced rather than
+assumed, since $k$ nonincreasing and bounded below by a positive constant would make
+$\int_1^\infty k(x)\,x^{-1}dx$ diverge like the harmonic integral. What comes out is the
+sandwich $k(x{+}) \le \varpi((x,\infty)) \le k(x)$, whose two sides agree off the countably
+many discontinuities of $k$; that is why the tail identity is asserted almost everywhere and
+not everywhere, and a right-continuous version of $k$ is neither available nor needed.
+
+Given such a $\varpi$, \ref{eq:cone-superposition} is the layer-cake exchange
+\[
+  \int_{(0,\infty)} \Cin(\tau\omega)\,\varpi(d\tau)
+  = \int_0^\infty \frac{1 - \cos\omega x}{x}\,\varpi((x,\infty))\,dx
+  = \int_0^\infty (1 - \cos\omega x)\,k(x)\,\frac{dx}{x},
+\]
+in which $\Cin(\tau\omega)$ is read as $\int_0^\tau (1-\cos\omega x)x^{-1}dx$ and the exchange
+is Tonelli, for which $\varpi$ is $\sigma$-finite: the tail measure of an unbounded profile puts
+infinite mass near the origin, but its restriction to $[\varepsilon,\infty)$ is finite for every
+$\varepsilon > 0$. Adding $a\,\omega^2$ gives
+\ref{eq:cone-superposition}.
+\end{proof}
+
+\begin{remark}[the constant]\label{rem:cin-constant}
+The constant of \ref{lem:cin-rays}(1) is Euler's constant: $\Cin(z) = \gamma_E + \log z -
+\mathrm{Ci}(z)$ with $\mathrm{Ci}$ the cosine integral and $\mathrm{Ci}(z) = O(1/z)$
+(\sscite{dlmf2026}, (6.2.13) for the identity, and (6.2.20) with the expansions (6.12.3) and
+(6.12.4) for the rate). The identification is not used anywhere in this article, which is
+why \ref{lem:cin-rays} asserts only that the constant is finite.
+\end{remark}
+
+% CHANGED (proof of record 2026-09-09): the first two paragraphs of the proof are rewritten to
+% the machine-checked route, which is where the domain argument changed. The printed proof asked
+% for a comparison of Cin(z) with z^2 near 0 and with log z at infinity "uniformly comparable
+% across omega on compact subsets of R minus {0}"; the checked route needs no uniform two-sided
+% comparison at all. It needs two LOWER bounds -- Cin(z) >= (19/96)z^2 on [0,1] and
+% Cin(z) >= (1 + log z)/2 past a threshold, both one line from the expansions of lem:cin-rays(1)
+% -- and, on the bounded stretch between them, monotonicity of Cin alone. The Tonelli identities
+% that turn the domain condition into the two integrability conditions of
+% lem:profile-integrability are also written out now, because they are what the formalisation
+% proves and what the review's "the domain condition is exactly right" was asserting.
+% The existence of varpi is credited to lem:cin-rays(2) rather than to
+% lem:selfdecomposable-exponents, which is where it is actually proved.
+%
+% CHANGED (proof of record 2026-09-09, wave 3): the last two paragraphs are rewritten to the
+% machine-checked route, and lem:selfdecomposable-exponents is removed from \uses, an edge wave
+% 2's rewrite had already replaced in the text and left in the list.
+% (a) INJECTIVITY. The printed proof closed "hence the tails of varpi at almost every point,
+% hence varpi", eliding two steps that turned out to be the price of the clause. Both are now
+% written: the passage from tails equal a.e. to tails equal everywhere (a squeeze between two
+% tails at points of the conull good set, then continuity of a measure from below), and the
+% passage from tails to the measure. The second is NOT the pi-system argument the natural first
+% draft reaches for and the statement annotation anticipated: the Choquet measure of an unbounded
+% profile puts infinite mass near the origin, so the line carries no exhausting sequence of
+% finite-measure half-lines, and the exhaustion has to be made after restricting to
+% (epsilon, infinity), where the tails are finite. The paragraph says so.
+% (b) EXTREMALITY. The printed proof identified the extreme rays of the domain and transported
+% them, which is one argument; the checked development is three, and the two positive clauses do
+% not use the transport at all. They are read at the profile: the summands of the Gaussian
+% exponent have null \Levy{} measure, and the summands of a Cin exponent are a.e. constant on
+% (0,tau) because each is at once nonincreasing (being a profile) and nondecreasing (being a
+% constant minus a nonincreasing function). Only the classification uses the coordinates, and
+% what it needs there is not "a positive measure that is not a multiple of a Dirac splits" as a
+% piece of measure theory but an infimum argument, which is now written out. The rays and their
+% folded \Levy{} densities, the printed paragraph's last sentence, are kept verbatim.
+% CHANGED (2026-09-11, draft sync, R101): "the Choquet measure of a bounded profile has infinite
+% mass near the origin", in the injectivity paragraph and in (a) above, is corrected to
+% "unbounded": varpi((0,eps]) = k(0+) - k(eps) is finite when k is bounded, so a bounded profile
+% does admit an exhausting sequence of finite-measure half-lines, and it is the unbounded case
+% that forces the detour through (eps,infinity). The draft already read "unbounded".
+% draft: Proposition 8.2
+% twin: hcs prop:extreme-rays --- verbatim port, with the Gaussian ray in the drift's place.
+% CHANGED (2026-09-19, article mirror of module B, R174): the closing clause glosses "Gaussian
+% jitter" (the register pass's item 3: the term is used in the statement and introduced nowhere in
+% module B, chapter 7's prose being the line paper's). A gloss of three words; no change of content.
+\begin{proposition}[Choquet structure of the admissible cone]\label{prop:choquet-cone}
+\uses{lem:cin-rays,lem:admissible-cone,thm:main-characterization,prop:fourier-toolbox,lem:profile-integrability,lem:quadratic-growth}
+\lean{SpatialLine.choquet_cone_forward, SpatialLine.choquet_cone_surjective,
+SpatialLine.choquet_cone_domain, SpatialLine.choquet_cone_linear,
+SpatialLine.choquet_cone_injective,
+SpatialLine.choquet_cone_extreme_gaussian, SpatialLine.choquet_cone_extreme_cin,
+SpatialLine.choquet_cone_extreme_only}\leanok
+\notes{dickman-cin-rays}
+The superposition map of \ref{lem:cin-rays},
+\[
+  (a,\varpi) \ \mapsto\ F, \qquad
+  F(\omega) = a\,\omega^2 + \int_{(0,\infty)} \Cin(\tau\omega)\,\varpi(d\tau),
+\]
+is a linear bijection from
+$\bigl\{(a,\varpi) : a \ge 0,\ \varpi \ \text{a positive Borel measure on } (0,\infty),\
+\int [\tau^2 \wedge (1 + \log_+\tau)]\,\varpi(d\tau) < \infty\bigr\}$
+onto the cone of \ref{lem:admissible-cone}, with inverse $\varpi = -dk$, $k(x) =
+\varpi((x,\infty))$, and $a$ the Gaussian coefficient. Consequently the extreme rays of the
+cone are the Gaussian ray $\omega \mapsto \omega^2$ together with the one-parameter family
+$\Cin(\tau\,\cdot)$, $\tau > 0$, whose folded \Levy{} densities are
+$x^{-1}\mathbf 1_{(0,\tau)}(x)$; and every admissible family is a unique superposition of
+$\Cin$ rays and Gaussian jitter, the term $a\,\omega^2$.
+\statusT\quad\emph{(\textbf{Formalised} (2026-09-09), in eight declarations. The map, its
+surjectivity with the inverse named here, the domain condition and the linearity rest on Lean
+core alone. The injectivity of the map and the three extremality clauses rest, besides, on
+uniqueness of the \Levy{} pair, \ref{prop:fourier-toolbox}(3) --- the one cited interface this
+proposition spends, and the same one \ref{thm:matern} spends; no axiom was added for this
+chapter. The domain condition is verified rather than asserted: it is
+exactly the two integrability conditions of \ref{lem:profile-integrability} on the tail
+profile, in both directions. Two steps of the injectivity argument are measure theory this
+development had not needed before and are stated for arbitrary measures: an equality of tails
+at almost every positive point is an equality at every positive point, and two measures carried
+by $(0,\infty)$ with equal tails are equal.)}
+\end{proposition}
+
+\begin{proof}
+\leanok
+An admissible $F$ has, by \ref{thm:main-characterization}, a pair $(a,k)$ of the form
+\ref{eq:sd-profile}; a positive measure $\varpi$ on $(0,\infty)$ with
+$k(x) = \varpi((x,\infty))$ almost everywhere exists by \ref{lem:cin-rays}(2), and
+\ref{eq:cone-superposition} is then the displayed representation. Conversely a pair
+$(a,\varpi)$ in the stated domain gives back an admissible $F$: its profile is the tail
+$k(x) = \varpi((x,\infty))$, nonnegative and nonincreasing, and the two integrability
+conditions of \ref{lem:profile-integrability} are the domain condition read through Tonelli,
+\[
+  \int_0^1 x\,\varpi((x,\infty))\,dx = \int \tfrac12(\tau \wedge 1)^2\,\varpi(d\tau),
+  \qquad
+  \int_1^\infty \varpi((x,\infty))\,\frac{dx}{x} = \int \log_+\tau\,\varpi(d\tau),
+\]
+two more instances of the layer cake of \ref{lem:cin-rays}(2), with the weights $x$ cut off
+above $1$ and $x^{-1}$ cut off below $1$. Since
+$\tfrac12(\tau\wedge1)^2 + \log_+\tau \le \tau^2 \wedge (1 + \log_+\tau)
+ \le 2\bigl[\tfrac12(\tau\wedge1)^2 + \log_+\tau\bigr]$ for $\tau > 0$, the domain condition and
+the two integrability conditions are the same condition. So the map is onto the cone, and the
+domain is what the statement says.
+
+That the superposition integral is finite at one $\omega \ne 0$ if and only if at all, and if
+and only if the domain condition holds, follows. Sufficiency is the paragraph just given
+together with \ref{lem:quadratic-growth}, which makes an admissible exponent finite at every
+frequency. For necessity it is enough to dominate $\tau^2 \wedge (1 + \log_+\tau)$ by a
+multiple of $\Cin(\tau|\omega|)$ pointwise on $(0,\infty)$, and three regimes do that, using
+only \emph{lower} bounds on $\Cin$. Below $\tau|\omega| = 1$ the expansion at the origin gives
+$\Cin(z) \ge \tfrac{19}{96}z^2$, which dominates $\tau^2$ up to the constant
+$|\omega|^{-2}$. Past a threshold the expansion at infinity gives
+$\Cin(z) \ge \tfrac12(1 + \log z)$, which dominates $1 + \log_+\tau$ up to a constant once
+$\tau$ is large enough that $\log(\tau|\omega|)$ is at least half of $\log\tau$. On the bounded
+stretch between the two, monotonicity alone suffices:
+$\Cin(\tau|\omega|) \ge \Cin(1) \ge \tfrac{19}{96}$ there, while $1 + \log_+\tau$ is bounded.
+The map is linear in $(a,\varpi)$ by construction, both clauses being additivity of the
+integral in the measure and positive homogeneity. It is injective because the pair of $F$ is
+unique (\ref{prop:fourier-toolbox}(3)): the pair determines $a$ and the \Levy{} measure
+$k(x)x^{-1}dx$, hence $k$ up to a null set, hence the tails $\varpi((x,\infty))$ at almost
+every $x > 0$. Two steps carry that to $\varpi$ itself. First, the exceptional set being null,
+every interval $(x, x + \varepsilon)$ contains a point $y$ at which the two tails agree, and
+$\varpi_1((x + \varepsilon,\infty)) \le \varpi_1((y,\infty)) = \varpi_2((y,\infty)) \le
+\varpi_2((x,\infty))$; letting $\varepsilon$ decrease and using continuity of a measure along
+the increasing sets $(x + \varepsilon, \infty)$ gives equality of the tails at \emph{every}
+$x > 0$. Second, the tails at positive points are finite, by the domain condition, so for each
+$\varepsilon > 0$ the restrictions of $\varpi_1$ and $\varpi_2$ to $(\varepsilon,\infty)$ are
+finite measures agreeing on every half-line $(-\infty,t]$, since $\varpi((\varepsilon,t])$ is a
+difference of two finite tails; two finite measures on $\RR$ agreeing on all such half-lines are
+equal. Letting $\varepsilon$ decrease again, and using that $\varpi_1$ and $\varpi_2$ give no
+mass to $(-\infty,0]$, gives $\varpi_1 = \varpi_2$. The detour through a finite restriction is
+not avoidable by a direct $\pi$-system argument on the line: the Choquet measure of an unbounded
+profile has infinite mass near the origin, so no exhausting sequence of finite-measure
+half-lines exists before the restriction is made.
+
+Extremality of the two named families is read at the profile, not through the coordinates. If
+$\omega^2 = F_1 + F_2$ with both summands admissible, then $F_1 + F_2$ has pair $(1,0)$ by
+uniqueness, so $k_1 + k_2$ vanishes almost everywhere on $(0,\infty)$, so each $k_i$ does, and
+$F_i(\omega) = a_i\,\omega^2$ with $a_i \ge 0$: the Gaussian ray is extreme. If
+$\Cin(\tau\,\cdot) = F_1 + F_2$, then uniqueness gives $a_1 = a_2 = 0$ and
+$k_1 + k_2 = \mathbf 1_{(0,\tau)}$ almost everywhere; on the conull set inside $(0,\tau)$ where
+that holds, each $k_i$ is nonincreasing, being a profile, and nondecreasing, being what is left
+of a constant after subtracting a nonincreasing function, hence constant there, while above
+$\tau$ both vanish by nonnegativity. So $k_i = c_i\,\mathbf 1_{(0,\tau)}$ almost everywhere and
+$F_i = c_i\,\Cin(\tau\,\cdot)$ with $c_i \ge 0$: each $\Cin$ ray is extreme.
+
+That there are no other extreme rays is where the coordinates are used, and where the
+injectivity just proved is spent. Let $F$ be extreme with pair $(a,\varpi)$. If $\varpi = 0$
+then $k$ vanishes almost everywhere and $F(\omega) = a\,\omega^2$. If $\varpi \ne 0$ then
+$a = 0$: otherwise splitting $F$ as $a\,\omega^2$ plus the pure-jump part makes $a\,\omega^2$
+equal to $c_1F$ for some $c_1$, and either $c_1 = 0$, forcing $a = 0$, or $F$ is a multiple of
+$\omega^2$, which by uniqueness forces $\varpi = 0$. Now suppose some $s > 0$ has
+$\varpi((0,s]) > 0$ and $\varpi((s,\infty)) > 0$. The restrictions of $\varpi$ to $(0,s]$ and to
+$(s,\infty)$ split $F$ into two admissible exponents; extremality makes the first of them
+$c_1F$; injectivity turns that into an equality of measures, the restriction of $\varpi$ to
+$(0,s]$ against $c_1\varpi$; evaluating both sides on $(s,\infty)$ forces $c_1 = 0$, and then
+$\varpi((0,s]) = 0$, a contradiction. So every $s$ has mass on at most one side. Put
+$\tau := \inf\{s > 0 : \varpi((0,s]) > 0\}$, a set that is nonempty because $\varpi \ne 0$.
+Then $\varpi((x,\infty)) = 0$ for $x > \tau$, by the defining property of the infimum together
+with the hypothesis just established, hence also at $x = \tau$; and $\varpi((0,x]) = 0$ for
+$0 < x < \tau$, by minimality. So $\varpi$ is carried by the single point $\tau$, which is
+positive since otherwise $\varpi$ would be $0$, and $F = c\,\Cin(\tau\,\cdot)$ with
+$c = \varpi(\{\tau\})$, finite because $\varpi((\tau/2,\infty))$ is. This is the map's own
+picture: $(1,0) \mapsto \omega^2$, the Gaussian ray, and
+$(0,\delta_\tau) \mapsto \Cin(\tau\,\cdot)$, whose profile is
+$k(x) = \delta_\tau((x,\infty)) = \mathbf 1_{(0,\tau)}(x)$ and whose folded \Levy{} density is
+therefore $x^{-1}\mathbf 1_{(0,\tau)}(x)$.
+\end{proof}
+
+% CHANGED (2026-09-19, article mirror of module B, R174): three register repairs inside the
+% remark, from the module B register pass's item 2 (notes/reviews/register-b/README.md).
+% (a) "none of them extreme" is FALSE at one point of one family and now carries the exception:
+% the stable family ends on the Gaussian ray at alpha = 2, which prop:choquet-cone makes extreme.
+% Safe direction: the remark claims less. (b) The chain ID_s > SD_s > GGC_s was printed with no
+% gloss -- the three symbols occur nowhere else in the blueprint and are defined in macros.tex
+% only -- and the three classes are now named where they are used. (c) "which rests on a cited
+% interface and is not yet machine-checked" is stale since R160: prop:student-t(3) is
+% machine-checked under its hypothesis, and what is cited is that hypothesis (rem:student-ggc,
+% ledger A18, unadmitted). The sentence now says which.
+% CHANGED (2026-09-11, draft sync, R107): "all three lie in the Thorin subcone
+% (prop:thorin-subclass)" cited the memberships to a node that, since R79, states none of them:
+% its declarations prove the representation, the bridge identity and the strict inclusion. Each
+% membership is now cited to the node that states it, as R79's paragraph after
+% prop:thorin-subclass's proof does, the Student-t one being prop:student-t(3), cited and not
+% machine-checked. (The ledger entry is named in prose, not by macro, so that this remark does
+% not project it as a source.) Mirrored at draft Remark 8.3.
+\begin{remark}[what the cone looks like, and what changed]\label{rem:cone-shape}
+In the log-displacement coordinate of \ref{rem:displacement-dictionary} the proposition reads:
+every nonincreasing profile is a unique positive stack of unit steps, and every admissible
+family is that stack plus one number $a$, a point \emph{off} the curve. The three distinguished
+families of this article are slices cut by different principles: the
+symmetric stable family by dilation symmetry (\ref{cor:semigroup-case}), the \Matern{} family as
+the single-atom member of the Thorin subclass (\ref{thm:matern}), and the Student-t family as
+the image of the causal Bessel corner under the bridge (\ref{prop:student-t}). No member of the
+three is an extreme ray of the cone, with one exception at an endpoint: the stable family closes
+at $\alpha = 2$ on the Gaussian ray (\ref{prop:stable-family}), which is extreme. All three
+lie in the Thorin subcone, each by the node that states it: the \Matern{} family as the one-atom
+case of \ref{prop:thorin-subclass}(2), the stable family by its Thorin density
+(\ref{prop:stable-family}), and the Student-t family by \ref{prop:student-t}(3), whose Thorin
+half is proved under the hypothesis that the causal delay law is a generalized gamma
+convolution, a cited fact (\ref{rem:student-ggc}). The $\Cin$ rays are the paradigm of
+what lies outside it: profiles with a hard cutoff, whose kernels carry derivative singularities
+at the displacements $\pm\tau, \pm2\tau, \dots$, echoes of the step
+(\ref{lem:cin-delay-equation}). Two things are new against the causal cone. The Gaussian ray is
+an extreme ray of every subcone in the chain
+$\IDs \supset \SDs \supset \GGCs$ --- the symmetric infinitely divisible laws, the symmetric
+self-decomposable ones, and the symmetric Thorin subclass of \ref{prop:thorin-subclass} --- being present
+in each with $k \equiv 0$, whereas the corresponding causal ray, the drift, was the degenerate
+member. And the $\Cin$ rays, unlike their causal counterparts, are not the image of anything
+under the bridge of Chapter~\ref{ch:bridge} (\ref{prop:bridge-strictness}). The tail statement
+of the causal remark holds here in a different shape but with the same conclusion: by
+\ref{prop:moments-tails}(2) a $\Cin$ kernel has tails of order $e^{-|x|\log|x|/\tau}$, lighter
+than any exponential and heavier than any Gaussian; any admissible kernel with a jump catalogue
+has tails at least that heavy, whatever its Gaussian coefficient; and the only admissible
+kernels with Gaussian tails are the Gaussians themselves. No truncation of the Gaussian is
+admissible.
+\end{remark}
+
+% draft: Lemma 8.4
+% NEW: the exact twin of the delay equation of the Dickman function, with the average of the
+% two neighbours in place of the one delayed value, because displacements come in both signs.
+% twin: hcs has no node for the Dickman delay equation; the causal article states it in prose
+% in its cone remark.
+% CHANGED (proof 2026-09-10): the two Lean declarations named below gained the hypothesis that
+% the density is measurable (AEMeasurable p volume). This is a REPAIR, not a convenience: both
+% declarations were FALSE without it. The hypothesis mu = volume.withDensity (ofReal p) sees a
+% non-measurable p only through the measurable simple functions below it, so raising p on a
+% Bernstein set -- inner measure zero, full outer measure -- leaves the hypothesis intact while
+% the conclusion fails on a set no null set contains; the derivative form fails likewise, at a
+% test function supported where p was altered but p(.+-tau) was not, one side being junk-zero
+% and the other not. The prose statement of record is unaffected: "the density of the symmetric
+% law" is a density, and a density is measurable. Every call site supplies the hypothesis, the
+% density being produced by prop:kernel-regularity. Wave 5 recorded the missing hypothesis as a
+% review question; wave 6 found it to be a defect and repaired it.
+\begin{lemma}[the $\Cin$ kernels satisfy a delay equation]\label{lem:cin-delay-equation}
+\uses{lem:cin-rays,prop:kernel-regularity,prop:fourier-uniqueness,thm:increments-levy}
+\lean{SpatialLine.cin_delay_equation, SpatialLine.cin_delay_equation_deriv}\leanok
+\notes{dickman-cin-rays}
+Let $p_\tau$ be the density of the symmetric law with exponent $\Cin(\tau\,\cdot)$ --- folded
+profile $\mathbf 1_{(0,\tau)}$, two-sided \Levy{} density
+$\tfrac12|x|^{-1}\mathbf 1_{(0,\tau)}(|x|)$, no Gaussian part --- and let $P_\tau$ be its
+distribution function. Then, in the sense of distributions,
+\[
+  x\,p_\tau(x) = P_\tau(x) - \tfrac12\bigl[P_\tau(x-\tau) + P_\tau(x+\tau)\bigr],
+  \qquad\text{equivalently}\qquad
+  x\,p_\tau'(x) = -\tfrac12\bigl[p_\tau(x-\tau) + p_\tau(x+\tau)\bigr].
+\]
+\statusT\quad\emph{(The identity propagates whatever singularity $p_\tau$ has at the origin to
+$\pm\tau$, thence to $\pm2\tau$, and so on, with one more order of smoothness at each step,
+exactly as for the Dickman kernel; \ref{prop:cin-origin-singularity} says what the singularity
+at the origin is. The equality is asserted in the sense of distributions, which is what the
+transform argument delivers; both sides are locally integrable, so it is also an
+almost-everywhere identity. \textbf{Machine-checked} (2026-09-10) in both forms, on Lean core.
+Read at the law rather than at the density the two displays are one statement, an identity
+between two finite signed measures, and that is how the proof below is organised; the passage
+back to the density is a change of variables for the first display and one integration by parts
+for the second. The two Lean declarations carry one hypothesis the display above leaves
+implicit --- that the density is measurable --- because the Lean statements quantify over an
+arbitrary $p$ with $\mu = \int p\,dx$, and such a hypothesis constrains $p$ only through the
+measurable functions below it; the prose statement, which speaks of \emph{the} density, is
+unaffected.)}
+\end{lemma}
+
+% CHANGED (proof of record 2026-09-10): rewritten to the machine-checked route. The printed
+% proof convolved p with the SIGNED measure y nu_2(dy) = (1/2) sgn(y) 1_{|y|<tau} dy and then
+% differentiated the resulting a.e. identity. The checked route keeps the two halves of that
+% weight positive until the last step -- the first is Lebesgue measure on [0,tau), the second
+% its reflection -- so what is convolved is a positive measure, its transform is the transform
+% of a convolution, and no signed measure is convolved anywhere. Only at the end are two
+% positive finite measures subtracted, and uniqueness is applied to the Jordan recombination.
+% The differentiation of the a.e. identity, which the printed proof performs formally, is
+% replaced by the pairing against a test function, where it is an integration by parts.
+% CHANGED (2026-09-11, draft sync, R102): eq:cin-delay-measures defined nu_tau := nu(. - tau),
+% which read as nu_tau(A) = nu(A - tau) is the image of nu under x -> x + tau: density
+% mu((x-2tau, x-tau]). The next sentence gives nu_tau the density mu((x, x+tau]) = (density of
+% nu)(x + tau), and the transform display gives it e^{-i omega tau} nu-hat under the kernel
+% e^{i omega x} the proof computes with; both are the image under x -> x - tau, and so is the
+% Lean (CinDelayForm.lean reads nu at x + tau). The density fixes the direction whatever the sign
+% convention. Now "the image of nu under x -> x - tau", as the draft already read.
+% CHANGED (2026-09-11, post-sync follow-up, R110): the transforms in this proof were computed
+% with the kernel e^{+i omega x}, against def (2.0)'s e^{-i omega x} of prop:fourier-uniqueness,
+% which the proof cites. Now computed with e^{-i omega x}: the moment transform is
+% -i tau Cin'(tau omega) c(omega), the window transform (1 - e^{-i omega tau})/(i omega), the shift
+% factor e^{+i omega tau}, and the difference -2i (1 - cos omega tau) c(omega)/omega. Every
+% displayed quantity is the complex conjugate of the old one, c being real, so the identity
+% eq:cin-delay-measures and the route are unchanged. The Lean (CinDelayForm.lean) computes with
+% Mathlib's charFun, whose kernel is e^{+i omega x}; the two are conjugate and uniqueness holds
+% for either, so this is a convention alignment, not a change of route.
+\begin{proof}
+\leanok
+Write $\mu$ for the law, $c(\omega) = \int\cos(\omega x)\,\mu(dx) = e^{-\Cin(\tau\omega)}$ for
+its transform, and $\kappa_\tau$ for Lebesgue measure on $[0,\tau)$. Everything follows from one
+identity between finite signed measures on $\RR$:
+\begin{equation}\label{eq:cin-delay-measures}
+  2\,x\,\mu(dx) \;=\; \nu - \nu_\tau ,
+  \qquad \nu := \mu * \kappa_\tau, \quad
+  \nu_\tau := \text{the image of $\nu$ under } x \mapsto x - \tau .
+\end{equation}
+By Tonelli, $\nu$ has Lebesgue density $x \mapsto \mu((x-\tau,x])$ and $\nu_\tau$ has density
+$x \mapsto \mu((x,x+\tau])$; both are finite measures of total mass $\tau$. The left-hand side
+is finite because $\mu$ has a finite first absolute moment: $\Cin(z) \le z^2/4$, so the exponent
+of $\mu$ is quadratically flat, the truncation inequality of \ref{thm:increments-levy} gives
+$\mu\{|x| > R\} = O(R^{-2})$, and the layer cake integrates that tail.
+
+\emph{The transforms.} Since $\mu$ is symmetric, $\int x\,e^{-i\omega x}\mu(dx)$ has no real
+part, the integrand's cosine half being odd, so it equals $-i\int x\sin(\omega x)\,\mu(dx)$. The
+first absolute moment lets $c$ be differentiated under the integral sign, giving
+$c'(\omega) = -\int x\sin(\omega x)\,\mu(dx)$; and differentiating $c = e^{-\Cin(\tau\cdot)}$ by
+the chain rule gives $c'(\omega) = -\tau\,\Cin'(\tau\omega)\,c(\omega)$ with
+$\Cin'(v) = (1-\cos v)/v$. The two readings of $c'$ are the elementary delay ODE
+\begin{equation}\label{eq:cin-delay-ode}
+  \omega\,c'(\omega) = -\,c(\omega)\,\bigl(1 - \cos\tau\omega\bigr),
+\end{equation}
+and together they give
+$\int x\,e^{-i\omega x}\mu(dx) = -i\,\tau\,\Cin'(\tau\omega)\,c(\omega)$, which for
+$\omega \ne 0$ is $-i\,(1-\cos\tau\omega)\,c(\omega)/\omega$. On the other side, the transform of
+a convolution is the product, so
+\[
+  \hat\nu(\omega) = c(\omega)\int_0^\tau e^{-i\omega u}\,du
+    = c(\omega)\,\frac{1 - e^{-i\omega\tau}}{i\omega},
+  \qquad \hat\nu_\tau(\omega) = e^{i\omega\tau}\,\hat\nu(\omega),
+\]
+whence, for $\omega \ne 0$,
+\[
+  \hat\nu(\omega) - \hat\nu_\tau(\omega)
+    = c(\omega)\,\frac{(1 - e^{-i\omega\tau})(1 - e^{i\omega\tau})}{i\omega}
+    = c(\omega)\,\frac{2 - 2\cos\omega\tau}{i\omega}
+    = -2i\,\frac{1 - \cos\omega\tau}{\omega}\,c(\omega),
+\]
+which is twice the transform of $x\,\mu(dx)$, that is, the transform of the left-hand side of \ref{eq:cin-delay-measures}; at $\omega = 0$ both
+sides vanish, the left by symmetry and the right because $\nu$ and $\nu_\tau$ have equal mass.
+
+\emph{Uniqueness.} Both sides of \ref{eq:cin-delay-measures} are signed, so
+\ref{prop:fourier-uniqueness} is applied after recombination: writing $x^{\pm}$ for the positive
+and negative parts of $x$, the two \emph{positive} finite measures
+$2\,x^{+}\mu(dx) + \nu_\tau$ and $2\,x^{-}\mu(dx) + \nu$ have the same transform
+by the display above, hence are equal, which is \ref{eq:cin-delay-measures}.
+
+\emph{The two displays.} The first is \ref{eq:cin-delay-measures} read at Lebesgue densities.
+With $\mu(dx) = p_\tau(x)\,dx$ the left-hand side has density $2x\,p_\tau(x)$ and the right-hand
+side has density
+\[
+  \mu((x-\tau,x]) - \mu((x,x+\tau])
+  = 2\Bigl(P_\tau(x) - \tfrac12\bigl[P_\tau(x-\tau) + P_\tau(x+\tau)\bigr]\Bigr),
+\]
+and two integrable functions with the same integral against every bounded measurable test
+function agree almost everywhere --- it is enough to test against the sign of their difference.
+The second display is \ref{eq:cin-delay-measures} paired with $\varphi'$ for a test function
+$\varphi \in C_c^\infty$. Since $\int_0^\tau \varphi'(x+u)\,du = \varphi(x+\tau) - \varphi(x)$,
+and likewise for $\nu_\tau$ with $x$ shifted, pairing gives
+\[
+  2\int x\,\varphi'(x)\,\mu(dx)
+   = \int\bigl[\varphi(x+\tau) + \varphi(x-\tau)\bigr]\mu(dx) - 2\int \varphi\,d\mu ,
+\]
+that is $\int (x\varphi)'\,d\mu = \tfrac12\int[\varphi(\cdot+\tau) + \varphi(\cdot-\tau)]\,d\mu$;
+and one integration by parts against the density turns that into the second display. One route
+to the same identity convolves $\mu$ with the \emph{signed} weight
+$y\,\nu_2(dy) = \tfrac12\sgn(y)\mathbf 1_{|y|<\tau}\,dy$, which is $\tfrac12$ of $\kappa_\tau$
+minus its reflection. The computation above is that one with the two halves kept positive until
+the subtraction at the end, so that no signed measure is convolved anywhere.
+\end{proof}
+
+% NEW NODE (2026-09-15, module B step 2, R159; the postdoc's P-0008): the folding translation,
+% made a node of its own and machine-checked. Until now it was asserted in prose in three places
+% -- chapter 2's folding-convention paragraph, ledger A10's "what the entry does NOT carry"
+% bullet, and the annotation of prop:cin-origin-singularity below -- and checked nowhere. It is
+% [T], it is elementary, and it is the second of the two obstacles the wave-6 note records
+% against admitting A10: admitting the three regimes in their folded form would put this
+% translation behind an admitted name. With the lemma proved, an admission would carry the
+% source's own statement and nothing more. Nothing in the article claimed less before: the
+% translation was always asserted, and it is now checked.
+% CHANGED 2026-09-19 (R180, second external review round, referee A findings 4 and 5): THE
+% ANNOTATION ONLY -- no clause, no tag, no status. The referee found two hypotheses of the cited
+% theorems that this lemma verifies nowhere: Sato's (53.14) driftless finite-variation form with
+% its (53.15), and the left-continuity normalisation of his k-function (p. 403, repeated in the
+% hypothesis of Thm. 28.4 p. 191). Both hold here -- the first from k <= c under the hypothesis
+% c < infinity, the drift from the cosine-transform specification of a symmetric law and the
+% Gaussian part from a = 0; the second by a modification on a countable set, under which the
+% \Levy{} measure, the exponent, the two one-sided limits and both comparison functions are
+% unchanged -- and the whole point of this lemma is that such matchings are made on the page, so
+% they are written into the annotation rather than left to a reader. NOT into the statement: the
+% lemma is \leanok and folding_translation proves the four conjuncts it has; an added conclusion
+% would be an unproved clause under a \lean tag. The left-continuity step is a step the three A10
+% names carry beyond their pages and is added to the per-name list at the head of
+% trust-boundary.txt; the finite-variation one is not, being implied by the hypotheses the
+% specifications already carry.
+\begin{lemma}[the folding translation]\label{lem:folding-translation}
+\uses{lem:profile-integrability}
+\lean{SpatialLine.folding_translation}\leanok
+Let $(a,k)$ be a pair of the form \ref{eq:sd-profile} with $a = 0$, and suppose the folded
+profile has a finite right limit $c := k(0{+})$ at the origin. Put $k_2(x) := \tfrac12 k(|x|)$
+for $x \in \RR$. Then $k_2$ is a two-sided profile in the sense of the probabilistic sources:
+it is nonnegative, nonincreasing on $(0,\infty)$, nondecreasing on $(-\infty,0)$, and
+$\int_\RR (1 \wedge x^2)\,k_2(x)\,|x|^{-1}dx < \infty$. Its \Levy{} measure
+$k_2(x)|x|^{-1}dx$ on $\RR \setminus \{0\}$ is the unfolding of $k(x)x^{-1}dx$:
+\[
+  \int_\RR \bigl(1 - \cos\omega x\bigr)\,\frac{k_2(x)}{|x|}\,dx
+   = \int_0^\infty \bigl(1 - \cos\omega x\bigr)\,\frac{k(x)}{x}\,dx
+   \qquad (\omega \in \RR),
+\]
+so the two forms specify the same symmetric law. Moreover $k_2(x) + k_2(-x) = k(x)$ for every
+$x > 0$, and both one-sided limits at the origin exist, with
+\[
+  k_2(0{+}) = k_2(0{-}) = \tfrac12 c,
+  \qquad\text{so that}\qquad
+  k_2(0{+}) + k_2(0{-}) = c \quad\text{and}\quad k_2(0{+}) - k_2(0{-}) = 0 .
+\]
+\statusT\quad\emph{(Machine-checked in full and on Lean core. The lemma is the dictionary
+between this article's folded convention and the two-sided convention of the probabilistic
+sources, and it is stated because the sources state their results about a self-decomposable
+density at the origin in terms of the two constants $k_2(0{+}) + k_2(0{-})$ and
+$k_2(0{+}) - k_2(0{-})$: the first is the folded $k(0{+})$ and the second vanishes. The
+hypothesis that $c$ is finite is used only for the two limits; the structural conditions and
+the exponent identity hold with no hypothesis at the origin. The two-sided profile is a
+vocabulary for citations and not a class this development quantifies over: it is defined in
+\texttt{SpatialLine/TwoSidedDefs.lean} and appears nowhere else in the library.
+\textbf{Two further hypotheses of the sources, and why $k_2$ meets them} (2026-09-19, R180; the
+second external review found both unmatched). The singular and threshold regimes are stated for a
+law of the source's driftless finite-variation form --- Sato's (53.14), which asks
+$\int_{|x|<1}k_2(x)\,dx < \infty$ as its (53.15) and has no drift term and no Gaussian part. Under
+the hypothesis $c < \infty$ carried above, $k_2 \le \tfrac12c$ on each side of the origin by
+monotonicity, so $\int_{|x|<1}k_2(x)\,dx \le c < \infty$; the drift vanishes because the law is
+specified through its cosine transform, which fixes the symmetrisation and leaves no first-order
+term; and there is no Gaussian part because $a = 0$. That is why the finiteness of $c$ is the
+hypothesis those two regimes carry and the smooth one does not need in the same way.
+\emph{Sato's $k$-function is moreover the version left-continuous on $(0,\infty)$ and
+right-continuous on $(-\infty,0)$}, and $k_2$ as defined here need not be either. Nothing is lost,
+and three invariances say so: passing to $x \mapsto k_2(x{-})$ on $(0,\infty)$ and $k_2(x{+})$ on
+$(-\infty,0)$ changes $k_2$ on a countable set, hence changes neither the \Levy{} measure
+$k_2(x)|x|^{-1}dx$ nor the exponent nor the law; it changes neither one-sided limit at the origin,
+so $c$ and the antisymmetric constant are the same; and it changes neither $K$ nor $L$, both being
+integrals of $k_2$. So the source's theorems, applied to the modification, conclude about the same
+law and with the same comparison functions. The Lean specifications of
+\texttt{SpatialLine/TwoSidedDefs.lean} quantify over a monotone $k$ without the continuity
+normalisation, and that is the step: it is recorded at the three names in
+\texttt{blueprint/trust-boundary.txt}.)}
+\end{lemma}
+
+\begin{proof}
+\leanok
+The three structural conditions are the corresponding conditions on $k$ read through
+$x \mapsto |x|$: nonnegativity is immediate, and for $x \le y < 0$ one has $|x| \ge |y| > 0$, so
+$k_2(x) \le k_2(y)$ because $k$ is nonincreasing on $(0,\infty)$. For the two integrals, note
+first that the map $x \mapsto -x$ preserves Lebesgue measure and that both integrands below are
+even, $\cos$ being even and $k_2$ being a function of $|x|$; so each integral over $\RR$ is
+twice the corresponding integral over $(0,\infty)$, where $k_2 = \tfrac12 k$. The two factors
+$2$ cancel, which gives the exponent identity, and the same computation turns
+$\int_\RR (1 \wedge x^2)k_2(x)|x|^{-1}dx$ into $\int_0^\infty (1 \wedge x^2)k(x)x^{-1}dx$, which
+is finite: on $(0,1)$ it is $\int_0^1 x\,k(x)\,dx$ and on $(1,\infty)$ it is
+$\int_1^\infty k(x)x^{-1}dx$, the two conditions of \ref{lem:profile-integrability}.
+
+The pointwise identity is $k_2(x) + k_2(-x) = \tfrac12 k(x) + \tfrac12 k(x)$ for $x > 0$. For the
+limits, $k_2$ agrees with $\tfrac12 k$ on $(0,\infty)$, so its right limit is $\tfrac12 c$; and
+$k_2(x) = \tfrac12 k(-x)$ on $(-\infty,0)$, where $x \mapsto -x$ carries the left neighbourhood
+filter at the origin to the right one, so its left limit is $\tfrac12 c$ as well. The sum and
+the difference follow.
+\end{proof}
+
+% additive as a NODE, prose in the draft (\S8, the paragraph after Lemma 8.4). It is a real
+% claim, it rests on two theorems of Sato, and prop:jet-regularity(4) depends on it, so it is
+% stated as a cited interface rather than asserted in a remark.
+% CHECK (draft, checks for \S8, item 5): the constant in Sato's (53.30) and the reading of
+% its cosine factor are not yet page-verified; the ledger entry says so, and the node claims
+% only the order of the singularity, not the constant.
+% CHANGED (proof 2026-09-09, sweep): the Lean declarations named below gained the hypothesis
+% that the kernels are SYMMETRIC. This is the review's R7 defect, swept for across chapters
+% 5-13 by wave 2's merge: a declaration whose hypotheses constrain a measure only through its
+% COSINE transform -- which fixes the symmetrisation and nothing more -- may not conclude
+% anything about the measure itself. Symmetry is what (A3) gives every family of this article,
+% so the hypothesis narrows nothing; the statement of record below is unaffected, the gap being
+% in the LEAN quantification and not in the prose.
+% Affected: cin_origin_singularity_unbounded, _smooth and _threshold, each of which asserts
+% that the kernel HAS A DENSITY with a prescribed two-sided bound or smoothness. Counterexample
+% without it: replace the symmetric law of density q by the probability measure of density
+% 2q(x)1_{x>0}, which has the same cosine transform and density 0 on the negative half-line.
+% The fourth declaration, SpatialLine.cin_origin_singularity_cin_ray, mentions no measure and
+% is unaffected.
+% CHANGED (author's decision 2026-09-10): the \uses edge to lem:cin-delay-equation is REMOVED.
+% It was vestigial: it recorded the propagation clause, which review Q8 moved out of this
+% statement into rem:cin-propagation on 2026-09-09, and wave 6 established that what remains --
+% the three regimes and the Cin-ray sentence -- never consumed the delay equation, the regimes
+% quantifying over an arbitrary admissible F with Gaussian coefficient 0 and speaking only of
+% its kernel near the origin. The dependency graph is a statement of record, so an edge that is
+% merely harmless is still false. The annotation's \ref to lem:cin-delay-equation stays: it says
+% what the node does NOT depend on, and rem:cin-propagation, which does depend on it, carries
+% the reference that matters. A \ref is not a \uses.
+% CHANGED (2026-09-11, draft sync, R100): the threshold regime read "phi_1 is continuous at no
+% better than logarithmic order, phi_1(x) ~ L(x)", which contradicts its own comparison: k is
+% nonincreasing with k(0+) = c = 1, so k <= 1, the integrand (1 - k(u))/u is nonnegative, K >= 1
+% on (0,1), and L(x) >= log(1/|x|) -> infinity. A function comparable to L is unbounded near the
+% origin and does not extend continuously there. Now "is unbounded, phi_1(x) ~ L(x)". The word
+% adds no claim: unboundedness is a consequence of the two-sided comparison, which is all that
+% Skeleton.cin_origin_singularity_threshold states (its lower bound c_1 * L with c_1 > 0), exactly
+% as the Lean docstring at the c < 1 regime says of "unbounded" there. Mirrored at draft
+% Proposition 8.5, which had dropped the phrase.
+% CHANGED (2026-09-15, module B step 2, R159): the ANNOTATION only; the statement, the tag and
+% the status are untouched and the node stays \notready. The closing sentences said that two
+% things stood in the way of admitting ledger A10 -- that nothing spends the three regimes, and
+% that admitting them in their folded form would put the folding translation behind an admitted
+% name -- and both are now answered: lem:folding-translation above is the translation, checked
+% on Lean core; SpatialLine.cin_origin_singularity_unbounded_of_sato, _smooth_of_sato and
+% _threshold_of_sato derive these three statements from the source's own sentences taken as
+% hypotheses, also on Lean core; and cor:origin-boundedness below reads all three regimes. The
+% node remains \notready because the interface is still unadmitted, which is what \notready
+% means here.
+% CHANGED (2026-09-15, module B step 2, R162): the node is \leanok, THE AUTHOR HAVING ADMITTED
+% ledger A10. The STATEMENT IS UNCHANGED, word for word; what changed is the tag and the status.
+% The three regimes are now SpatialLine.cin_origin_singularity_unbounded, _smooth and _threshold,
+% proved in SpatialLine/OriginSingularity.lean -- each one application of the corresponding
+% _of_sato theorem to the corresponding axiom -- where they were Skeleton declarations carrying
+% sorry, and those are deleted. The three axioms are SpatialLine.sato_origin_singular,
+% sato_origin_smooth and sato_origin_threshold, declared in SpatialLine/Interfaces.lean and
+% stated AT SATO'S LETTER, over the source's own two-sided profile and its two one-sided limits;
+% the translation into this article's folded convention is lem:folding-translation above and is
+% NOT carried by them. A proof environment is added below for the reason R157 added one at
+% prop:kernel-regularity: a \leanok [A] node that prints nothing between its citation and its
+% conclusion leaves this article's own step -- here the passage between the two conventions -- in
+% the annotation alone. The \uses edge to lem:folding-translation is added, that lemma being what
+% the three proofs now spend. Neither headline theorem is affected: neither reaches this chapter,
+% and both #print axioms blocks are byte-identical across the admission.
+% CHANGED (2026-09-19, external review of module B, R171): THE SINGULAR REGIME WAS FALSE, AND SO
+% WAS THE ADMITTED AXIOM. The regime read "phi_1(x) asymp |x|^{c-1}" for c < 1, dropping the
+% slowly varying factor K of Sato's (53.25) -- the same K the threshold clause already carried
+% inside its L. The referee's counterexample: the folded profile k(x) = 1/2 - 1/log(1/x) on
+% (0, e^{-4}) and 0 beyond is admissible with c = 1/2, its exponent is
+% F(omega) = (1/2)log omega - log log omega + O(1), so e^{-F} asymp omega^{-1/2}log omega; a
+% density bounded by C|x|^{-1/2} near the origin would give (phi_1 * g_eps)(0) = O(eps^{-1/2}),
+% while the positive Fourier integral is at least a multiple of eps^{-1/2}log(1/eps). So the upper
+% half of the comparison does not hold, and neither did SpatialLine.sato_origin_singular, admitted
+% on 2026-09-15 at the ledger's paraphrase of (53.28). The librarian re-read Thm. 53.8 from the
+% page image on 2026-09-19: (53.28) is
+% f(x) ~ [kappa sin(k(0+)pi)/(Gamma(c)sin(c pi))] x^{c-1} K(x), with K of (53.25) and, in the
+% proof of Thm. 53.6 (p. 410), the one-sided K of (53.18) said to be slowly varying at 0; the
+% hypothesis (53.24) is c < infinity WITH k(0+) > 0 and k(0-) > 0. What changed here: K is defined
+% once, before the three regimes, for the singular clause and the threshold clause both; the
+% singular comparison function is |x|^{c-1}K(|x|); K >= 1 is stated, that being what keeps
+% "unbounded" true and what cor:origin-boundedness reads; the annotation says that K is slowly
+% varying and need not be bounded, with the referee's example. The Lean axiom is RESTATED AT THE
+% SOURCE'S LETTER (a delegated safe-direction change, the author's decision of 2026-09-11): it
+% carries K, and both it and the threshold axiom carry (53.24)'s two positivity hypotheses, which
+% a symmetric law supplies with k(0+) = k(0-) = c/2. No conclusion downstream weakens: the only
+% property of K that origin_boundedness spends is K >= 1 (SpatialLine.one_le_satoK, Lean core),
+% which follows from k <= c on (0,infty). The last paragraph of the proof below is corrected in
+% the same pass: it asserted K == 1 and L(x) = log(1/|x|) on a Cin ray, which holds only for
+% tau >= 1.
+% CHANGED 2026-09-19 (R181, second external review round, referee A findings 6 and 7): TWO
+% REPAIRS. (a) THE POSITIVITY OF c IS A HYPOTHESIS, not an assertion. "Put c := k(0+) in (0,infty]"
+% asserted c > 0, and the zero exponent is admissible with Gaussian coefficient 0 and k = 0, so
+% c = 0 occurs -- and then the singular regime's range c < 1 would cover a law (delta_0) with no
+% density and the clause would be false. The three Lean regimes each carry it already
+% (cin_origin_singularity_unbounded has hc0 : 0 < c; the smooth one has N < c with N >= 1; the
+% threshold has c = 1), as does cor:origin-boundedness, which says "finite and positive". Safe
+% direction: a hypothesis added, matching the declarations. (b) THE ANNOTATION records that the
+% passage from the source's asymptotic to the two-sided comparison needs the source's constant to
+% be nonzero, with the computation that makes it so for symmetric data -- sin(c pi/2)/sin(c pi) =
+% 1/(2 cos(c pi/2)) > 0 below the threshold, cos(c' pi/2) = 1 at it. The statement already claimed
+% only the order; what was missing was the reason the order follows at all.
+% CHANGED (2026-09-19, article mirror of module B, R174): the statement says, where c is
+% introduced, that the three regimes concern finite c and that nothing is claimed at c = infinity
+% (the register pass's item 10: the display admits c = infinity and no clause reaches it). The
+% range was already in the annotation; it is now where a reader meets the hypothesis. Nothing
+% else in the statement, the tag or the status changes, and no declaration is affected: the three
+% Lean regimes each carry their own finiteness hypothesis already.
+\begin{proposition}[the behaviour of an admissible kernel at the origin]
+\label{prop:cin-origin-singularity}
+\uses{thm:main-characterization,lem:selfdecomposable-exponents,prop:kernel-regularity,lem:folding-translation,lem:cin-rays}
+\lean{SpatialLine.cin_origin_singularity_unbounded, SpatialLine.cin_origin_singularity_smooth,
+SpatialLine.cin_origin_singularity_threshold, SpatialLine.one_le_satoK,
+SpatialLine.cin_origin_singularity_cin_ray}\leanok
+Let $F$ be admissible with Gaussian coefficient $0$ and folded profile $k$, let $\phi_1$ be its
+kernel at canonical scale $1$, and suppose the right limit $c := k(0{+})$ is positive, so that
+$c \in (0,\infty]$. The three regimes below
+are stated for finite $c$, and nothing is claimed when $c = \infty$. For $0 < y < 1$ set
+\[
+  K(y) := \exp\Bigl[\int_y^1 \bigl(c - k(u)\bigr)\,\frac{du}{u}\Bigr],
+  \qquad
+  L(y) := \int_y^1 K(z)\,\frac{dz}{z},
+\]
+both integrals being convergent; $K \ge 1$, since $k$ is nonincreasing with right limit $c$. Then,
+near the origin: if $c < 1$, $\phi_1$ is unbounded with $\phi_1(x) \asymp |x|^{c-1}K(|x|)$; if
+$N < c \le N+1$ for an integer $N \ge 1$, $\phi_1$ extends continuously and has $N-1$ derivatives;
+and if $c = 1$, $\phi_1$ is unbounded with $\phi_1(x) \asymp L(|x|)$. Every $\Cin$ ray has $c = 1$
+with $K$ constant near the origin, so its kernel is logarithmically singular there.
+\statusA\quad\ledger{A10}\quad\emph{(\textbf{Assignment.} \ledger{A10} carries the three
+regimes with both comparison functions, for self-decomposable laws on $\RR$ stated there in terms
+of the two-sided profile at the origin. What it does not carry is the translation into this
+article's folding convention --- the source's constant is $k(0{+}) + k(0{-})$ on the two-sided
+profile, which is exactly the folded $k(0{+})$ used here, and the symmetric case makes the
+source's antisymmetric constant vanish. The node deliberately claims the ORDER of the
+singularity and not the constant in the source's asymptotic formula; the formula itself was read
+from the page image on 2026-09-19, and its constant is
+$\kappa\sin(k_2(0{+})\pi)/(\Gamma(c)\sin(c\pi))$ below the threshold and $(\kappa/\pi)$ times
+$\cos(c'\pi/2)$ at it, with $\kappa$ the exponential-integral expression of the source's (53.27).
+\textbf{That constant has to be nonzero for the comparison to follow from the asymptotic}, since
+$f \sim A g$ gives $f \asymp g$ only for $A \ne 0$, and it is nonzero here for the reason the
+folding supplies (2026-09-19, R180, the referee's finding): $\kappa > 0$, and with
+$k_2(0{+}) = k_2(0{-}) = c/2$ the first factor is
+$\sin(c\pi/2)/\sin(c\pi) = 1/\bigl(2\cos(c\pi/2)\bigr) > 0$ for $0 < c < 1$, while at the
+threshold $c' = 0$ gives $\cos(c'\pi/2) = 1$. Both are consequences of the symmetry, which is
+therefore load-bearing twice: once for the antisymmetric constant and once for the nonvanishing.
+The Lean specifications state the conclusion as the two-sided comparison with existential
+constants $0 < c_1 \le c_2$ on a punctured neighbourhood, so they assert exactly this
+consequence and not the source's asymptotic.
+Range: the three regimes are stated for finite $c$; nothing is
+claimed when $k(0{+}) = \infty$, which is the case for the stable profiles and for every
+completely monotone profile with an unbounded Thorin measure.
+\textbf{The factor $K$.} It is common to the two singular clauses --- the source's (53.25), which
+enters the threshold's comparison function through (53.26) --- and it was missing from the singular
+clause, and from the admitted axiom, until 2026-09-19 (the external review of module B; the marker
+above). $K$ is slowly varying at the origin, and it is \emph{not} bounded there in general: the
+admissible folded profile $k(x) = \tfrac12 - 1/\log(1/x)$ on $(0,e^{-4})$, $0$ beyond, has
+$c = \tfrac12$ and $K(y) \asymp \log(1/y)$, and its kernel is of order $|x|^{-1/2}\log(1/|x|)$, so
+no multiple of $|x|^{-1/2}$ dominates it. What the statement asserts of $K$ is $K \ge 1$, which is
+elementary and machine-checked (\texttt{one\_le\_satoK}): $k$ is nonincreasing on $(0,\infty)$ with
+right limit $c$, so $k \le c$ there and the integrand of $K$ is nonnegative. That bound is the only
+property of $K$ the corollary below reads, and the reason "unbounded" survives the correction. The
+convergence of the two integrals is elementary as well: the integrand of $K$ is nonnegative and
+bounded on $[y,1]$, the profile being monotone there, and $K$ is nonincreasing, so
+$K(z)/z \le K(y)/y$ on $[y,1]$; both steps
+are machine-checked (\texttt{integrableOn\_satoIntegrand} for every $c$ on the two-sided profile,
+with \texttt{integrableOn\_thresholdIntegrand} and \texttt{integrableOn\_thresholdComparison} at
+the threshold). The last sentence, that every
+$\Cin$ ray sits at the threshold with $K$ constant near the origin, is $[T]$ and is
+machine-checked (2026-09-09); it rests on Lean core and on no clause of \ledger{A10}. The three
+regimes rest on the entry and on nothing else, and \textbf{the entry is admitted} (2026-09-15,
+the author's decision): its three regimes are the Lean axioms \texttt{sato\_origin\_singular},
+\texttt{sato\_origin\_smooth} and \texttt{sato\_origin\_threshold}, one per regime, and the three
+statements above are derived from them on Lean core. The admission waited through six waves of
+the proving campaign for two reasons, and both were removed the day before it was taken: nothing
+spent the regimes --- \ref{cor:origin-boundedness} now spends all three --- and admitting them in
+this article's \emph{folded} form would have put the folding translation, which \ledger{A10} says
+it does not carry, behind an admitted name. So the three names are stated \textbf{at the source's
+own letter}, over a two-sided profile and its two one-sided limits, and the translation is
+\ref{lem:folding-translation} beside them. What they carry beyond their pages is four things,
+the same four for each, and the canonical list is at the head of
+\texttt{blueprint/trust-boundary.txt}: the hypothesis is this article's cosine-transform
+specification of a symmetric law rather than the source's self-decomposable law, which is a
+passage through \ledger{A3}; the conclusion is the two-sided comparison above, with its constants
+and its neighbourhood existential, which is \emph{less} than the source's asymptotic with its
+constant and cosine factor but needs that constant to be nonzero, as the paragraph above records;
+the datum is a monotone two-sided profile rather than the source's one-sided-continuous version of
+it, a modification on a countable set that changes nothing the theorems speak of
+(\ref{lem:folding-translation}'s annotation); and the folding convention, which is no longer among
+them. So this
+node is \leanok{} in the sense \ref{prop:kernel-regularity} is: what is machine-checked is the
+passage from the source's sentences to these, and the analysis itself remains cited.
+\textbf{The singular name was restated on 2026-09-19} (R171), when the referee's example showed
+that what it asserted was false: it carries the factor $K$ now, and it and the threshold name carry
+the source's own hypothesis that both one-sided limits are positive, which a symmetric law supplies
+with $k_2(0{+}) = k_2(0{-}) = c/2$. No conclusion downstream became weaker, the corollary reading
+$K \ge 1$ alone. Their
+hypotheses were checked at the edges in wave 6 (2026-09-10) and again before the admission:
+$c = 0$ is excluded from all three, and must be, since with $a = 0$ it forces $k \equiv 0$ and a
+law without a density; the Gaussian is excluded by $a = 0$; $c = \infty$ is excluded by the shape
+of the hypothesis; and none of the three is vacuous, the threshold regime being met by the $\Cin$
+rays, the singular one by $c\,\mathbf 1_{(0,\tau)}$ with $c < 1$ and the smooth one by the
+\Matern{} profile at $\gamma = 1$, where $c = 2$. The node never depended on
+\ref{lem:cin-delay-equation}: the three regimes quantify over an arbitrary admissible $F$ with
+Gaussian coefficient $0$ and speak only of its kernel near the origin --- what did depend on the
+delay equation was the propagation, which is \ref{rem:cin-propagation}.)}
+\end{proposition}
+
+% ADDED (2026-09-15, module B step 2, R162): a proof environment, for the reason R157 added one
+% at prop:kernel-regularity. An [A] node that prints nothing between its cited facts and its
+% conclusion leaves this article's own step in the annotation alone, and here that step is the
+% passage between the two conventions -- which is exactly what the admission was made to avoid
+% taking on trust. The proof is the one the Lean takes: lem:folding-translation, then the source's
+% three sentences read through it, then the Cin-ray computation.
+\begin{proof}
+\leanok
+The three regimes are the cited interface, and what has to be said here is how the source's
+statement becomes this one. The sources state the behaviour at the origin of a self-decomposable
+law with no Gaussian part in terms of its \emph{two-sided} profile $k_2$ on $\RR \setminus \{0\}$
+and the two constants $k_2(0{+}) + k_2(0{-})$ and $k_2(0{+}) - k_2(0{-})$: the first is their
+$c$, the second their antisymmetric constant. By \ref{lem:folding-translation} the law in
+question is theirs. Its two-sided datum is $k_2(x) = \tfrac12 k(|x|)$, which is a profile of the
+kind the sources require; its exponent is the folded exponent, so the two descriptions specify
+the same law; the first constant is $k(0{+}) = c$; and the second vanishes, the law being
+symmetric. Three hypotheses of the sources are met and not visible in that sentence, and
+\ref{lem:folding-translation}'s annotation says why: with $c$ finite the two-sided profile has
+finite variation near the origin, $\int_{|x|<1}k_2 \le c$; the law has no drift, being specified
+through its cosine transform, and no Gaussian part, since $a = 0$; and the one-sided continuity by
+which the sources normalise a $k$-function is a modification on a countable set, under which the
+\Levy{} measure, the exponent, the two limits at the origin and both comparison functions are
+unchanged. Reading the three regimes through that dictionary gives the three statements
+displayed above, with $k_2(u) + k_2(-u)$ becoming $k(u)$ in the integrand of $K$, which is the
+factor both singular clauses carry. The passage from the source's asymptotic to the two-sided
+comparison uses that the constant in the source's formula does not vanish, which the symmetry
+supplies; the annotation computes it. That passage is machine-checked; the regimes themselves are
+cited, and the order of the singularity is all that is claimed of them.
+
+The last sentence is this article's own. The $\Cin$ ray of step $\tau$ has profile
+$\mathbf 1_{(0,\tau)}$ (\ref{lem:cin-rays}(1)), whose right limit at the origin is $1$, so
+$c = 1$ and the threshold regime applies; and on $(0,\tau)$ the integrand $(1 - k(u))u^{-1}$ of
+$K$ vanishes, which is the constancy of an indicator on its own interval and is what is
+machine-checked, on Lean core. So $K$ is constant on $(0,\min(\tau,1))$, with the value
+$\max(1,1/\tau)$: for $\tau \ge 1$ nothing is integrated, and for $\tau < 1$ the window $(\tau,1)$
+contributes $\int_\tau^1 u^{-1}du = \log(1/\tau)$. Hence $L$ is a constant multiple of
+$\log(1/|x|)$ plus a constant near the origin --- $L(x) = \log(1/|x|)$ when $\tau \ge 1$ and
+$L(x) = \tau^{-1}\log(\tau/|x|) + \tau^{-1} - 1$ when $\tau < 1$ --- and in both cases the
+logarithmic order is all the statement claims.
+\end{proof}
+
+% CHANGED (review 2026-09-09, Q8): the propagation of the singularity to the points +-n tau was
+% MOVED OUT of the proposition's statement into this remark. It is [T] content, its induction is
+% written down nowhere, and it sat inside an [A] statement -- the worst place for an unproved
+% claim, since a reader takes the ledger to cover the whole node. Nothing scheduled consumes it
+% (its only consumer is prop:jet-regularity(4), Chapter 15, unscheduled), so it is described
+% rather than asserted; should it be needed, the induction has to be written and typed first.
+\begin{remark}[the singularity propagates outward]\label{rem:cin-propagation}
+For a $\Cin$ ray of step $\tau$ the delay equation of \ref{lem:cin-delay-equation} carries the
+singularity outward along the lattice $\tau\ZZ$, one order of smoothness gained at each step:
+the derivative of the kernel inherits a logarithmic singularity at $\pm\tau$, so the kernel
+itself is continuous there with a kink of order $|x \mp \tau|\log|x \mp \tau|$, and so on to
+$\pm2\tau$ and beyond. This is a description of the shape of the kernel and not a claim of the
+proposition: the induction it summarises is not carried out here, and no node depends on it.
+\end{remark}
+
+The $\Cin$ kernels are therefore logarithmically singular at the origin, like the
+variance-gamma member of smoothness index $0$, whose density is a Bessel $K_0$ and which sits
+at the same threshold. That coincidence is not one: both are instances of a single boundary,
+and where it falls is decided by the profile alone.
+
+% NEW NODE (2026-09-15, module B step 2, R159; the postdoc's P-0008). Three things in the
+% article said this and were never put side by side: the external review's finding C, that the
+% closed form of prop:matern-density is a \Matern{} covariance only for gamma > 1/2 and is K_0 at
+% gamma = 1/2; ledger A10's three regimes, whose boundary is c = 1; and the \Matern{} profile's
+% own value 2 gamma at the origin. The corollary is what they say together, and it claims
+% strictly less than prop:cin-origin-singularity, being a two-line deduction from the three
+% regimes. It gives A10 what wave 6 found it lacked, a consumer reading all three regimes, and
+% it turns a naming caveat about one family into a statement about every admissible kernel.
+% The \uses edge to prop:matern-exponent is FORWARD, into Chapter 10; it is deliberate, and it is
+% the same deliberate forward reference prop:two-members makes to the same node for the same
+% reason -- the corner computation belongs to Chapter 10 and the statement that needs it does
+% not. There is no cycle: prop:matern-exponent reaches Chapters 2 and 7 only.
+% CHANGED (2026-09-15, module B step 2, R162): the node is \leanok and its statement is NARROWED
+% by one half-sentence. THE STATUS: ledger A10 is admitted (the author's decision), so clause (1)
+% is SpatialLine.origin_boundedness -- proved, spending all three names -- where it was
+% Skeleton.origin_boundedness carrying sorry, which is deleted. THE NARROWING: clause (2)'s
+% closing "where prop:matern-density gives it as the Bessel K_0" is dropped from the STATEMENT
+% and moved into the annotation. It is a pointer to a node that is itself notready, and a \leanok
+% statement should not assert, even by attribution, what no declaration of its own tag proves;
+% the sentence survives as a cross-reference where it belongs. THE TAG gains
+% SpatialLine.matern_origin_boundedness, the bundle that reads clause (1) at the \Matern{} member
+% and concludes what clause (2) claims of it -- boundedness exactly for gamma > 1/2 -- so that
+% each clause has a declaration proving it rather than leaving the modus ponens to the reader
+% (the fidelity-review rule on \lean tags). Statement otherwise unchanged.
+\begin{corollary}[the boundedness threshold]\label{cor:origin-boundedness}
+\uses{prop:cin-origin-singularity,lem:folding-translation,lem:cin-rays,prop:matern-exponent}
+\lean{SpatialLine.origin_boundedness, SpatialLine.matern_origin_boundedness,
+SpatialLine.matern_origin_constant,
+SpatialLine.cin_origin_singularity_cin_ray}\leanok
+Let $F$ be admissible with Gaussian coefficient $0$ and folded profile $k$, let $\phi_1$ be its
+kernel at canonical scale $1$, and suppose $c := k(0{+})$ is finite and positive.
+\begin{enumerate}
+\item \emph{(The threshold.)} If $c > 1$, then $\phi_1$ has a representative continuous on the
+whole line. If $c \le 1$, then for every representative $p$ of $\phi_1$, every $\delta > 0$ and
+every $M$ there is an $x$ with $0 < |x| < \delta$ and $p(x) > M$; no representative of $\phi_1$
+is bounded near the origin. So $\phi_1$ is bounded at the origin exactly when $c > 1$.
+\item \emph{(The named members.)} Every $\Cin$ ray has $c = 1$ and sits at the threshold. The
+\Matern{} member of index $\gamma$ and range $\theta$ has $c = 2\gamma$, so its kernel is
+bounded at the origin exactly for $\gamma > \tfrac12$, and at $\gamma = \tfrac12$ it sits at the
+threshold.
+\end{enumerate}
+\statusA\quad\ledger{A10}\quad\emph{(\textbf{Assignment.} Clause (1) is a deduction from the
+three regimes of \ref{prop:cin-origin-singularity} and carries no content beyond them, so it
+rests on \ledger{A10} exactly as that node does and on the same finite range: nothing is claimed
+when $k(0{+}) = \infty$. The deduction reads all three regimes, which is what makes this the
+consumer the entry lacked, and what the entry's admission (2026-09-15) bought. Two steps of it
+are this article's own and are machine-checked: that both singular comparison functions diverge,
+which is one bound on the slowly varying factor, $K \ge 1$, read off the profile's own
+monotonicity and not off \ledger{A16}'s asymptotic (below the threshold it leaves
+$|x|^{c-1}K(|x|) \ge |x|^{c-1}$, and at the threshold $L(x) \ge \log(1/|x|)$); and the passage
+from \emph{one} unbounded representative to
+\emph{every} one, which compares measures rather than functions. Clause (2) is $[T]$ in both
+halves and machine-checked: that every $\Cin$ ray has $c = 1$ is
+\texttt{cin\_origin\_singularity\_cin\_ray}, proved in 2026-09-09, and that the \Matern{} profile
+has $k(0{+}) = 2\gamma$, with the three regimes reading $\gamma < \tfrac12$,
+$\gamma = \tfrac12$ and $\gamma > \tfrac12$, is \texttt{matern\_origin\_constant}; both rest on
+Lean core and on no clause of \ledger{A10}, and the member's own boundedness statement is clause
+(1) read at $c = 2\gamma$ (\texttt{matern\_origin\_boundedness}). What clause (2) adds to clause
+(1) is therefore only arithmetic, and the boundary it names is the one the external review found
+from the other side, at the closed form of \ref{prop:matern-density}: that closed form is a
+\Matern{} covariance only for $\gamma > \tfrac12$ and is the Bessel $K_0$ at $\gamma = \tfrac12$.
+That sentence stood in clause (2) until the admission and is here instead: it is a pointer to
+\ref{prop:matern-density}, whose closed form is not machine-checked, and a statement of this node
+should assert only what this node's own declarations prove.
+\textbf{Not claimed}: the constant in the comparison, as at \ref{prop:cin-origin-singularity};
+the rate of the divergence, at the threshold or below it. That rate is not logarithmic in general:
+$L$ is of logarithmic order exactly where $K$ is constant near the origin, which is the case for
+the $\Cin$ rays and for the \Matern{} member at $\gamma = \tfrac12$ but not for every profile at
+the threshold --- with $K \asymp \log(1/x)$ one gets $L \asymp \log^2(1/x)$ --- and the rate for
+the named members is \ledger{A16}'s asymptotic rather than anything proved here. And any statement
+in dimension greater than one.)}
+\end{corollary}
+
+% CHANGED (2026-09-15, module B step 2, R162): the proof carries \leanok, and its measure
+% comparison is rewritten to the CHECKED ROUTE (the author's decision of 2026-09-09). The printed
+% argument integrated the regime's lower bound over (0,epsilon) to get c_1 epsilon^c / c; the Lean
+% proof does not integrate it at all, but replaces it on that interval by its smallest value,
+% which is the same comparison with one step fewer -- and the same at the threshold with
+% log(1/epsilon). Nothing else of the proof changed.
+\begin{proof}
+\leanok
+Both halves of clause (1) come from \ref{prop:cin-origin-singularity}. If $c > 1$, choose the
+integer $N \ge 1$ with $N < c \le N+1$ --- which exists for every finite $c > 1$, namely
+$N = \lceil c\rceil - 1$ --- and the smooth regime gives a representative of $\phi_1$ that is
+$C^{N-1}$ on the whole line, in particular continuous. Below the threshold and at it, both
+comparison functions are handled by one bound on the slowly varying factor: $k$ is nonincreasing
+on $(0,\infty)$ with right limit $c$, so $k \le c$ there, the integrand $(c-k(u))u^{-1}$ of $K$ is
+nonnegative, and $K \ge 1$ on $(0,1)$. If $c < 1$ the singular regime gives a
+representative $p_0$ and constants $c_1 > 0$, $\delta_0 > 0$ with
+$p_0(x) \ge c_1|x|^{c-1}K(|x|) \ge c_1|x|^{c-1}$ for $0 < |x| < \delta_0$; if $c = 1$ the
+threshold regime gives the same with $c_1 L(|x|)$ in place of $c_1|x|^{c-1}K(|x|)$, and
+$L(x) \ge \int_{|x|}^1 z^{-1}dz = \log(1/|x|)$ by the same bound. In both cases
+the lower bound tends to $+\infty$ as $x \to 0$.
+
+That carries to every representative, and not only to $p_0$, by comparing measures rather than
+functions. Suppose some representative $p$ satisfied $p \le M$ on the punctured
+$\delta$-neighbourhood of the origin, and let $0 < \varepsilon \le \min(\delta,\delta_0)$. On
+$(0,\varepsilon)$ the regime's lower bound is at least its value at $\varepsilon$, both
+$|x|^{c-1}$ and $L$ being nonincreasing in $|x|$: below the threshold
+$p_0 \ge c_1\varepsilon^{c-1}$ there, and at it $p_0 \ge c_1\log(1/\varepsilon)$. So
+$\phi_1\bigl((0,\varepsilon)\bigr) \ge c_1\varepsilon^{c-1}\cdot\varepsilon$ in the first case
+and $\ge c_1\log(1/\varepsilon)\cdot\varepsilon$ in the second, while the assumed bound on $p$
+gives $\phi_1\bigl((0,\varepsilon)\bigr) \le M\varepsilon$. Dividing by $\varepsilon$ leaves
+$c_1\varepsilon^{c-1} \le M$, respectively $c_1\log(1/\varepsilon) \le M$, and both left-hand
+sides tend to $+\infty$ as $\varepsilon$ decreases. Choosing $\varepsilon$ small enough
+contradicts the assumption. Neither step needs $p$ to be measurable: a density integrates over a
+Borel set whatever representative names it, and the two bounds are bounds on that integral.
+
+Clause (2) is the profile computation in each case. The $\Cin$ ray of step $\tau$ has profile
+$\mathbf 1_{(0,\tau)}$, whose right limit at the origin is $1$ (\ref{lem:cin-rays}(1)); the
+\Matern{} profile at range $\theta$ is $2\gamma e^{-x/\theta}$ (\ref{prop:matern-exponent}(1)),
+whose right limit is $2\gamma$. Reading $c = 2\gamma$ through clause (1) puts the threshold at
+$\gamma = \tfrac12$.
+\end{proof}
+
+% NEW NODE 2026-09-19 (R189; the author's decision D1, a widening authorized at the second
+% external review round of module B). The corollary above assumes c finite, so at c = infinity
+% the article claimed nothing -- and that is the case for the stable members, whose row in the
+% article's comparison table says "bounded at 0: yes". Ledger A10's smooth regime is Sato
+% Thm. 28.4, and its clause (ii), read from the page image by the librarian on 2026-09-19 and
+% transcribed into blueprint/AXIOMS-verbatim.md the same day, covers c = infinity in one
+% sentence: "If c = infinity, then mu has a C^infinity density on R". This node is that clause
+% read through the folding translation. It is PROSE-ONLY: no Lean is scheduled, no name is
+% admitted, blueprint/trust-boundary.txt is unchanged, and the three admitted A10 names cover
+% the finite regimes alone. The node is \notready in this article's sense -- stated, cited, not
+% machine-checked -- as lem:thorin-ggc is.
+% Note on the \uses edge: the node does NOT use lem:folding-translation, whose hypothesis is
+% c < infinity; the two lines of translation it needs are written out in the proof, and the
+% lemma's own annotation records that its finiteness hypothesis is used for the two limits alone.
+\begin{corollary}[an unbounded profile makes the kernel smooth]\label{cor:origin-smooth}
+\uses{thm:main-characterization,lem:profile-integrability,prop:stable-family}
+\notready
+Let $F$ be admissible with Gaussian coefficient $0$ and folded profile $k$, and let $\phi_1$ be
+its kernel at canonical scale $1$. If $k(0{+}) = \infty$, then $\phi_1$ has a representative of
+class $C^\infty$ on $\RR$; in particular that representative is bounded on every bounded set, so
+$\phi_1$ is bounded at the origin. The symmetric stable members of index $0 < \alpha < 2$ are of
+this kind: their folded profile is a positive multiple of $x^{-\alpha}$
+(\ref{prop:stable-family}), whose right limit at the origin is $+\infty$.
+\statusA\quad\ledger{A10}\quad\emph{(\textbf{Assignment.} \ledger{A10} carries the conclusion:
+for a self-decomposable law on $\RR$ presented through a two-sided profile with
+$k_2(0{+}) + k_2(0{-}) = \infty$, the law has a $C^\infty$ density. What it does not carry is
+the passage into this article's folded convention, which is two lines of the proof below and is
+$[T]$; the normalisation of the source's $k$-function to its one-sided-continuous version, which
+is the same modification on a countable set that \ref{lem:folding-translation} discusses and that
+the three admitted names of \ledger{A10} carry beyond their pages
+(\texttt{blueprint/trust-boundary.txt}); and the two consequences, that a $C^\infty$ function is
+bounded on every compact set and that the stable profile is unbounded at the origin, both $[T]$.
+\textbf{Not machine-checked, and no name is admitted.} The three Lean axioms behind
+\ref{prop:cin-origin-singularity} are the regimes at \emph{finite} $c$; the clause at
+$c = \infty$ is cited here and nowhere else in the library, so the trust boundary is unchanged
+and the node is \texttt{notready}. \textbf{Not claimed}: any rate, any bound on the density or
+its derivatives, and anything about the Student-t members. Their profile is unbounded at the
+origin too, but this article does not prove it --- what it has of that family's profile is the
+mixture \ref{eq:bridge-profile} of a causal catalogue it does not compute --- and nothing is
+lost, the Student-t kernel being bounded at the origin by its own explicit density,
+\ref{prop:student-t}(1).
+\textbf{The dichotomy.} With the Gaussian coefficient $0$ and $F \not\equiv 0$ the right limit
+$c = k(0{+})$ lies in $(0,\infty]$, since a nonincreasing $k$ with $k(0{+}) = 0$ vanishes
+identically. So this node and \ref{cor:origin-boundedness} together cover the whole range and say
+one thing: \emph{an admissible kernel with no Gaussian part is bounded at the origin exactly when
+its profile starts above $1$.})}
+\end{corollary}
+
+\begin{proof}
+The cited theorem is stated for a self-decomposable law on $\RR$ with no Gaussian part, presented
+through a two-sided profile $k_2$ on $\RR \setminus \{0\}$ --- nonnegative, nonincreasing on
+$(0,\infty)$ and nondecreasing on $(-\infty,0)$ --- and reads its conclusion off the constant
+$c = k_2(0{+}) + k_2(0{-})$; at $c = \infty$ that conclusion is a $C^\infty$ density on the line.
+That presentation is itself the hypothesis: the source says of it that it is the general form of a
+purely non-Gaussian self-decomposable law on $\RR$, so exhibiting a law in it is exhibiting it as
+one.
+Put $k_2(x) := \tfrac12 k(|x|)$. The structural conditions and the exponent identity are the first
+two paragraphs of the proof of \ref{lem:folding-translation}, which read only the monotonicity of
+$k$ and the two integrability conditions of \ref{lem:profile-integrability}: that lemma's
+hypothesis that $k(0{+})$ is finite is used for its two one-sided limits alone, and is not
+available here. So $k_2$ is a two-sided profile of the required kind and its \Levy{} measure
+$k_2(x)|x|^{-1}dx$ specifies the same symmetric law as the pair $(0,k)$, whose kernel at canonical
+scale $1$ is $\phi_1$. Both one-sided limits of $k_2$ at the origin are $+\infty$: on $(0,\infty)$
+it is $\tfrac12 k$, whose right limit is $+\infty$ by hypothesis, and on $(-\infty,0)$ it is
+$x \mapsto \tfrac12 k(-x)$, where $x \mapsto -x$ carries the left neighbourhood filter at the
+origin to the right one. Hence the source's constant is $c = \infty$. One hypothesis of the source
+is not displayed by that dictionary, and it is the one \ref{lem:folding-translation}'s annotation
+records: the source normalises a $k$-function to the version left-continuous on $(0,\infty)$ and
+right-continuous on $(-\infty,0)$, and $k_2$ need not be either. Passing to that modification
+changes $k_2$ on a countable set, hence changes neither the \Levy{} measure nor the exponent nor
+the law, and leaves both one-sided limits infinite; so the theorem applies to the modification and
+concludes about the same law.
+
+The two consequences are elementary. A function of class $C^\infty$ on $\RR$ is continuous, hence
+bounded on every compact set, so the representative the theorem produces is bounded on a
+neighbourhood of the origin. And the symmetric stable member of index $\alpha$ has folded profile
+$C_\alpha^{-1}x^{-\alpha}$ with $C_\alpha \in (0,\infty)$ (\ref{prop:stable-family}), which tends
+to $+\infty$ as $x$ decreases to $0$; so the hypothesis holds for every member of that family.
+\end{proof}

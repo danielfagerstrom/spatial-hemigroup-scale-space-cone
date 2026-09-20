@@ -1,0 +1,114 @@
+Batch S1 of notes/PLAN-review-response-module-b-round2.md: the numerical example (referee D's
+findings 1-10, referee C's finding 1 on p. 68). Applied with scripts/apply-anchors.py.
+
+@@@ FILE paper-b/07-implementation.tex
+@@@ OLD
+lattice the kernels from the origin are convolution powers of the two-sided geometric kernel,
+which are among
+@@@ NEW
+lattice the kernels from the origin are convolution products of two-sided geometric kernels,
+powers of one such kernel for the \Matern{} members, and these are among
+@@@ END
+@@@ OLD
+the Poisson scale space, on the one gray scale of the key at the right, which saturates at
+$\pm 0.055$. The members
+@@@ NEW
+the Poisson scale space, on the one gray scale of the key at the right. The key saturates at
+$\pm 0.056$, half the largest difference, which occurs in the Poisson panel, so that panel is
+clipped around the fine event. The members
+@@@ END
+@@@ OLD
+$\pi(i - \tfrac12)$, which stay at distance $0.507$ from it. Teal:
+@@@ NEW
+$\pi(i - \tfrac12)$, which stay at distance $0.507$ from it on the window of the computation
+($0.509$ on the line). Teal:
+@@@ END
+@@@ OLD
+$5 \times 10^{-12}$ for the member with $24$ ranges. The fitted exponential rate of the tail,
+multiplied by $t$, is $1.000$ for $\gamma = 1$ and $1.02$ for $\gamma = 4$, against $1$, and
+$1.5706$ for the member with $24$ ranges, against its smallest node $\pi/2$. The Poisson
+@@@ NEW
+$5 \times 10^{-12}$ for the member with $24$ ranges. The tail of a \Matern{} kernel of integer
+index is $x^{\gamma-1}e^{-x/t}$ up to a constant, so the rate is fitted to
+$\log h - (\gamma - 1)\log x$, a straight-line fit over $12 < x/t < 20$. Multiplied by $t$ it
+is $1.000$ for $\gamma = 1$ and $1.02$ for $\gamma = 4$, against $1$. The excess at
+$\gamma = 4$ is the bias of the window, the lower-order terms of the polynomial factor, and a
+fit of $\log h$ alone would lie below $1$ on every window. For the member with $24$ ranges,
+whose tail has no polynomial factor, the rate over $8 < x/t < 14$ is $1.5706$ against its
+smallest node $\pi/2$. The Poisson
+@@@ END
+@@@ OLD
+Proposition~\ref{prop:stable-family} at $\alpha = 1$. A quadrature with $N$ nodes and real
+weights, over cells spaced geometrically between $2/N$ and $2N$ with the part of the measure
+above the last cell carried as a Gaussian coefficient, has a kernel at $L^1$ distance $0.154$
+from the Poisson kernel for $N = 4$ and $1.7 \times 10^{-3}$ for $N = 256$. That is the
+@@@ NEW
+Proposition~\ref{prop:stable-family} at $\alpha = 1$. The quadrature with real weights has
+$N$ cells: the interval from $0$ to $2/N$, and the $N - 1$ intervals between $N$ points spaced
+geometrically from $2/N$ to $2N$. Each cell carries its mass, $2/\pi$ times its width, at its
+midpoint, and the part of the measure above $2N$ is carried as the Gaussian coefficient
+$1/(2\pi N)$. The mass below $2/N$ cannot be dropped, since without it the exponent is short by
+a term of order $N^{-1}\log N$. The kernel of this member is at $L^1$ distance $0.154$ from
+the Poisson kernel for $N = 4$ and $1.7 \times 10^{-3}$ for $N = 256$, on the window. That is the
+@@@ END
+@@@ OLD
+the distance to the Poisson kernel tends to $0.507$, the distance between the two limits.
+@@@ NEW
+the distance to the Poisson kernel tends to the distance between the two limits, which is
+$0.5086$ on the line and $0.5070$ on the window.
+@@@ END
+@@@ OLD
+identity of Proposition~\ref{prop:matern-exponent}(1) extends to complex $\theta$ with
+positive real part and gives the profile $k(x) = 2\sum_i e^{-\theta_ix}$, which the script
+confirms against $-\log R$ by quadrature to $3 \times 10^{-11}$.
+@@@ NEW
+identity of Proposition~\ref{prop:matern-exponent}(1) extends to complex $\theta$ with
+positive real part, by the differentiation under the integral sign used for the pair
+$1 \pm i$ in Remark~\ref{rem:rational-converse}, and gives the profile
+$k(x) = 2\sum_i e^{-\theta_ix}$. The script confirms it against $-\log R$ by quadrature to
+$3 \times 10^{-11}$.
+@@@ END
+@@@ OLD
+positive measure. This is an analytic statement and not a reading of the plot, since at the
+points where the cosine equals $-1$ the second term is eventually the larger. The design is
+@@@ NEW
+positive measure. This is an analytic statement and not a reading of the plot: the real pole
+decays faster than the pair, so at every point where the cosine equals $-1$ the second term
+is the larger, the first of them being $x = 2.23\,\sigma$, where $k = -0.19$. The design is
+@@@ END
+@@@ OLD
+$1.783 \pm 0.6318\,i$ and $1.723 \pm 1.997\,i$ and a cubic numerator in $\omega^2$. The fitted
+@@@ NEW
+$1.783 \pm 0.6318\,i$ and $1.723 \pm 1.997\,i$ and a cubic numerator in $\omega^2$. On
+$x \ge 0$ the fitted function is
+$(a_0\cos\omega_0x + a_1\sin\omega_0x)\,e^{-b_0x} + (c_0\cos\omega_1x + c_1\sin\omega_1x)\,e^{-b_1x}$
+with the amplitudes $a_0 = 1.68$, $a_1 = 3.735$, $c_0 = -0.6803$ and $c_1 = -0.2598$, printed
+here to the digits of the source, of which $a_0$ has two decimals. The fitted
+@@@ END
+@@@ OLD
+that round to the printed ones, the slope lies between $+0.0068$ and $+0.0286$, so at least
+@@@ NEW
+that round to the printed ones, the slope $a_1\omega_0 - a_0b_0 + c_1\omega_1 - c_0b_1$ lies
+between $+0.0068$ and $+0.0286$, most of that width coming from the two decimals of $a_0$, so at least
+@@@ END
+@@@ OLD
+Both designs are more accurate than the real-pole cascade at the same order, and the last
+panel gives the price of staying inside the class. The largest error of the kernel, relative
+to its peak, is $0.05\%$ for Deriche's design and $1.04\%$ for that of Young and van Vliet. For
+the cascade of $\gamma$ identical sections at matched variance it is $10.8\%$ at $\gamma = 4$
+and $1.2\%$ at $\gamma = 32$, it decays like $0.38/\gamma$, and it falls below $1.04\%$ at
+$\gamma = 37$. A user who needs
+@@@ NEW
+Both designs are more accurate than the real-pole cascade at the same order, and the last
+panel gives the price of staying inside the class. A largest error against the unit Gaussian
+depends on the dilation at which a kernel is read, so each number carries its gauge. At its
+own scale parameter the largest error of the kernel, relative to the Gaussian's peak, is
+$0.05\%$ for Deriche's design and $1.04\%$ for that of Young and van Vliet. The prototype of
+the latter has the variance $1.18\,\sigma^2$: the design is calibrated by its error and not by
+its variance, its error at matched variance is $8.5\%$, and at its best dilation it is
+$0.86\%$. For the cascade of $\gamma$ identical sections the error at matched variance is
+$10.8\%$ at $\gamma = 4$ and $1.2\%$ at $\gamma = 32$ and decays like $0.38/\gamma$. At its
+best dilation, which is $9\%$ wider at $\gamma = 4$ and $1\%$ wider at $\gamma = 32$, it is
+$4.1\%$ and $0.48\%$ and decays like $0.15/\gamma$. Best dilation against best dilation, the
+cascade passes the design of Young and van Vliet at $\gamma = 19$. A user who needs
+@@@ END

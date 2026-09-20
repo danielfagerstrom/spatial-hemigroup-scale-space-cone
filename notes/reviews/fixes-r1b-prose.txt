@@ -1,0 +1,41 @@
+Review response R1b, paper-side prose of section 3 around the corrected origin proposition (R171): the singular regime carries the slowly varying factor K, and the divergence at the threshold is logarithmic for the Cin rays and the Matern member, not in general. Applied with scripts/apply-anchors.py.
+
+@@@ FILE paper-b/03-cone.tex
+@@@ OLD
+that value is finite: below $1$ the kernel is
+unbounded with a power singularity, above $1$ it is bounded, and at $1$ it is logarithmically
+singular (Proposition~\ref{prop:cin-origin-singularity}). The $\Cin$ rays sit at $1$. The
+@@@ NEW
+that value is finite: below $1$ the kernel is
+unbounded, with a power singularity up to a slowly varying factor, above $1$ it is bounded, and
+at $1$ it is unbounded with a weaker singularity, a logarithm for the $\Cin$ rays
+(Proposition~\ref{prop:cin-origin-singularity}). The $\Cin$ rays sit at $1$. The
+@@@ END
+
+@@@ FILE paper-b/03-cone.tex
+@@@ OLD
+through one number, its value $c = k(0{+})$ at the origin: for $c < 1$ the density is
+singular with the power $|x|^{c-1}$, for $c > 1$ it is continuous with $\lceil c\rceil - 2$
+derivatives, and at $c = 1$ it is singular with a logarithm. The intensity of small
+@@@ NEW
+through one number, its value $c = k(0{+})$ at the origin: for $c < 1$ the density is
+singular of the order $|x|^{c-1}K(|x|)$, for $c > 1$ it is continuous with
+$\lceil c\rceil - 2$ derivatives, and at $c = 1$ it is singular of the order of an integral of
+$K$. The factor $K$ is built from the profile, $K(y) = \exp\int_y^1 (c - k(u))\,du/u$. It is
+slowly varying and at least $1$, and it measures how fast the profile approaches its value at
+the origin. When the profile is constant near the origin, as for a $\Cin$ ray, $K$ is constant
+there, the singularity below the threshold is the pure power and the one at the threshold is
+a logarithm. In general $K$ is unbounded: the profile $\tfrac12 - 1/\log(1/x)$ near the origin
+has $c = \tfrac12$ and a kernel of the order $|x|^{-1/2}\log(1/|x|)$. The intensity of small
+@@@ END
+
+@@@ FILE paper-b/03-cone.tex
+@@@ OLD
+threshold and not the rate of the divergence there, which is logarithmic and is the cited
+Bessel asymptotic rather than anything proved here, and it says nothing in dimension greater
+than one.
+@@@ NEW
+threshold and not the rate of the divergence there, which for this member is logarithmic and
+is the cited Bessel asymptotic rather than anything proved here, and it says nothing in
+dimension greater than one.
+@@@ END

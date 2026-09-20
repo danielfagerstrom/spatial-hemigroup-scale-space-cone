@@ -1,0 +1,1585 @@
+% !TEX root = ../print.tex
+% Draft \S9 --- The subordination bridge
+%
+% Source: draft/spatial-hemigroup-scale-space.md, \S9 (lines 521-583).
+%
+% This is the chapter where the causal theory is MATHEMATICS rather than provenance, so it
+% is the one place -- besides rem:provenance-causal -- where the causal article is cited
+% inside statements and proofs. Its cone is recorded here as def:causal-admissible so that
+% the blueprint is self-contained.
+%
+% REROUTE recorded here: the draft's analytic proof of lem:bridge-exponents cites the
+% composition rule for Bernstein functions and continuous negative definite functions
+% (Jacob Vol. I, \S3.9). The proof below does not: it goes through Bernstein--Widder
+% (ledger A11) and the complete monotonicity of the exponential of a Bernstein function
+% (ledger A12), which realises e^{-tau g(omega^2/2)} as a positive mixture of Gaussian
+% transforms and so makes it positive definite by def:positive-definite directly. Two small
+% cited facts replace one large one, and both are already needed in Chapter 10.
+%
+% CHANGED (proof of record 2026-09-10): that reroute is now itself superseded for the
+% ADMISSIBILITY half of lem:bridge-exponents, which the formalisation proves directly and
+% which spends no ledger entry at all. A11 and A12 survive in this chapter only in the
+% probabilistic reading of lem:bridge-exponents -- the sentence that asserts the delay T_1
+% exists -- and nothing downstream reads that sentence. See the node.
+%
+% CHANGED (author's decision 2026-09-10): that sentence is no longer part of a statement node.
+% lem:bridge-exponents is narrowed to the admissibility clause and a mixture clause CONDITIONAL
+% on a delay law, both machine-checked on Lean core; the existence of the delay is
+% rem:bridge-subordination, which cites A11(a) and A12 in prose and is marked as not
+% machine-checked. So this chapter now spends NO ledger entry inside a statement node, and
+% neither A11 nor A12 has a consumer here.
+
+\chapter{The subordination bridge}
+\label{ch:bridge}
+
+The causal theory classifies the time-causal families: in its canonical gauge the kernel at
+scale $x$ is the law of $x\,T_1$, where $T_1$ is a random delay with Laplace exponent
+$F_{\mathrm I}$ of the form recorded below. This article has classified the
+reflection-symmetric families. The two cones are related by the oldest construction in the
+subject, Bochner's subordination: run a Brownian motion for a random causal delay, and the
+displacement reached is symmetric. This chapter makes the construction a map between the two
+theories, family to family, and shows that it is not onto. Throughout, $\BM$ is a standard
+Brownian motion, so $\mathbb{E}\cos(\omega \BM_u) = e^{-u\omega^2/2}$, and $g_u$ is its law at
+time $u$, with $g_0 = \delta_0$; a different diffusion constant is a change of spatial gauge
+and is not tracked.
+
+% additive: the causal cone, recorded here so that the statements of this chapter are
+% self-contained. It is a definition, not a claim.
+% twin: hcs thm:main-characterization + lem:selfdecomposable-exponents (the class those two
+% nodes characterise).
+% CHANGED (fidelity review 2026-09-10, R4): the closing sentence is requalified. It used to
+% assert, unconditionally, that e^{-F_I} is the Laplace transform of the law of a delay
+% T_1 >= 0 -- the same existence fact the author's decision 2 of 2026-09-10 moved out of
+% lem:bridge-exponents into rem:bridge-subordination, and the one step ledger A11 clause (a)
+% and A12 carry. A definition node may not smuggle it back in: complete monotonicity of
+% e^{-F_I} is immediate from the displayed form and is what the sentence now says; the delay
+% law is cited at the remark, where it is marked as not machine-checked.
+% CHANGED (2026-09-11, draft sync, R1): the display now says that the delay profile is
+% nonnegative, k_I : (0,infty) -> [0,infty). It was implied by reading k_I(u) du/u as a \Levy{}
+% measure, and the Lean carries it as the field CausalAdmissible.k_nonneg, but the class was
+% introduced without it. Nothing narrows: every consumer already had the field. Mirrored in the
+% draft's Definition 9.0, which also prints the integrability pair for the first time (R11).
+% CHANGED (2026-09-12, phase C2, R152): the \lean tag names the SHARED type. This chapter's
+% Lean was a deliberate local mirror of Paper I's SelfDecomposableExponent, marked an import
+% candidate since 2026-09-08 with TWINS.md's instruction "import, do not restate"; the type now
+% lives in ScaleSpaceCore v0.2.0 as ScaleSpace.CausalAdmissible, with this chapter's field
+% layout (the two integrability windows of the display below), Paper I's single-finiteness form
+% through ofNeTop, and their equivalence ne_top_iff_windows. Paper V reaches it by
+% `export ScaleSpace (CausalAdmissible)`, which keeps the unqualified name and dot notation, but
+% an alias is not a declaration and a checker that resolves names would miss it -- so the tag is
+% the shared name. The statement below is unchanged.
+\begin{definition}[the causal admissible cone]\label{def:causal-admissible}
+\lean{ScaleSpace.CausalAdmissible, ScaleSpace.CausalAdmissible.exponent}\leanok
+A function $F_{\mathrm I} : [0,\infty) \to [0,\infty)$ is \emph{causally admissible} if
+\[
+  F_{\mathrm I}(\sigma) = b_0\,\sigma
+   + \int_0^\infty \bigl(1 - e^{-\sigma u}\bigr)\,k_{\mathrm I}(u)\,\frac{du}{u},
+  \qquad b_0 \ge 0, \quad k_{\mathrm I} : (0,\infty) \to [0,\infty) \ \text{nonincreasing},
+\]
+with $\int_0^1 k_{\mathrm I}(u)\,du < \infty$ and
+$\int_1^\infty k_{\mathrm I}(u)\,u^{-1}du < \infty$. These are exactly the exponents the
+time-causal article's characterization theorem attaches to its axioms, in its canonical gauge;
+$(b_0, k_{\mathrm I})$ is its data, its drift and its delay profile. Such an
+$F_{\mathrm I}$ is a Bernstein function vanishing at the origin, so $e^{-F_{\mathrm I}}$ is
+completely monotone with value $1$ there; that it is therefore the Laplace transform of the law
+of a random delay $T_1 \ge 0$ --- the subordination reading of this chapter --- is cited at
+\ref{rem:bridge-subordination} and is not asserted here.
+\statusT\quad\emph{(Vocabulary. No claim is made here about the causal axioms; the equivalence
+of this class with them is the content of that article, and this chapter uses only the
+displayed form. The closing sentence stops at complete monotonicity because the step beyond it
+is an existence claim on \ledger{A11}\,(a) and \ledger{A12}, which the author's decision of
+2026-09-10 had already moved out of \ref{lem:bridge-exponents}; nothing in the chapter reads
+the delay law, every consumer of the bridge quantifying over it instead.)}
+\end{definition}
+
+% draft: Lemma 9.1
+% NEW as a statement, though the construction is classical. twin: none --- the causal article
+% has no bridge chapter.
+% CHANGED (author's decision 2026-09-10): the lemma is NARROWED by dropping the delay-law
+% clause. The last sentence used to ASSERT that a delay T_1 with Laplace transform e^{-F_I}
+% exists, which is the one step ledger A11(a) and A12 carried, and it was typed as
+% Skeleton.bridge_delay_law -- an interface with no consumer, since SpatialLine.bridge_exponents
+% was proved without reading it and nothing else in the development spends it. The sentence is
+% now conditional on such a delay being given, which is exactly what
+% SpatialLine.bridge_exponents_mixture proves and what a specification-as-hypothesis loses
+% nothing by (the delay law is unique, being determined by its Laplace transform). Dropping a
+% hypothesis strengthens the admissibility clause, so nothing that cited this lemma weakens.
+% The existence -- the subordination reading -- is now rem:bridge-subordination below, marked as
+% not machine-checked and citing A11(a) with A12 in prose. Skeleton.bridge_delay_law is deleted
+% and bridge_exponents's unused hypothesis with it; the node is [T] and \leanok.
+\begin{lemma}[the bridge on exponents]\label{lem:bridge-exponents}
+\uses{def:causal-admissible,def:positive-definite,lem:profile-integrability,lem:selfdecomposable-exponents,prop:fourier-toolbox,thm:main-characterization}
+\lean{SpatialLine.bridge_exponents, SpatialLine.bridge_exponents_mixture}\leanok
+Let $F_{\mathrm I}$ be causally admissible with data $(b_0, k_{\mathrm I})$ and put
+\begin{equation}\label{eq:bridge}
+  \Psi(\omega) := F_{\mathrm I}\bigl(\tfrac12\omega^2\bigr), \qquad \omega \in \RR .
+\end{equation}
+Then $\Psi$ is admissible in the sense of \ref{thm:main-characterization}, that is of the form
+\ref{eq:sd-profile}, with Gaussian coefficient $a = \tfrac12 b_0$ and folded profile
+\begin{equation}\label{eq:bridge-profile}
+  k(x) = 2x\int_0^\infty g_u(x)\,k_{\mathrm I}(u)\,\frac{du}{u}, \qquad x > 0,
+\end{equation}
+the Gaussian mixture of the delay catalogue. Moreover, if $T_1 \ge 0$ is a random delay
+independent of $\BM$ with $\mathbb{E}e^{-\sigma T_1} = e^{-F_{\mathrm I}(\sigma)}$ for every
+$\sigma \ge 0$, then the law of $\BM_{T_1}$ --- the mixture of the Gaussian laws against the law
+of $T_1$ --- is a symmetric probability law with cosine transform $e^{-\Psi}$.
+\statusT\quad\emph{(Both clauses are machine-checked and the node's route is Lean core; no
+ledger entry is spent. The delay $T_1$ enters the second clause as a \emph{hypothesis} and not
+as an assertion, and quantifying over it loses nothing, a law on $[0,\infty)$ being determined
+by its Laplace transform. That a delay with the prescribed transform exists at all is the
+subordination reading of the bridge and is \ref{rem:bridge-subordination}, which is cited and
+not machine-checked. \textbf{Changed 2026-09-10 (author's decision).} The lemma used to close
+by asserting that existence, and carried ledger A11's clause (a) with A12 for it; the
+formalisation then proved the admissibility clause without reading the delay law at all, so the
+two entries stood behind a statement nothing consumed. Dropping the clause removes a hypothesis
+from the admissibility half and is therefore a strengthening: what a proof cites is an upper
+bound on what a statement needs, and here the statement \emph{prescribes} the profile, which is
+checked field by field, so no representation theorem is needed to produce one. The one field the
+draft is right to single out --- that $k$ in \ref{eq:bridge-profile} is nonincreasing, which is
+not visible term by term because $\frac{d}{dx}[x\,g_u(x)]$ changes sign at $x = \sqrt u$ ---
+becomes visible term by term after the substitution $u = x^2v$; see the proof.
+\textbf{Attribution} (2026-09-19, R194, left by batch S2; the pages were read at the held copies
+this session). The construction is classical, and its two halves have different sources.
+\ref{eq:bridge-profile} is \sscite{sato2001subordination}'s (3.3), p.~8, in the two-sided
+convention: his $k^{\sharp}(x) = x\int_0^\infty(2\pi s)^{-1/2}e^{-x^2/2s}\,k(s)\,ds/s$ is half the
+folded $k$ printed here, and his (4.2)--(4.3), p.~9, record the same folding at the origin,
+$k^{\sharp}(0{+}) = k(0{+})$ and $c_Y = 2c_Z$. That the image of a self-decomposable delay is
+self-decomposable is \sscite{halgreen1979self}, \S3, p.~15, for a pure variance mixture --- where
+the ratio $\zeta(t^2/2)/\zeta(a^2t^2/2)$ of Laplace transforms is again one, which is the route of
+\ref{rem:bridge-route} --- and \sscite{sato2001subordination}, Theorem~1.1, for a general
+self-decomposable subordinator, proved there in \S2 by approximating the delay profile by step
+functions. What this lemma does that those do not is to \emph{prescribe} the pair $(a,k)$ and
+check it field by field, so that no representation theorem is spent and the second clause
+quantifies over the delay law instead of producing it.)}
+\end{lemma}
+
+\begin{proof}
+\leanok
+Write $\nu_2(x) = \int_0^\infty g_u(x)\,k_{\mathrm I}(u)\,du/u$ and $k(x) = 2x\,\nu_2(x)$, and
+put $a = \tfrac12 b_0$. We verify that $(a,k)$ is a pair of the kind \ref{eq:sd-profile}
+requires and that its exponent is $\Psi$; admissibility is then \ref{thm:main-characterization}.
+
+\emph{$\nu_2$ is finite off the origin.} Fix $x \ne 0$. Below $u = 1$ the mixture integrand is
+dominated by a multiple of $k_{\mathrm I}$: from $y^2 \le 4e^y$ at $y = x^2/2u$ we get
+$e^{-x^2/2u} \le 16u^2/x^4$, and $u \le \sqrt{2\pi u}$ for $u \le 1$, so
+$g_u(x)/u \le 16/x^4$ and the integrand is at most $(16/x^4)\,k_{\mathrm I}(u)$, integrable by
+$\int_0^1 k_{\mathrm I} < \infty$. Above $u = 1$, $g_u \le 1$ and the integrand is at most
+$k_{\mathrm I}(u)u^{-1}$, integrable by the second condition of \ref{def:causal-admissible}. The
+two conditions pay in different places, and the first pays only because of the Gaussian: the
+mixture carries $du/u$ where that condition carries $du$, and the missing power of $u$ is
+supplied by the flatness of $g_u(x)$ as $u \downarrow 0$ at a fixed $x \ne 0$.
+
+\emph{$k$ is nonincreasing.} This is the clause that is not visible term by term. It becomes
+visible in the right variable. Substituting $u = x^2v$, which leaves $du/u$ invariant,
+\begin{equation}\label{eq:bridge-scaling}
+  x\,\nu_2(x) = \int_0^\infty \frac{e^{-1/2v}}{v\sqrt{2\pi v}}\;k_{\mathrm I}(x^2v)\,dv ,
+  \qquad x > 0 .
+\end{equation}
+The weight no longer involves $x$; the whole dependence sits in $k_{\mathrm I}(x^2v)$, which is
+nonincreasing in $x > 0$ for each fixed $v > 0$ because $k_{\mathrm I}$ is nonincreasing. Hence
+$k = 2x\nu_2(x)$ is nonincreasing on $(0,\infty)$.
+
+\emph{The \Levy{} condition.} Since $\int_\RR (1 \wedge x^2)\,g_u(x)\,dx$ is at most the total mass
+$1$ and at most the variance $u$, Tonelli gives
+\[
+  \int_0^\infty (1 \wedge x^2)\,k(x)\,\frac{dx}{x}
+   = \int_0^\infty\Bigl(\int_\RR (1 \wedge x^2)\,g_u(x)\,dx\Bigr) k_{\mathrm I}(u)\,\frac{du}{u}
+   \le \int_0^\infty (1 \wedge u)\,k_{\mathrm I}(u)\,\frac{du}{u} < \infty,
+\]
+the last integral being the single-integral reading of the two conditions of
+\ref{def:causal-admissible}. By \ref{lem:profile-integrability} this is the pair of conditions
+\ref{eq:sd-profile} asks of $k$. So the spatial \Levy{} condition \emph{is} the causal
+integrability condition, with the Gaussian performing the truncation.
+
+\emph{The exponent.} Since $e^{-u\omega^2/2} = \int\cos(\omega x)\,g_u(x)\,dx$ and
+$\int g_u = 1$, we have $1 - e^{-u\omega^2/2} = \int_\RR (1 - \cos\omega x)\,g_u(x)\,dx$, and
+Tonelli gives
+\[
+  a\,\omega^2 + \int_0^\infty (1 - \cos\omega x)\,k(x)\,\frac{dx}{x}
+   = \tfrac12 b_0\,\omega^2
+     + \int_0^\infty \bigl(1 - e^{-u\omega^2/2}\bigr)\,k_{\mathrm I}(u)\,\frac{du}{u}
+   = F_{\mathrm I}\bigl(\tfrac12\omega^2\bigr) = \Psi(\omega),
+\]
+the folding factor $2$ in $k = 2x\nu_2$ being exactly the factor the half-line reading of an
+even integral needs.
+
+\emph{The mixture reading.} Let $T_1 \ge 0$ be as in the statement. The mixture of the Gaussian
+laws against the law of $T_1$ is a probability measure, each $g_u$ being one, and it is
+symmetric, each $g_u$ being symmetric and symmetry passing through the mixture set by set.
+Conditioning on $T_1$ and using $\mathbb{E}\cos(\omega \BM_u) = e^{-u\omega^2/2}$,
+\[
+  \mathbb{E}\cos(\omega \BM_{T_1}) = \mathbb{E}\,e^{-T_1\omega^2/2}
+   = e^{-F_{\mathrm I}(\omega^2/2)} = e^{-\Psi(\omega)},
+\]
+the middle equality being the hypothesis read at $\sigma = \omega^2/2$. So the law of $\BM_{T_1}$
+is a symmetric probability law with cosine transform $e^{-\Psi}$. Nothing here reads where the
+delay law comes from: only its Laplace transform is used.
+\end{proof}
+
+\begin{remark}[the bridge is subordination]\label{rem:bridge-subordination}
+A delay of the kind the lemma's second clause hypothesises always exists, and that is what makes
+the bridge an instance of Bochner's subordination rather than a formal identity between
+exponents. A causally admissible $F_{\mathrm I}$ is a Bernstein function vanishing at the
+origin, so $e^{-F_{\mathrm I}}$ is completely monotone --- ledger A12, Schilling et al.
+Thm. 3.7(iii) --- with value $1$ at the origin, and a completely monotone function with value $1$
+at the origin is the Laplace transform of a probability law on $[0,\infty)$ --- ledger A11
+clause (a), Schilling et al. Thm. 1.4. That law is the law of a random delay
+$T_1 \ge 0$, unique because a law on the half-line is determined by its Laplace transform, and
+the lemma then says that the symmetric family attached to $\Psi$ is the family of laws of
+$\BM_{T_1}$: Brownian motion run for the causal delay. The catalogue formula \ref{eq:bridge-profile}
+is the same statement on profiles.
+
+This remark is \emph{not} machine-checked, and it is the only part of the bridge that is not:
+the two cited facts are Bernstein's theorem and the complete monotonicity of the exponential of
+a Bernstein function, and Mathlib carries no Bernstein-function development at the pinned
+version. Nothing in the article depends on the remark --- every consumer of the bridge quantifies
+over the delay law instead --- so neither entry is admitted as a Lean axiom, and neither name is
+on the trust boundary.
+\end{remark}
+
+% CHANGED (2026-09-19, article mirror of module B, R174): the remark is reframed as the paper
+% reframed it on 2026-09-17 (paper-b/04-bridge.tex, "to be mirrored"): it is a second route to the
+% admissibility clause, stated as such, and not the history of an argument the draft once carried.
+% The register pass's finding behind the paper-side rewrite is that "the draft" has no referent for
+% a reader of the article. The mathematics is unchanged, the two cited facts keep their ledger
+% names in prose, and the sentence saying which of the two routes is machine-checked stays here,
+% where the blueprint records it (the paper's copy drops it, the author's decision D5).
+\begin{remark}[why the image is self-decomposable, in one line]\label{rem:bridge-route}
+There is a second route to the admissibility clause, which produces the profile instead of
+checking a prescribed one and shows in one line \emph{why} the image is self-decomposable. For
+$c \in (0,1)$ the function $g = F_{\mathrm I} - F_{\mathrm I}(c^2\,\cdot)$ is again a Bernstein
+function vanishing at the origin, so $e^{-\tau g}$ is completely monotone for every $\tau > 0$
+(A12) and hence the Laplace transform of a probability law $\rho_\tau$ on $[0,\infty)$ (A11);
+then
+$e^{-\tau(\Psi(\omega) - \Psi(c\omega))} = \int_{[0,\infty)} e^{-u\omega^2/2}\rho_\tau(du)$
+is a positive mixture of positive definite functions, so
+$\Psi - \Psi(c\,\cdot) \in \NDs$ for every $c$, and condition (1) of
+\ref{lem:selfdecomposable-exponents} produces \ref{eq:sd-profile}. The route rests on the two
+cited facts of the previous remark; the proof above rests on none, which is why it is the proof
+of record. What this route does is \emph{produce} a profile, where the lemma \emph{prescribes}
+one and the prescription is checked field by field; that check is machine-checked, and this
+remark is not.
+\end{remark}
+
+% draft: Proposition 9.2
+\begin{proposition}[the bridge on families; the corners; the gauges]\label{prop:bridge-families}
+\lean{SpatialLine.bridge_families, SpatialLine.bridge_families_delay,
+SpatialLine.bridge_families_gamma, SpatialLine.bridge_families_bessel,
+SpatialLine.bridge_families_stable}\leanok
+% The forward references to the corners' nodes (prop:matern-exponent, prop:student-t,
+% prop:two-members) were removed from \uses on 2026-09-07: they made the dependency graph
+% cyclic (those nodes use this one), and plasTeX's graph walk does not terminate on a cycle.
+% The identification of the images is a computation done here; the corner nodes cite this one.
+% CHANGED (proof of record 2026-09-10, wave 5): clause (2) is rewritten to the machine-checked
+% route, which runs in the opposite direction to the printed one, and a \uses edge to
+% prop:matern-exponent is added because the checked route consumes that node's integral. The
+% printed proof reads the causal exponent gamma log(1+sigma) off the hypothesis and then
+% evaluates the profile; the Lean statement hypothesises the causal PROFILE k_I(u) = gamma e^-u,
+% so the exponent has to be derived, and the cheap derivation is through the profile rather than
+% through a causal Frullani integral: eq:bridge says F_I(omega^2/2) IS the exponent of the
+% SDProfile carrying eq:bridge-profile, so once the profile is identified the spatial Frullani
+% of prop:matern-exponent(1) finishes. The edge to prop:matern-exponent is acyclic now that that
+% node's own edge to this one is gone (see 10-corners.tex).
+% CHANGED 2026-09-19 (R177, second external review round, referee B finding 4(i) and referee C
+% finding 8): CLAUSE (3) IS CONDITIONAL, as SpatialLine.student_subordinated and
+% lem:student-subordinated have been since R160 (2026-09-15) and as prop:student-t(3) has been since
+% the same day. The clause read "the causal Bessel family, whose kernels are inverse-gamma laws of
+% shape a, maps to the Student-t family with 2a degrees of freedom", which a reader takes as
+% naming an instance of this node's hypothesis, and the proof's "self-decomposability of the image
+% is lem:bridge-exponents" needs exactly what lem:student-subordinated takes as a hypothesis: that
+% the inverse-gamma law is the delay law of a causally admissible exponent. That is ledger A18,
+% cited at rem:student-ggc and admitted nowhere; the declaration under the tag,
+% bridge_families_bessel, proves the MIXTURE IDENTITY and nothing about a causal family. The clause
+% now says which half is unconditional and which is not. Safe direction (a hypothesis made
+% explicit); no Lean change. The referee also found the same slide in four running sentences and in
+% Table 3's caption; the ones inside this repository's blueprint and paper-b sections are repaired
+% with it (the paragraph after prop:thorin-subclass's proof in chapter 10, and the chain display
+% and caption in paper-b), and the rest are listed for the summary sweep (batch S4).
+\uses{lem:bridge-exponents,prop:fourier-uniqueness,thm:main-characterization,prop:matern-exponent}
+\notes{bessel-student-corner}
+Let $(\Phi^{\mathrm I}_{x,y})$ be a time-causal family satisfying the causal axioms, with
+kernels $\mu^{\mathrm I}_{x,y}$ on $[0,\infty)$ written in its canonical gauge and exponent
+$F_{\mathrm I}$. Define, for $0 \le s \le t$,
+\begin{equation}\label{eq:bridge-families}
+  \mu_{s,t} := \int_{[0,\infty)} g_u\;\mu^{\mathrm I}_{s^2,t^2}(du),
+  \qquad \Phis{s}{t}f := \mu_{s,t} * f .
+\end{equation}
+Then $(\Phis{s}{t})$ satisfies (A1)--(A8) and (ND) with $S_\lambda t = \lambda t$; the
+coordinate $t$ is its canonical gauge, and its exponent is $F = F_{\mathrm I}(\cdot^2/2)$. In
+particular:
+\begin{enumerate}
+\item the causal pure delay, $\mu^{\mathrm I}_{x,y} = \delta_{y-x}$, maps to the Gaussian family
+of \ref{prop:two-members}, $\mu_{s,t} = g_{t^2-s^2}$; the causal drift ray $b_0\sigma$ maps to
+the Gaussian ray $\tfrac12 b_0\omega^2$;
+\item the causal Gamma family, $F_{\mathrm I}(\sigma) = \gamma\log(1+\sigma)$, maps to the
+\Matern{} family at range $1/\sqrt2$: $F(\omega) = \gamma\log(1 + \omega^2/2)$, folded profile
+$k(x) = 2\gamma e^{-\sqrt2\,x}$;
+\item if the inverse-gamma laws of shape $a$ are the delay kernels of such a family --- the causal
+Bessel family, whose existence is cited at \ref{rem:student-ggc} and asserted nowhere here --- then
+it maps to the Student-t family with $2a$ degrees of freedom. The mixture identity behind that
+clause is unconditional: mixing the Gaussian kernels against the inverse-gamma law of shape $a$
+gives the Student-t law with $2a$ degrees of freedom, which is \ref{prop:student-t}(1);
+\item the causal stable family, $F_{\mathrm I}(\sigma) = \sigma^\alpha$ with
+$0 < \alpha \le 1$, maps to the symmetric stable family
+$F(\omega) = 2^{-\alpha}|\omega|^{2\alpha}$ of index $2\alpha \in (0,2]$; the boundary
+$\alpha = 1$ is item (1);
+\item the spatial canonical gauge is the square root of the causal one: a causal scale $x$
+becomes the spatial scale $t = \sqrt x$, which is the parabolic gauge of the causal article.
+\end{enumerate}
+\statusT\quad\emph{(Every clause is a computation on exponents once \ref{lem:bridge-exponents}
+has supplied admissibility. Item (3)'s density identification is
+\ref{prop:student-t}(1). The chain of equalities in item (2) is checked against the profile of
+\ref{prop:matern-exponent} at range $1/\sqrt2$ and agrees; see the proof.
+\emph{Item (3) is conditional} since 2026-09-19 (R177): what the declarations prove is the
+mixture identity, \texttt{SpatialLine.bridge\_families\_bessel}, and the passage from it to a
+spatial \emph{family} needs the inverse-gamma law to be the delay law of a causally admissible
+exponent --- the hypothesis \ref{lem:student-subordinated} quantifies over and
+\ref{rem:student-ggc} cites, ledger \ledger{A18}, admitted nowhere. The other four items name
+causal families this article's own computations produce or whose admissibility
+\ref{lem:bridge-exponents} supplies from an explicit profile.)}
+\end{proposition}
+
+\begin{proof}
+\leanok
+\emph{The family.} $\hat\mu_{s,t}(\omega) = \int e^{-u\omega^2/2}\,\mu^{\mathrm I}_{s^2,t^2}(du)
+= \widehat{\mu^{\mathrm I}_{s^2,t^2}}(\omega^2/2)
+= \exp[-(F_{\mathrm I}(t^2\omega^2/2) - F_{\mathrm I}(s^2\omega^2/2))]$, using the causal
+similarity form in the canonical gauge. So $g_{s,t}(\omega) = F(t\omega) - F(s\omega)$ with
+$F = F_{\mathrm I}(\cdot^2/2)$, admissible by \ref{lem:bridge-exponents}; the family is
+therefore the one \ref{thm:main-characterization} attaches to $F$ in the canonical gauge, and
+that construction verified (A1)--(A8) and (ND), with $S_\lambda t = \lambda t$ because
+$F(\lambda t\omega) - F(\lambda s\omega) = g_{s,t}(\lambda\omega)$. Directly:
+$\Dil{\lambda}g_u = g_{\lambda^2u}$, so a spatial dilation by $\lambda$ is a causal dilation by
+$\lambda^2$, and the causal covariance
+$\Dil{\lambda^2}\mu^{\mathrm I}_{x,y} = \mu^{\mathrm I}_{\lambda^2x,\lambda^2y}$ becomes
+$\Dil{\lambda}\mu_{s,t} = \mu_{\lambda s,\lambda t}$; the cascade is inherited from the
+independent increments of both $\BM$ and the delay.
+
+Two identifications in that paragraph need justification, and they are where the work is
+once \ref{lem:bridge-exponents} is in hand. First, the kernels \ref{thm:main-characterization}
+attaches to $F$ and the mixtures \ref{eq:bridge-families} are \emph{a priori} two different
+families; they agree because both are symmetric probability measures and their cosine
+transforms agree, so \ref{prop:fourier-uniqueness} identifies them. Second, the scaling action
+is $S_\lambda t = \lambda t$ on the nose, not merely up to the gauge: the construction of
+\ref{thm:main-characterization} produces the gauge conjugate $\chi^{-1}(\lambda\chi(t))$, which
+in the canonical gauge $\chi = \mathrm{id}$ is $\lambda t$ for every $t \ge 0$, and every clause
+of (A8) reads $S_\lambda$ on $[0,\infty)$ only.
+
+(1) $\mu^{\mathrm I}_{x,y} = \delta_{y-x}$ gives $\mu_{s,t} = g_{t^2-s^2}$, and
+$F_{\mathrm I}(\sigma) = b_0\sigma$ gives $F(\omega) = \tfrac12 b_0\omega^2$.
+
+(2) Take the causal Gamma family by its \emph{profile}, $k_{\mathrm I}(u) = \gamma e^{-u}$ with
+no drift; the exponent then comes out of the computation rather than into it. By
+\ref{eq:bridge-profile} the image has folded profile
+\[
+  k(x) = 2\gamma x\int_0^\infty g_u(x)\,e^{-u}\,\frac{du}{u}
+       = \frac{2\gamma x}{\sqrt{2\pi}}\int_0^\infty u^{-3/2}e^{-x^2/2u}e^{-u}\,du
+       = 2\gamma e^{-\sqrt2\,x},
+\]
+by the identity $\int_0^\infty u^{-3/2}e^{-A/u - Bu}\,du = \sqrt{\pi/A}\,e^{-2\sqrt{AB}}$ at
+$A = x^2/2$, $B = 1$ --- equivalently, the Laplace transform
+$\int_0^\infty \frac{x}{\sqrt{2\pi u^3}}e^{-x^2/2u}e^{-\sigma u}du = e^{-x\sqrt{2\sigma}}$ of the
+first-passage law of Brownian motion at level $x$, at $\sigma = 1$. That is the folded profile
+$2\gamma e^{-x/t}$ of \ref{prop:matern-exponent} at $t = 1/\sqrt2$. The exponent now follows
+without a second integral: \ref{eq:bridge} says that $F_{\mathrm I}(\omega^2/2)$ \emph{is} the
+exponent of the admissible datum whose folded profile is \ref{eq:bridge-profile}, and that
+profile has just been identified, so \ref{prop:matern-exponent}(1) evaluates it and
+$F(\omega) = \gamma\log(1 + \omega^2/2) = \gamma\log(1 + t^2\omega^2)$ at $t = 1/\sqrt2$. In
+particular the causal exponent $\gamma\log(1+\sigma)$ is a consequence of the causal profile and
+need not be assumed.
+
+(3) is the classical normal variance-mixture representation, computed in
+\ref{prop:student-t}(1); that identity needs no hypothesis on the causal side. Under the clause's
+hypothesis --- that the inverse-gamma law of shape $a$ is the delay law of a causally admissible
+$F_{\mathrm I}$ --- \ref{lem:bridge-exponents} makes the image admissible and
+self-decomposable, and \ref{lem:student-subordinated} is the same statement read as membership in
+$\mathcal{S}$.
+
+(4) $(\omega^2/2)^\alpha = 2^{-\alpha}|\omega|^{2\alpha}$, and $\alpha \le 1$ maps onto index
+at most $2$.
+
+(5) The causal accumulated exponent in the canonical gauge is $F_{\mathrm I}(x\sigma)$, and the
+image has $\hat\mu_{0,t}(\omega) = e^{-F_{\mathrm I}(t^2\omega^2/2)} = e^{-F(t\omega)}$, so the
+spatial gauge $t$ satisfies $t^2 = x$.
+\end{proof}
+
+The last item deserves a sentence. The causal article names its parabolic gauge because in it
+the memory-line evolution of its Bessel family is a Bessel operator, a heat-type generator; the
+reason is now visible from the other side, that parameter being the spatial scale of the
+subordinated family, with the factor $\tfrac12$ from Brownian scaling. The two articles'
+natural coordinates agree through $x = t^2$, causal scale being a variance and spatial scale a
+standard deviation --- which is also why the scale-space literature's diffusion variable is the
+square of this article's $t$ (\ref{rem:gauge-freedom}).
+
+% draft: Proposition 9.3
+% CHANGED (review 2026-09-09, R16): clause (3)'s closing sentence now excludes F = 0. The zero
+% exponent is stationary everywhere and IS subordinated -- F_I = 0 is causally admissible -- so
+% the sentence was false as written. Clause (2) already carries the same exclusion in the words
+% "other than 0", and clause (3) needs it for the same reason. Found by writing the Lean
+% statement (Skeleton.bridge_strictness_stationary), whose second conjunct now carries it.
+%
+% CHANGED (proof 2026-09-10): the node was [A] on ledger A11 and is now [T]. Formalising
+% clause (2) showed A11 is not its obligation: def:causal-admissible hands the proof the
+% representing measure, so what is left is the positivity of an integral. A11's clause (b) in
+% AXIOMS.md is retired with no consumer; the entry stays, spent by prop:thorin-subclass alone.
+%
+% CHANGED (proof of record 2026-09-10): clauses (2) and (4) are rewritten to the machine-checked
+% route. (2) now derives F_I' by differentiation under the integral sign, with the dominating
+% function named, and concludes by positivity of the integral instead of by Bernstein; the
+% Bernstein reading survives as a closing paragraph, marked as what is not needed. (4) now names
+% the work the phrase "image of the causal cone" hid, which is that the causal cone is closed
+% under dilation -- the one closure property that is not termwise.
+%
+% CHANGED (fidelity review 2026-09-10, R76): TWO NARROWINGS AGAINST THE DRAFT ARE RECORDED, both
+% of them made silently when the node was written and found by the F8 sweep.
+%  (a) The draft's clause (1) closes with a second sentence: "when F is C^1 on (0,infty), a
+%      necessary condition is that u |-> F'(sqrt(2u))/sqrt(2u) be completely monotone." The node
+%      states the criterion alone. The sentence is TRUE -- F_I' is the Laplace transform of
+%      b_0 delta_0 + k_I(u) du, and the chain rule turns it into the displayed map -- but it is
+%      strictly weaker than clause (1), which is an iff, and nothing in the chapter or in the
+%      Lean uses it: no declaration under the tag mentions complete monotonicity. It is dropped
+%      as a redundant weakening, not as a doubtful one.
+%  (b) The draft's clause (4) lists "and their Thorin-type superpositions" among the members of
+%      S. The node's clause (4) does not. That membership is the image half of
+%      prop:thorin-subclass(4) and belongs there; it is also, like the four named families, not
+%      machine-checked -- see row R44.
+%
+% CHANGED (fidelity review 2026-09-10, R44): THE NODE GOES FROM \leanok TO \notready, and the
+% statement is untouched. Three passes found the same thing independently -- the supply-chain
+% card pass, the F7 import sweep and the F8 draft diff -- so it is recorded once, here. Clause
+% (4) has two halves. The CLOSURE half (convex subcone, closed under dilation) and the
+% EXCLUSION half (no Cin ray) are bridge_strictness_cone, proved, Lean core. The MEMBERSHIP
+% half -- that S contains the Gaussian ray and the Matern, Student-t and symmetric stable
+% families -- has no declaration under this tag and none anywhere: IsSubordinated is an
+% existential over CausalAdmissible, and the development constructs NO causally admissible
+% datum at all, only the add/smul/dilate combinators of CausalCone.lean. prop:bridge-families,
+% which the proof cites for the memberships, states the image identities for a GIVEN causal
+% datum and exhibits none either.
+% Why it is not a cheap fix, which is the part worth writing down: the Gaussian membership is
+% one 20-line datum (b_0 = 2a, k = 0) and the causal Gamma one is a middling exercise, but the
+% Student-t membership needs the \Levy{} data of the inverse-gamma delay law, which is exactly
+% what ledger A18 grounds -- and A18 is deliberately unadmitted, for want of a consumer
+% (AXIOMS.md A18: "what the entry grounds is the CAUSAL admissibility of the Bessel family").
+% So the membership half cannot be closed without either admitting A18 or splitting the clause.
+% Why \notready rather than a disclosure in place: this article's own rule, applied twice
+% during the campaign (prop:thorin-subclass clause (3) -> lem:thorin-ggc; prop:polya-frequency's
+% fourth exclusion -> lem:polya-student-exclusion), is that a \leanok node claims exactly what
+% its declarations prove and an unformalised clause is SPLIT OUT, not disclosed in place. The
+% split is a statement change at a Tier-1 node and belongs to the author, so the review takes
+% the honest interim: \notready, with the annotation saying precisely which half is checked.
+% That interim ended on 2026-09-11; the next marker is what replaced it.
+%
+% CHANGED (2026-09-11, R44 split): THE MEMBERSHIP SENTENCE IS SPLIT OUT, and the node returns to
+% \leanok, statement and proof block both. The author's decision applies the rule the block above
+% names: a \leanok node claims exactly what its declarations prove, and an unformalised clause is
+% split out rather than disclosed in place (prop:thorin-subclass(3) -> lem:thorin-ggc;
+% prop:polya-frequency's fourth exclusion -> lem:polya-student-exclusion). What moved: clause
+% (4)'s sentence "containing the Gaussian ray and the Matern, Student-t and symmetric stable
+% families" is now lem:subordinated-members below -- [A] on ledger A18, notready, typed as
+% Skeleton.subordinated_members -- and the citation of prop:bridge-families that carried it moved
+% out of the proof of clause (4) with it. What stays is what the five declarations prove: the
+% convex subcone, the dilations, and the exclusion of the Cin rays.
+%
+% ONE FURTHER NARROWING, found while making the split and NOT part of R44. Clause (4) closed with
+% "So the symmetric theory is strictly larger than the causal theory in Brownian disguise, and the
+% extra members are exactly those with catalogue mass on hard steps." The first half stays: it is
+% the Cin exclusion read against lem:cin-rays, which puts those rays in the admissible cone. The
+% second half is an IFF and only one direction of it is proved -- clause (3) gives that an F with
+% a lattice-step profile is not subordinated, never the converse -- and the iff is FALSE as it
+% stands: an admissible F whose catalogue is carried by a compact subset of (0,infty) and is not
+% lattice-carried has no causal ancestor either, every subordinated profile being a Gaussian
+% mixture of the delay catalogue (eq:bridge-profile) and hence strictly positive on all of
+% (0,infty). So the sentence is not a clause of this node. It is moved into the discussion
+% paragraph after the proof and restated in the direction that is proved, and the identification
+% that paragraph already carried ("are the members of the spatial theory with no causal
+% ancestor") is narrowed with it. The chapter's own CHECK note at rem:bridge-crossings, which
+% records that the exact extent of S is open, is the same observation from the other side.
+% CHANGED (2026-09-11, R121): the annotation's last sentence no longer says the membership node
+% is notready; three of its four memberships are machine-checked there and the Student-t one is
+% lem:student-subordinated. Annotation only; the statement and proof are unchanged.
+% CHANGED (2026-09-19, article mirror of module B, R174): clause (4)'s closing sentence -- "So the
+% symmetric theory is strictly larger than the causal theory in Brownian disguise" -- is MOVED OUT
+% of the statement, to the discussion paragraph after lem:student-subordinated's proof, and
+% restated without the image ("larger than the image of the causal theory under the bridge"). It is
+% the register pass's item 13: commentary inside a statement. It is a reading of the exclusion
+% clause and no declaration of the tag proves a sentence of that shape, so the statement claims
+% less; the reading survives where the chapter discusses strictness. No Lean and no status change.
+\begin{proposition}[strictness: the bridge is not onto]\label{prop:bridge-strictness}
+\uses{lem:bridge-exponents,lem:selfdecomposable-exponents,prop:choquet-cone,lem:cin-rays,lem:lattice-zero,def:causal-admissible,prop:bridge-families}
+\lean{SpatialLine.bridge_strictness_criterion, SpatialLine.bridge_strictness_increasing,
+SpatialLine.bridge_strictness_cin, SpatialLine.bridge_strictness_stationary,
+SpatialLine.bridge_strictness_cone}\leanok
+\notes{dickman-cin-rays}
+Call an admissible $F$ \emph{subordinated} if $F(\omega) = F_{\mathrm I}(\omega^2/2)$ for some
+causally admissible $F_{\mathrm I}$, and write $\mathcal{S}$ for the set of subordinated
+exponents.
+\begin{enumerate}
+\item $F$ is subordinated if and only if $\sigma \mapsto F(\sqrt{2\sigma})$ is causally
+admissible.
+\item Every subordinated $F$ other than $0$ is strictly increasing on $(0,\infty)$, with
+$F' > 0$ there.
+\item No $\Cin$ ray is subordinated, since $\Cin'(z) = (1 - \cos z)/z$ vanishes at every
+$z \in 2\pi\ZZ \setminus \{0\}$. More generally, an admissible $F$ has a stationary point
+$\omega_0 \ne 0$ if and only if $a = 0$ and the Choquet measure $\varpi$ of
+\ref{prop:choquet-cone} is carried by the lattice $\tfrac{2\pi}{|\omega_0|}\ZZ$, that is, if
+and only if $a = 0$ and the profile $k$ is a step function with all its jumps on that lattice; and no such
+$F$ with $F \not\equiv 0$ is subordinated.
+\item $\mathcal{S}$ is a convex subcone of the admissible cone, closed under the dilations
+$F \mapsto F(\lambda\,\cdot)$; it contains none of the extreme rays $\Cin(\tau\,\cdot)$.
+\end{enumerate}
+\statusT\quad\emph{(The node carried A11 until 2026-09-10, for one step of clause (2): that a
+completely monotone function vanishing at an interior point vanishes identically. Formalising
+the clause showed that step is not its obligation. \ref{def:causal-admissible} \emph{hands} the
+proof the representing measure $k_{\mathrm I}(u)\,du$; what has to be shown is that
+$b_0 + \int_0^\infty e^{-\sigma u}k_{\mathrm I}(u)\,du$ is strictly positive unless
+$(b_0, k_{\mathrm I})$ vanishes, which is an integral of a positive integrand and needs no
+representation theorem. Bernstein's theorem produces a measure; here there is one already. All
+five declarations are machine-checked to Lean core, and the proof below is the checked route.
+Clause (4)'s \emph{membership} sentence --- that $\mathcal{S}$ contains the Gaussian ray and the
+\Matern{}, Student-t and symmetric stable families --- was split out to
+\ref{lem:subordinated-members} on 2026-09-11 (R44, the author's decision); its Gaussian, \Matern{}
+and stable memberships are machine-checked there, and its Student-t membership is
+\ref{lem:student-subordinated}, \texttt{notready} on ledger A18 (R121). What the four clauses
+claim here is what the five declarations prove.)}
+\end{proposition}
+
+% CHANGED (2026-09-11, R44 split): the proof block is \leanok again. The membership sentence and
+% the citation of prop:bridge-families that carried it moved to lem:subordinated-members with the
+% clause; what is below is the checked route for all four clauses.
+\begin{proof}\leanok
+(1) is \ref{def:causal-admissible} read on $F_{\mathrm I}(\sigma) := F(\sqrt{2\sigma})$.
+
+(2) Let $F = F_{\mathrm I}(\cdot^2/2)$ with $F_{\mathrm I}$ causally admissible, and suppose
+$F \not\equiv 0$. Fix $\sigma > 0$. On $(1,\infty)$ the elementary bound
+$u\,e^{-\sigma u/2} \le 2/\sigma$ turns $e^{-\sigma u/2}k_{\mathrm I}(u)$ into
+$(2/\sigma)\,k_{\mathrm I}(u)u^{-1}$, integrable by the second condition of
+\ref{def:causal-admissible}, and on $(0,1)$ it is at most $k_{\mathrm I}$, integrable by the
+first; so $e^{-\sigma u/2}k_{\mathrm I}(u)$ dominates the $\sigma$-derivative
+$e^{-\sigma u}k_{\mathrm I}(u)$ of the integrand uniformly for $\sigma$ in a neighbourhood of
+the given one, and differentiation under the integral sign gives
+\[
+  F_{\mathrm I}'(\sigma) = b_0 + \int_0^\infty e^{-\sigma u}\,k_{\mathrm I}(u)\,du,
+  \qquad \sigma > 0 .
+\]
+Both terms are nonnegative. If the sum vanishes at one $\sigma > 0$ then $b_0 = 0$ and, the
+exponential being strictly positive, $k_{\mathrm I} = 0$ almost everywhere on $(0,\infty)$;
+but then the representation makes $F_{\mathrm I}$, and so $F$, identically zero. Hence
+$F_{\mathrm I}' > 0$ on $(0,\infty)$, and the chain rule gives
+$F'(\omega) = \omega\,F_{\mathrm I}'(\omega^2/2) > 0$ for $\omega > 0$. A function continuous
+on $(0,\infty)$ with positive derivative there is strictly increasing there, and $F$ is
+continuous, its representation \ref{eq:sd-profile} being so by dominated convergence.
+
+The derivative formula is the only place the causal representation is differentiated, and one
+classical step does \emph{not} enter it. Read as a function of $\sigma$, $F_{\mathrm I}'$ is
+the Laplace transform of the positive measure $b_0\delta_0 + k_{\mathrm I}(u)\,du$, so it is
+completely monotone and one may argue, as the causal article does, that a completely monotone
+function vanishing at an interior point vanishes identically. That is Bernstein's theorem, and
+it is not needed: it \emph{produces} a representing measure, and \ref{def:causal-admissible}
+has already given one. What is left is the positivity of an integral, which is the display
+above.
+
+(3) $\Cin'(2\pi n) = 0$ for every nonzero integer $n$, which contradicts (2); so no $\Cin$ ray
+is subordinated. For the general statement, \ref{eq:symbol} gives
+$\omega F'(\omega) = B(\omega) = 2a\omega^2 + \int (1 - \cos\omega u)\,\varpi(du)$, a sum of
+nonnegative terms, which vanishes at $\omega_0 \ne 0$ if and only if $a = 0$ and
+$\cos(\omega_0 u) = 1$ for $\varpi$-almost every $u$; the latter says, by the argument of
+\ref{lem:lattice-zero} applied to $\varpi$, that $\varpi$ is carried by
+$\tfrac{2\pi}{|\omega_0|}\ZZ$, which is the profile $k = \varpi((\cdot,\infty))$ being a step
+function with jumps on that lattice. Such an $F$ has a stationary point off the origin, so it
+is not subordinated, by (2).
+
+(4) $\mathcal{S}$ is the image of the causal cone under $F_{\mathrm I} \mapsto
+F_{\mathrm I}(\cdot^2/2)$, so the three closure properties are closure properties of the causal
+cone, and the map carries them across because it is linear and because
+$F_{\mathrm I}(\lambda^2\,\cdot)$ maps to $F(\lambda\,\cdot)$ --- a spatial dilation by
+$\lambda$ is a causal dilation by $\lambda^2$. On the causal side, sums and nonnegative
+multiples act on the data $(b_0, k_{\mathrm I})$ termwise and the two conditions of
+\ref{def:causal-admissible} are preserved term by term. The dilation $F_{\mathrm I} \mapsto
+F_{\mathrm I}(c\,\cdot)$, $c > 0$, has data $(c\,b_0, k_{\mathrm I}(\cdot/c))$, and for it the
+two conditions are better read as the single one
+\[
+  \int_0^\infty (1 \wedge u)\,k_{\mathrm I}(u)\,\frac{du}{u} < \infty,
+\]
+which they are equivalent to, $(1 \wedge u)/u$ being $1$ below $1$ and $u^{-1}$ above it. The
+change of variables $u = cx$ leaves $du/u$ invariant, so it transforms that integral into
+$\int_0^\infty (1 \wedge cx)\,k_{\mathrm I}(x)\,dx/x$, and
+$1 \wedge cx \le \max(1,c)\,(1 \wedge x)$ bounds it by $\max(1,c)$ times the undilated one. Splitting the two windows first would
+instead require the change of variables on two moving intervals. The exclusion of the $\Cin$
+rays is (3), whose Choquet coordinates are \ref{prop:choquet-cone}.
+\end{proof}
+
+% draft: Proposition 9.3(4), the membership sentence
+% NEW as a node (2026-09-11, R44, the author's decision). The content is not new: the sentence
+% stood inside prop:bridge-strictness(4) from the first writing of this chapter. What is new is
+% that it is stated apart, because it has no declaration and cannot cheaply get one.
+% IsSubordinated is an existential over CausalAdmissible, and the development exhibits no causally
+% admissible datum at all -- CausalCone.lean has the add/smul/dilate combinators and no generator
+% to feed them; prop:bridge-families, which the proof below cites, states the image identities for
+% a GIVEN causal datum and exhibits none either. Per family the cost is one datum: Gaussian
+% b_0 = 2a with k_I = 0, about twenty lines; the causal Gamma datum for the Matern and the causal
+% stable datum for the stable family, middling exercises; and for the Student-t the \Levy{} data of
+% the inverse-gamma delay law, which is exactly what ledger A18 grounds and which this article
+% leaves unadmitted for want of a consumer. So the node is [A] on A18 and notready, with
+% Skeleton.subordinated_members as its typed target. The Lean statement quantifies over the
+% Student-t exponent through its transform -- there is no closed-form Student-t exponent in the
+% development, and -log of prop:student-t(2)'s closed form is junk at omega = 0 -- which loses
+% nothing, exp being injective.
+% CARRIED TO THE DRAFT SYNC, NOT STATED HERE (R44's F8 finding): draft Proposition 9.3(4) lists
+% "and their Thorin-type superpositions" among the members of S, and the blueprint dropped that
+% without a record. It is the image half of prop:thorin-subclass(4) and belongs there; it is not
+% a clause of this node, and no declaration of this node would cover it.
+% CHANGED (2026-09-11, the author's decision on the post-sync recommendation, R115): the phrase is
+% DROPPED, not moved into prop:thorin-subclass(4). That clause already states the bridge on the
+% Thorin subclasses, and a membership sentence beside it would repeat the shape R44 and R79
+% removed from \leanok nodes; "Thorin-type superpositions" of the four named families is also not
+% well defined (the stable family is itself a Thorin superposition). No sentence citing clause (4)
+% for "every symmetric Thorin member is subordinated" is added: SpatialLine.thorin_bridge proves
+% the forward map only -- the image of a causal Thorin member is a symmetric Thorin member with
+% U twice the image of U_I -- and not the surjectivity that clause (4)'s "onto" asserts. The
+% draft's bracketed note at Lemma 9.3' is removed.
+% CHANGED (2026-09-11, R121, split under the safe-direction delegation): THE THREE ELEMENTARY
+% MEMBERSHIPS ARE MACHINE-CHECKED AND THE STUDENT-T MEMBERSHIP IS SPLIT OUT. The statement is
+% narrowed to the Gaussian ray and the Matern and symmetric stable families, which is what
+% SpatialLine.subordinated_members proves on Lean core; the node is [T] and \leanok and A18 leaves
+% it (the author's decision of 2026-09-11: split, not admit). The Student-t membership is
+% lem:student-subordinated below, [A] on A18 and notready, with the paragraph of the old proof
+% that concerned it; the \uses edge to prop:student-t moved with it. The edge to prop:two-members
+% is dropped: no declaration of this node reads it, the families' exponents being the vocabulary
+% of prop:matern-exponent and prop:stable-family. The proof is rewritten to the checked route.
+% Findings: the development now exhibits causally admissible data
+% (SpatialLine/CausalData.lean: the drift, the Gamma profile, the stable profile); and the causal
+% stable exponent sigma^beta needs no limit at the origin -- the causal article matches
+% derivatives on (0,infty) and limits at 0+, while here the homogeneity of the profile turns the
+% causal dilation into a multiple and one derivative at sigma = 1 fixes the constant.
+% twin: hcs prop:gamma-family, prop:stable-family -- the causal data
+% (Hemigroup.SelfDecomposableExponent.gammaExponent, ...stableExponent), ported onto the local
+% mirror CausalAdmissible with the same profiles and guards.
+\begin{lemma}[the subordinated slice's members]\label{lem:subordinated-members}
+\uses{prop:bridge-strictness,prop:bridge-families,def:causal-admissible,prop:matern-exponent,prop:stable-family}
+\lean{SpatialLine.subordinated_members}\leanok
+\notes{dickman-cin-rays}
+$\mathcal{S}$ contains the Gaussian ray and the \Matern{} and symmetric stable families.
+\statusT\quad\emph{(All three memberships are machine-checked to Lean core, as
+\texttt{SpatialLine.subordinated\_members}, at the parameter ranges the corner nodes use:
+$a \ge 0$ for the Gaussian ray $a\omega^2$, $\gamma, \theta > 0$ for the \Matern{} family, and
+$0 < \alpha < 2$ for the symmetric stable family $|\omega|^\alpha$, whose endpoint $\alpha = 2$
+is the Gaussian ray. The proof below is the checked route; the three causally admissible data it
+exhibits are the first instances of \ref{def:causal-admissible} in the development. The
+Student-t family's membership rests on ledger A18 and is stated apart as
+\ref{lem:student-subordinated}.
+\emph{Provenance.} The sentence stood inside \ref{prop:bridge-strictness}(4) until 2026-09-11,
+with no declaration under that node's tag; the fidelity review recorded that as row R44, and the
+author's decision split it out on the article's own rule, that a node marked as formalised claims
+exactly what its declarations prove. The same day the three elementary memberships were
+formalised and the Student-t membership was split out in turn (R121).)}
+\end{lemma}
+
+\begin{proof}\leanok
+Membership in $\mathcal{S}$ asks for a causally admissible datum $(b_0, k_{\mathrm I})$ whose
+exponent, read at $\omega^2/2$, is the given exponent. One datum is exhibited per family, and the
+named families at their general parameters are then reached by the closure clauses of
+\ref{prop:bridge-strictness}(4).
+
+\emph{The Gaussian ray.} For $b_0 \ge 0$ the datum $(b_0, 0)$ satisfies
+\ref{def:causal-admissible} with nothing to check, and its exponent is
+$F_{\mathrm I}(\sigma) = b_0\sigma$ for $\sigma \ge 0$. With $b_0 = 2a$ it gives
+$F_{\mathrm I}(\omega^2/2) = a\omega^2$.
+
+\emph{The \Matern{} family.} Let $b_0 = 0$ and $k_{\mathrm I}(u) = \gamma e^{-u}$ for $u > 0$. The
+profile is nonincreasing, bounded by $\gamma$ on $(0,1)$, and $k_{\mathrm I}(u)/u \le \gamma
+e^{-u}$ on $(1,\infty)$, so both conditions of \ref{def:causal-admissible} hold. By
+\ref{prop:bridge-families}(2), $F_{\mathrm I}(\omega^2/2) = \gamma\log(1 + \omega^2/2)$, the
+\Matern{} exponent at range $1/\sqrt2$. For $\theta > 0$,
+\[
+  \gamma\log(1 + \theta^2\omega^2) = \gamma\log\bigl(1 + \tfrac12(\sqrt2\,\theta\,\omega)^2\bigr),
+\]
+so the \Matern{} exponent at range $\theta$ is the dilation by $\lambda = \sqrt2\,\theta$ of the one
+at range $1/\sqrt2$, and it lies in $\mathcal{S}$ because $\mathcal{S}$ is closed under
+dilations.
+
+\emph{The symmetric stable family.} Let $0 < \beta < 1$ and $c_\beta = \beta/\Gamma(1-\beta)$,
+and take $b_0 = 0$ and $k_{\mathrm I}(u) = c_\beta u^{-\beta}$ for $u > 0$. The profile is
+nonincreasing, and $\int_0^1 u^{-\beta}du = (1-\beta)^{-1}$ and
+$\int_1^\infty u^{-\beta-1}du = \beta^{-1}$ are finite, the first because $\beta < 1$ and the
+second because $\beta > 0$. Its exponent is
+\[
+  F_{\mathrm I}(\sigma) = \sigma^\beta, \qquad \sigma \ge 0 .
+\]
+The profile is homogeneous: $k_{\mathrm I}(u/c) = c^\beta k_{\mathrm I}(u)$ for $c > 0$. So the
+dilated datum $(c\,b_0, k_{\mathrm I}(\cdot/c))$ of the proof of \ref{prop:bridge-strictness}(4),
+whose exponent is $F_{\mathrm I}(c\,\cdot)$, is the datum $(c^\beta b_0, c^\beta k_{\mathrm I})$,
+whose exponent is $c^\beta F_{\mathrm I}$; hence $F_{\mathrm I}(\sigma) = \sigma^\beta
+F_{\mathrm I}(1)$ for every $\sigma > 0$. The two sides agree on a neighbourhood of $\sigma = 1$,
+so their derivatives there agree: the right side has derivative $\beta F_{\mathrm I}(1)$, and by
+the derivative formula in the proof of \ref{prop:bridge-strictness}(2)
+\[
+  F_{\mathrm I}'(1) = \int_0^\infty e^{-u}\,c_\beta u^{-\beta}\,du = c_\beta\,\Gamma(1-\beta)
+  = \beta .
+\]
+Hence $F_{\mathrm I}(1) = 1$, and $F_{\mathrm I}(0) = 0$ by the representation. By
+\ref{prop:bridge-families}(4), $F_{\mathrm I}(\omega^2/2) = 2^{-\beta}|\omega|^{2\beta}$. Given
+$0 < \alpha < 2$, take $\beta = \alpha/2$: then $|\omega|^\alpha = 2^{\alpha/2}F_{\mathrm
+I}(\omega^2/2)$ is a positive multiple of a member of $\mathcal{S}$, and lies in $\mathcal{S}$,
+which is a cone.
+\end{proof}
+
+% draft: Proposition 9.3(4), the membership sentence, its Student-t member (draft Lemma 9.3'')
+% NEW as a node (2026-09-11, R121, split under the delegation). The sentence is not new: it was
+% one of the four memberships of lem:subordinated-members (R44) and, before that, of
+% prop:bridge-strictness(4). It is stated apart because the other three memberships are now
+% machine-checked and this one cannot be on Lean core: the causal datum it needs is the \Levy{} data
+% of the inverse-gamma delay law, which is what ledger A18 grounds, and A18 stays unadmitted (the
+% author's decision of 2026-09-11: split, not admit). Typed as Skeleton.student_subordinated, the
+% third conjunct of the former Skeleton.subordinated_members verbatim, which quantifies over the
+% Student-t exponent through its transform.
+% twin: hcs prop:bessel-family (causal ledger A8) for the causal datum.
+% CHANGED (2026-09-15, module B step 2, R160): THE DELAY LAW BECOMES A HYPOTHESIS, and the node
+% is [T] and \leanok. It read "S contains the Student-t family", [A] on ledger A18 and notready,
+% waiting on Skeleton.student_causal -- the declaration the entry would have carried. What the
+% proof consumes is not the named-class result (Halgreen: the generalized inverse Gaussian laws
+% are generalized gamma convolutions) but one causally admissible datum whose delay law is the
+% inverse-gamma law of shape a; quantifying over that datum loses nothing, and the passage from
+% it to membership in S is the bridge image, machine-checked as SpatialLine.student_subordinated
+% on Lean core. The existence of the datum is the cited remark rem:student-ggc, marked as not
+% machine-checked, which is where A18 now binds; the entry stays unadmitted and the trust
+% boundary is unchanged. Skeleton.student_subordinated and Skeleton.student_causal are withdrawn.
+% The direction is the delegation's: the node claims less -- a conditional -- and what it claims
+% is checked. (P-0010, which asked for exactly this to be tried before module B is drafted.)
+\begin{lemma}[the Student-t family is subordinated]\label{lem:student-subordinated}
+\uses{prop:bridge-strictness,prop:bridge-families,def:causal-admissible,prop:student-t}
+\lean{SpatialLine.student_subordinated}\leanok
+\notes{dickman-cin-rays}
+Let $a > 0$, let $T_1$ be the inverse-gamma law of shape $a$ of \ref{prop:student-t}, and suppose
+$T_1$ is the delay law of a causally admissible exponent: that for some $F_{\mathrm I}$ as in
+\ref{def:causal-admissible},
+\[
+  \mathbb{E}e^{-\sigma T_1} = e^{-F_{\mathrm I}(\sigma)}, \qquad \sigma \ge 0 .
+\]
+Then $\mathcal{S}$ contains the Student-t family of shape $a$, with $F_{\mathrm I}$ as its causal
+ancestor. That $T_1$ is such a delay law is cited at \ref{rem:student-ggc} and is not asserted
+here.
+\statusT\quad\emph{(Machine-checked to Lean core as
+\texttt{SpatialLine.student\_subordinated}, at the reading the withdrawn skeleton target already
+had: the Student-t exponent is quantified over through its transform --- every $F$ whose
+exponential $e^{-F}$ is the cosine transform of the Student-t law of shape $a$ is subordinated
+--- which loses nothing, the exponential being injective. The hypothesis is the whole of what
+this node once took from ledger A18, and it is weaker than the entry: only self-decomposability
+of $T_1$ is used here, not that it is a generalized gamma convolution, which
+\ref{prop:student-t}(3) needs and \ref{rem:student-ggc} supplies. Nothing is admitted ---
+\ledger{A18} grounds a hypothesis this node quantifies over, and no name of it is on the trust
+boundary.
+\emph{Provenance.} Split from \ref{lem:subordinated-members} on 2026-09-11 (R121), when that
+node's other three memberships were machine-checked; restated with the delay law as a hypothesis
+on 2026-09-15, under the safe-direction delegation.)}
+\end{lemma}
+
+\begin{proof}\leanok
+Conditioning the Brownian kernel on $T_1$, the Student-t law of shape $a$ is the mixture of the
+Gaussian laws against the law of $T_1$ --- \ref{prop:bridge-families}(3) --- so its cosine
+transform at $\omega$ is $\mathbb{E}e^{-T_1\omega^2/2}$, which is the mixture identity of
+\ref{lem:bridge-exponents}. The hypothesis read at $\sigma = \omega^2/2$ turns that into
+$e^{-F_{\mathrm I}(\omega^2/2)}$. So an exponent $F$ of the Student-t family --- one with
+$e^{-F(\omega)} = \hat\phi_1(\omega)$ at every frequency --- satisfies
+$e^{-F(\omega)} = e^{-F_{\mathrm I}(\omega^2/2)}$ there, hence
+$F(\omega) = F_{\mathrm I}(\omega^2/2)$ pointwise, the exponential being injective. That is
+membership in $\mathcal{S}$, with $F_{\mathrm I}$ as the ancestor.
+\end{proof}
+
+% CHANGED 2026-09-19 (R178, second external review round, referee B finding 12): the paragraph
+% below said "an admissible F whose CATALOGUE is carried by a compact subset of (0,infty)". The
+% catalogue is the \Levy{} measure nu = k dx/x (rem:displacement-dictionary), and for a
+% nonincreasing k not identically zero its support contains a neighbourhood of the origin, so no
+% catalogue is carried by a compact subset of the open half-line and the sentence was empty as
+% written. What the argument needs, and what it is true of, is the TAIL MEASURE varpi = -dk: a
+% profile that is continuous and of bounded support. The conclusion is unchanged; a prose sentence
+% is corrected.
+The criterion in (3) is worth a second look, because it is the third appearance of one
+phenomenon. A zero of an \emph{exponent} at $\omega_0 \ne 0$ means a lattice law
+(\ref{lem:lattice-zero}) and is excluded by covariance (\ref{lem:no-lattice}); a zero of the
+\emph{symbol} $B = \omega F'$ at $\omega_0 \ne 0$ means a lattice \emph{profile}, a catalogue
+whose jump sizes lie on a lattice, and is excluded by no axiom --- the $\Cin$ rays are the case
+of a single jump size. It is excluded exactly by subordination, because a Gaussian mixture
+spreads every jump size over the whole line.
+
+So the bridge is not onto, and the symmetric theory is strictly larger than the image of the
+causal theory under it.
+Symmetric self-decomposable laws with a lattice-step profile are members of the
+spatial theory with no causal ancestor. That is the direction the statements above give --- it is
+clause (3) in its general form, of which clause (4)'s exclusion of the $\Cin$ rays is the case of a
+single jump size. The
+converse --- that a member with no causal ancestor must have its catalogue mass on steps --- is
+not asserted, and it fails: an admissible $F$ whose \emph{tail measure} $\varpi = -dk$ is carried
+by a compact subset of $(0,\infty)$ and has no atom there --- equivalently, whose profile is
+continuous and of bounded support --- has no ancestor either, because a subordinated
+profile is a Gaussian mixture of the delay catalogue (\ref{eq:bridge-profile}) and is therefore
+positive at every $x > 0$. (The catalogue itself, the \Levy{} measure $\nu = k\,dx/x$ of
+\ref{rem:displacement-dictionary}, is carried by no compact subset of $(0,\infty)$: a
+nonincreasing $k \not\equiv 0$ is positive on a neighbourhood of the origin. The sentence said
+``catalogue'' until 2026-09-19; R178.) How much larger than the lattice-step members the complement of
+$\mathcal{S}$ is, this chapter does not settle.
+
+% NEW NODE (2026-09-17, the author's review of module B, R166): the dimension filtration as a
+% statement. The author's finding at section 4 of module B: rem:dimension-filtration was "an
+% enormous amount of technical prose where a large part reads as a proof", and that it is not
+% machine-checked does not make it less of a proof; it must be a proposition with a proof, with
+% the motivation before it. So the remark's proof-shaped paragraphs -- the classes, the nesting,
+% the slice inside every dimension, what clause (3) says -- are this node and its proof, and the
+% remark keeps what is a remark: the geometric readings, the two questions with the literature,
+% the family behind the lemma and the numerics. It is an [A] node: the top clause rests on the
+% radial theorem, which is the NEW ledger entry A23 (Schilling-Song-Vondracek Thm. 13.14 p. 212
+% with the Bernstein representation Thm. 3.2 p. 21, both read by the librarian on 2026-09-17), and
+% on A2 and A3 read at their anchors in dimension d; the slice clause rests on A3 in dimension d and
+% on A7's polar criterion (Sato Thm. 15.10, already in A7's cite line). The subordination reading
+% of the slice clause (Sato Thm. 30.1, (30.8), p. 198, read by the librarian the same day) is an
+% interpretation and is not load-bearing: the proof exhibits the Levy pair by Tonelli, as
+% lem:bridge-exponents does at d = 1. No Lean is scheduled; nothing here is machine-checked; the
+% widening of the ledger (a new entry, A23) is the author's decision at the review.
+% CHANGED (2026-09-18, module B register pass, R167): two hypotheses restored, both found by the
+% blind reviewer of paper-b section 4. (a) prop:bridge-strictness(3)'s restating clause "that is,
+% if and only if the profile k is a step function ..." dropped the conjunct a = 0 it restates
+% (a omega^2 + Cin(tau omega) with a > 0 has a lattice-step profile and no stationary point; the
+% Lean, SpatialLine.bridge_strictness_stationary, has P.a = 0 in the equivalence). (b) Clause (3)
+% of this node excluded every admissible F with a lattice-step profile from A_infty, by a proof
+% that goes through prop:bridge-strictness(3) and therefore needs a = 0; the clause, its summary
+% sentence and the proof now carry "with Gaussian coefficient 0". (The claim for a > 0 is true by
+% another route, the profile of a member of B being continuous, and is not asserted.) (c) The
+% proof's use of the radial theorem said nothing of the dilation between F(|xi|) and
+% f(|xi|^2) = F(sqrt 2 |xi|); one sentence now does. All three make the article claim the same or
+% less; no status changes.
+% CHANGED (2026-09-19, the author's decision D1 at the external review of module B, R172): A
+% WIDENING. New clause (4), A_infty = S, with its proof. The article called this open
+% (rem:dimension-filtration, the conclusions); the referee observed that it follows from the
+% radial theorem applied to the REMAINDERS of self-decomposability, which are infinitely
+% divisible in every dimension (Sato Prop. 15.5, read verbatim from the page image on
+% 2026-09-19: "rho_b in (15.1) is uniquely determined and infinitely divisible", on R^d). The
+% half-line step uses ledger A11 and A12 (a Bernstein function's exponential is completely
+% monotone, hence a Laplace transform), A7 (Cor. 15.11) and Sato Thm. 24.11 with Remark 21.6
+% (a law on the half-line: no Gaussian part, Levy measure on (0,oo), the Laplace form). The
+% argument is the referee's; the checking and the writing are this session's.
+% CHANGED 2026-09-19 (R179, second external review round, referee B finding 9): THREE STEPS OF THE
+% PROOF ARE NAMED, none of them new. (a) Clause (4)'s "by the one-dimensional characterization" is
+% Sato Cor. 15.11 p. 95 -- ledger A7's own anchor, for a law on the line -- and NOT
+% prop:sd-exponents, which is stated for symmetric laws while the T of that step is carried by the
+% half-line; the line now says so. (b) The radial theorem is stated for f : (0,infty) -> [0,infty),
+% so g_c >= 0 is a hypothesis of its application: it is the monotonicity of the Bernstein function
+% f at c^2 sigma <= sigma, half a sentence. (c) Sato's Def. 15.1 quantifies over b > 1 while the
+% proof of clause (1) uses b in (0,1); the reciprocal is noted at the first use. No statement, no
+% clause and no ledger line changes.
+\begin{proposition}[the dimension filtration]\label{prop:dimension-filtration}
+\uses{prop:bridge-strictness,def:causal-admissible,lem:bridge-exponents,prop:sd-exponents,lem:profile-integrability,prop:fourier-toolbox,prop:choquet-cone}
+For an integer $d \ge 1$ let $\mathcal{A}_d$ be the set of admissible $F$ for which
+$\xi \mapsto F(|\xi|)$, $\xi \in \RR^d$, is the exponent of a self-decomposable law on $\RR^d$;
+let $\mathcal{A}_\infty$ be the intersection of all the $\mathcal{A}_d$; and let $\mathcal{B}$ be the set of
+admissible $F$ for which $\sigma \mapsto F(\sqrt{2\sigma})$ is a Bernstein function on
+$(0,\infty)$.
+\begin{enumerate}
+\item \emph{(The bottom, and the nesting.)} $\mathcal{A}_1$ is the whole admissible cone, and
+$\mathcal{A}_{d+1} \subseteq \mathcal{A}_d$ for every $d \ge 1$.
+\item \emph{(The slice sits in every dimension.)} Let $(b_0,k_{\mathrm I})$ be causally
+admissible with exponent $F_{\mathrm I}$. For every $d$ the function
+$\xi \mapsto F_{\mathrm I}(|\xi|^2/2)$ on $\RR^d$ is the exponent of an isotropic infinitely
+divisible law, with Gaussian covariance $b_0 I$ and with a \Levy{} measure of radial density
+$f_d(r) = \int_0^\infty (2\pi u)^{-d/2}e^{-r^2/2u}\,k_{\mathrm I}(u)\,du/u$, whose polar profile
+is
+\begin{equation}\label{eq:radial-profile}
+  |S^{d-1}|\,r^d f_d(r)
+   = \frac{2}{\Gamma(d/2)}\int_0^\infty v^{d/2-1}e^{-v}\,
+     k_{\mathrm I}\Bigl(\frac{r^2}{2v}\Bigr)\,dv, \qquad r > 0 ,
+\end{equation}
+nonincreasing in $r$; so that law is self-decomposable, and
+$\mathcal{S} \subseteq \mathcal{A}_d$. At $d = 1$ the polar profile is the folded profile
+\ref{eq:bridge-profile}.
+\item \emph{(The top.)} $\mathcal{A}_\infty \subseteq \mathcal{B}$. Consequently every
+$F \in \mathcal{A}_\infty$ with $F \not\equiv 0$ has $F' > 0$ on $(0,\infty)$, and no admissible
+$F \not\equiv 0$ with Gaussian coefficient $0$ whose profile is a step function with its jumps on a lattice --- in particular
+no $\Cin$ ray --- lies in $\mathcal{A}_\infty$.
+\item \emph{(The intersection is the slice.)} $\mathcal{A}_\infty = \mathcal{S}$: an admissible
+$F$ whose radial extension is the exponent of a self-decomposable law on $\RR^d$ for every $d$
+is subordinated.
+\end{enumerate}
+So $\mathcal{S} = \mathcal{A}_\infty \subseteq \dots \subseteq \mathcal{A}_2 \subseteq
+\mathcal{A}_1$, and the lattice-step members of the line's theory with no Gaussian part lie outside
+$\mathcal{A}_\infty$.
+\statusA\quad\ledger{A23}\quad\ledger{A7}\quad\ledger{A3}\quad\ledger{A2}\quad\ledger{A11}\quad\ledger{A12}\quad\emph{(\textbf{Assignment.}
+Clause (4), added on 2026-09-19, spends \ledger{A23} a second time, on the remainders of
+self-decomposability; \ledger{A7} at the full letter of its Prop.~15.5, that the remainder
+$\rho_b$ of a self-decomposable law on $\RR^d$ is infinitely divisible, and at its
+one-dimensional characterization, read for a law carried by the half-line with the source's
+description of such laws (no Gaussian part, \Levy{} measure on $(0,\infty)$, the Laplace form of
+the exponent); \ledger{A2} in dimension $d$ for the remainders; and \ledger{A12} with
+\ledger{A11}, that the exponential of the negative of a Bernstein function is completely
+monotone and hence the Laplace transform of a positive measure. The argument of clause (4) is
+the external referee's. For clauses (1) to (3):
+\ledger{A23} carries the radial theorem at its source's letter --- $f : (0,\infty) \to [0,\infty)$
+is a Bernstein function if and only if $\xi \mapsto f(|\xi|^2)$ is continuous and negative
+definite on $\RR^d$ for all $d \in \NN$ --- and the representation of a Bernstein function,
+$f(\sigma) = a + b\sigma + \int_{(0,\infty)}(1 - e^{-\sigma u})\,m(du)$ with a unique triplet;
+clause (3) spends both. \ledger{A7} carries, beyond the line case the rest of the article uses,
+the definition of a self-decomposable law on $\RR^d$, that such a law is infinitely divisible,
+and the polar criterion, that an infinitely divisible law on $\RR^d$ is self-decomposable if and
+only if its \Levy{} measure has the polar form with a nonincreasing radial profile along every
+ray; clauses (1) and (2) spend it in that dimension. \ledger{A3} is read at its anchor in
+dimension $d$, where the source states it: the \Levy--Khintchine representation on $\RR^d$, its
+converse and its uniqueness; clause (2) spends the converse and the uniqueness. \ledger{A2} is
+read at its anchor in dimension $d$ as well: the exponent of an infinitely divisible law on
+$\RR^d$ is continuous and negative definite in the kernel sense, which is the hypothesis the
+radial theorem asks for; clause (3) spends it. What is NOT carried, and not claimed: any
+axiomatics in dimension $d$ --- the classes $\mathcal{A}_d$ are defined by the exponent
+condition and not by families of operators, and the reading of them as the radial restrictions
+of isotropic admissible families is \ref{rem:dimension-filtration}'s; the subordination reading
+of clause (2), that the law is Brownian motion on $\RR^d$ run for the delay, which the proof
+does not use; and anything about the top of the filtration beyond the inclusion, whether
+$\mathcal{A}_\infty = \mathcal{S}$ being open. Nothing here is machine-checked and no Lean is
+scheduled: the article has no development of laws on $\RR^d$.)}
+\end{proposition}
+
+\begin{proof}
+(1) An admissible $F$ is of the form \ref{eq:sd-profile}, which is the symmetric
+\Levy--Khintchine form of a self-decomposable law on the line (\ref{prop:sd-exponents}), so
+$F \in \mathcal{A}_1$; and $\mathcal{A}_1$ consists of admissible $F$ by definition. For the
+nesting let $F \in \mathcal{A}_{d+1}$, let $\mu$ be a self-decomposable law on $\RR^{d+1}$ with
+exponent $\xi \mapsto F(|\xi|)$, and let $\Pi : \RR^{d+1} \to \RR^d$ be the projection that
+drops the last coordinate, so that $\Pi^{\mathsf T}$ is an isometric embedding. The image law
+$\Pi_*\mu$ has transform $\eta \mapsto \hat\mu(\Pi^{\mathsf T}\eta) = e^{-F(|\eta|)}$, so its
+exponent is $\eta \mapsto F(|\eta|)$ on $\RR^d$. It is self-decomposable: for $b \in (0,1)$ the
+definition gives a law $\rho_b$ on $\RR^{d+1}$ with $\hat\mu(\xi) = \hat\mu(b\xi)\,\hat\rho_b(\xi)$
+--- the source states it at the reciprocal parameter, quantifying over $1/b > 1$ ---
+for every $\xi$, and reading this at $\xi = \Pi^{\mathsf T}\eta$ gives
+$\widehat{\Pi_*\mu}(\eta) = \widehat{\Pi_*\mu}(b\eta)\,\widehat{\Pi_*\rho_b}(\eta)$, which is the
+definition on $\RR^d$ with $\Pi_*\rho_b$ as the residual. So $F \in \mathcal{A}_d$.
+
+(2) Write $g^{(d)}_u$ for the centred Gaussian density on $\RR^d$ of covariance $u\,I$, and put
+$\nu_d(dx) := \bigl(\int_0^\infty g^{(d)}_u(x)\,k_{\mathrm I}(u)\,du/u\bigr)\,dx$ on
+$\RR^d \setminus \{0\}$, a positive measure with radial density $f_d$. It is a \Levy{} measure:
+since $\int_{\RR^d}(1 \wedge |x|^2)\,g^{(d)}_u(x)\,dx$ is at most the total mass $1$ and at most
+the trace $du$ of the covariance, Tonelli gives
+$\int (1 \wedge |x|^2)\,\nu_d(dx) \le \int_0^\infty (1 \wedge du)\,k_{\mathrm I}(u)\,du/u
+ \le d\int_0^\infty (1 \wedge u)\,k_{\mathrm I}(u)\,du/u < \infty$, the last integral being the
+single-integral reading of the two conditions of \ref{def:causal-admissible}. Since
+$e^{-u|\xi|^2/2} = \int_{\RR^d}\cos(\xi\cdot x)\,g^{(d)}_u(x)\,dx$ and $\int g^{(d)}_u = 1$, a second
+Tonelli exchange gives
+\[
+  F_{\mathrm I}\bigl(\tfrac12|\xi|^2\bigr)
+   = \tfrac12\,\xi\cdot(b_0 I)\xi
+     + \int_{\RR^d}\bigl(1 - \cos\xi\cdot x\bigr)\,\nu_d(dx), \qquad \xi \in \RR^d,
+\]
+the symmetric \Levy--Khintchine form on $\RR^d$ with Gaussian covariance $b_0 I$ and \Levy{}
+measure $\nu_d$; both are invariant under the orthogonal group. By the converse clause of the
+representation theorem in dimension $d$ this is the exponent of an infinitely divisible law,
+isotropic because its transform is, and by the uniqueness clause that law's \Levy{} measure is
+$\nu_d$. Its polar form is read off the radial density: in polar coordinates
+$\nu_d(dx) = f_d(r)\,r^{d-1}\,dr\,d\sigma(\theta)$, so the profile along every ray, in the
+sense of the polar criterion, is $r \mapsto r^d f_d(r)$ up to the constant $|S^{d-1}|$. The
+substitution $u = r^2/2v$, which leaves $du/u$ invariant, turns
+$|S^{d-1}|\,r^d\int_0^\infty (2\pi u)^{-d/2}e^{-r^2/2u}\,k_{\mathrm I}(u)\,du/u$ into
+\ref{eq:radial-profile}, using $|S^{d-1}| = 2\pi^{d/2}/\Gamma(d/2)$ and
+$(2\pi u)^{-d/2}r^d = \pi^{-d/2}v^{d/2}$. The weight $v^{d/2-1}e^{-v}$ no longer involves $r$,
+and $k_{\mathrm I}(r^2/2v)$ is nonincreasing in $r$ for each fixed $v$ because $k_{\mathrm I}$ is
+nonincreasing; so the polar profile is nonincreasing, and by the polar criterion the law is
+self-decomposable. Its exponent restricted to a line is $\omega \mapsto F_{\mathrm I}(\omega^2/2)$,
+which is admissible by \ref{lem:bridge-exponents}, so every subordinated $F$ lies in
+$\mathcal{A}_d$. At $d = 1$, $|S^0| = 2$ and \ref{eq:radial-profile} is \ref{eq:bridge-scaling}
+with the folding factor in place, that is the folded profile \ref{eq:bridge-profile}.
+
+(3) Let $F \in \mathcal{A}_\infty$ and fix $d$. The law on $\RR^d$ with exponent
+$\xi \mapsto F(|\xi|)$ is self-decomposable, hence infinitely divisible, so $e^{-tF(|\xi|)}$ is
+a characteristic function for every $t > 0$, hence positive definite, and $\xi \mapsto F(|\xi|)$
+is continuous and negative definite in the kernel sense. That holds for all $d$, and negative
+definiteness is unchanged by the dilation $\xi \mapsto \sqrt2\,\xi$, so with
+$f(\sigma) := F(\sqrt{2\sigma})$ the function $\xi \mapsto f(|\xi|^2) = F(\sqrt2\,|\xi|)$ is
+continuous and negative definite on every $\RR^d$. By the radial
+theorem $f$ is a Bernstein function on $(0,\infty)$, and
+$F \in \mathcal{B}$. For the derivative, the representation gives
+$f(\sigma) = a + b\sigma + \int_{(0,\infty)}(1 - e^{-\sigma u})\,m(du)$ with $a, b \ge 0$ and
+$\int (1 \wedge u)\,m(du) < \infty$; $a = \lim_{\sigma \downarrow 0} f(\sigma) = F(0) = 0$, $F$
+being continuous with $F(0) = 0$. On $[\sigma_0,\infty)$ for any $\sigma_0 > 0$ the
+$\sigma$-derivative $u\,e^{-\sigma u}$ of the integrand is dominated by $u$ on $(0,1]$ and by
+$1/(e\sigma_0)$ on $(1,\infty)$, both $m$-integrable, so
+$f'(\sigma) = b + \int_{(0,\infty)} u\,e^{-\sigma u}\,m(du)$ for $\sigma > 0$, a sum of
+nonnegative terms that vanishes only if $b = 0$ and $m = 0$, that is only if $f \equiv 0$, that is
+only if $F \equiv 0$. So $F \not\equiv 0$ gives $f' > 0$, and the chain rule gives
+$F'(\omega) = \omega\,f'(\omega^2/2) > 0$ for $\omega > 0$. Finally, an admissible $F \not\equiv 0$
+with Gaussian coefficient $0$ whose profile is a step function with its jumps on a lattice has, by
+\ref{prop:bridge-strictness}(3), a stationary point $\omega_0 \ne 0$, and by evenness one with
+$\omega_0 > 0$; that contradicts $F' > 0$, so no such $F$ lies in $\mathcal{A}_\infty$. The
+$\Cin$ rays are the case of a single jump.
+
+(4) $\mathcal{S} \subseteq \mathcal{A}_\infty$ is clause (2). Conversely let
+$F \in \mathcal{A}_\infty$ and put $f(\sigma) := F(\sqrt{2\sigma})$, a Bernstein function with
+$f(0{+}) = 0$ by clause (3) and the continuity of $F$. Fix $0 < c < 1$. For each $d$ let $\mu_d$
+be the self-decomposable law on $\RR^d$ with exponent $\xi \mapsto F(|\xi|)$. By the definition
+there is a law $\rho_{c,d}$ with $\hat\mu_d(\xi) = \hat\mu_d(c\xi)\,\hat\rho_{c,d}(\xi)$, and by
+the cited proposition $\rho_{c,d}$ is infinitely divisible. Its transform is
+$e^{-(F(|\xi|) - F(c|\xi|))}$, the transform of $\mu_d$ having no zero, so its exponent, being
+continuous with value $0$ at the origin, is $\xi \mapsto F(|\xi|) - F(c|\xi|)$. That function
+is therefore continuous and negative definite on $\RR^d$, for every $d$, and so is its dilate
+$\xi \mapsto F(\sqrt2|\xi|) - F(c\sqrt2|\xi|) = g_c(|\xi|^2)$ with
+$g_c(\sigma) := f(\sigma) - f(c^2\sigma)$. That $g_c$ takes values in $[0,\infty)$, which the
+radial theorem asks of its argument, is the monotonicity of the Bernstein function $f$ at
+$c^2\sigma \le \sigma$. By the radial theorem, applied as in clause (3),
+$g_c$ is a Bernstein function, and $g_c(0{+}) = 0$.
+
+The exponential of the negative of a Bernstein function is completely monotone, and a completely
+monotone function is the Laplace transform of a positive measure on $[0,\infty)$, whose mass is
+the value at $0{+}$. So there are probability laws $T$ and $R_c$ on $[0,\infty)$ with Laplace
+transforms $e^{-f}$ and $e^{-g_c}$, and $e^{-f(\sigma)} = e^{-f(c^2\sigma)}\,e^{-g_c(\sigma)}$
+says that $T$ has the law of $c^2T' + R$ with $T'$ distributed as $T$, $R$ as $R_c$, and the two
+independent, a Laplace transform determining a law on the half-line. As $c$ ranges over $(0,1)$
+so does $c^2$, so $T$ is self-decomposable. By the one-dimensional characterization of
+self-decomposable \Levy{} measures --- A7 at its own anchor, \sscite{sato1999levy},
+Corollary~15.11, p.~95, which is the two-sided form for a law on the line and not
+\ref{prop:sd-exponents}, this $T$ being one-sided rather than symmetric --- its \Levy{}
+measure is $k_{\mathrm I}(u)\,du/u$ on $(0,\infty)$ with $k_{\mathrm I}$ nonincreasing, the law
+being carried by the half-line, and its Laplace exponent is
+$f(\sigma) = b_0\sigma + \int_0^\infty(1 - e^{-\sigma u})\,k_{\mathrm I}(u)\,du/u$ with
+$b_0 \ge 0$ and $\int_0^\infty(1 \wedge u)\,k_{\mathrm I}(u)\,du/u < \infty$, which is the
+single-integral reading of the two conditions of \ref{def:causal-admissible}. So $f$ is causally
+admissible, and $F \in \mathcal{S}$ by \ref{prop:bridge-strictness}(1).
+\end{proof}
+
+% NEW as a remark (2026-09-15, module B step 2, R161), from the postdoc's proposal P-0009 and
+% written for module B's literature paragraph. It is a remark and not a statement node on purpose:
+% every sentence below is either cited to a held page or an elementary consequence of nodes already
+% in this chapter, and the two questions the proposal raises are left open in the text. Nothing here
+% is formalised and nothing here is admitted. The RADIAL form of Schoenberg's theorem is in no
+% ledger entry -- A1 is Bochner (Sato pp. 8-9), A2 is the kernel-versus-exponential form (Schilling
+% p. 36) -- and the closing paragraph says what an entry would have to carry if the reading ever
+% became a statement node.
+% FOUND WHILE WRITING IT, AND DELIBERATELY NOT ASSERTED AS A CLAIM OF THE CHAPTER: an explicit
+% admissible exponent of type G whose mixing subordinator is not self-decomposable, which answers
+% question (i) in the negative, and the same one-parameter family witnessing strictness of the
+% filtration at d = 2. Both are in the closing paragraph, in full in Formalization/SKELETON.md
+% section 23, and they are candidate statement nodes for the author.
+% CHANGED (2026-09-15, module B step 2, R161): this remark is new; no statement of this chapter is
+% touched, and no status changes.
+% CHANGED (2026-09-15, module B step 2, R163): the two constructions ARE NOW NODES, on the author's
+% decision of the same day, and two paragraphs are rewritten to cite them. The "two questions"
+% paragraph no longer says that no statement of this chapter answers either: lem:filtration-strictness
+% answers both, the first in the negative and the second at the bottom of the filtration, and what
+% is left open is A_infty = S, whose argument is a sketch (the convolution reading of
+% eq:radial-profile and an approximate identity in the dimension) and is stated here as a sketch.
+% The "two constructions, offered and not asserted" paragraph becomes the family and the numerics:
+% the general (beta, a, b) member and the thresholds c_d stay here, since they are numerical, and
+% the memberships at c = 4 and c = 8 move to the lemma, where each is a checkable inequality. The
+% comparison of the two sufficient conditions at d = 1 is new and is why the lemma's hypothesis is
+% c <= 6 + 4 sqrt 2 rather than the remark's c <= e/2: the sharper bound keeps the negative half of
+% the derivative and covers both values of c, so clause (2) inherits admissibility from clause (1)
+% instead of repeating it. No status of any node changes; nothing here is machine-checked.
+% CHANGED (2026-09-17, the author's review of module B, R166): the proof-shaped paragraphs -- the
+% radial theorem as applied, the classes, the nesting, why those classes are the restrictions,
+% the slice sits inside every dimension, what clause (3) says, the status paragraph -- are now
+% prop:dimension-filtration above and its proof, [A] on the new ledger entry A23 with A2, A3 and A7
+% read in dimension d. What stays is what is a remark: the geometric reading (the type G
+% identification and the radial-restriction heuristic, now marked as a reading), the two questions
+% with the literature, and the family behind the lemma with its numerics. No status changes; the
+% annotations of def:delay-data and lem:filtration-strictness now cite the proposition for what is
+% asserted and the remark for what stays a reading.
+% CHANGED (2026-09-19, article mirror of module B, R174): the geometric reading's pushforward
+% argument was one sentence of about 120 words and is now five (the register pass's item 20), and
+% its closing clause no longer says twice that the reading is a reading -- the paragraph is headed
+% "The geometric reading" and opens with "heuristically". No claim changes; nothing is added or
+% dropped.
+\begin{remark}[the dimension filtration: readings, questions, numerics]\label{rem:dimension-filtration}
+\uses{prop:dimension-filtration,prop:bridge-strictness,def:causal-admissible,lem:bridge-exponents}
+\emph{The geometric reading.} By the radial theorem, $\mathcal{B}$ is exactly the set of
+admissible $F$ whose radial extension $\xi \mapsto F(|\xi|)$ is a \Levy{} exponent on $\RR^d$
+for every $d$ at once, and the laws so obtained are the variance mixtures of the centred normal
+law with an infinitely divisible mixing law, the type G laws, the mixing law being the delay of
+this chapter (\sscite{maejima2002type}, (1.1), p.~323, and for $\RR^d$ p.~325, who attribute the class to
+Marcus and to Rosi\'nski; \sscite{aoyama2007characterizations}, Definition~1.1, p.~148; the
+one-dimensional mixture form is also \sscite{steutel2004infinite}, (2.7), p.~345); the criterion is about all
+dimensions together, the hard direction of the theorem taking a limit in the dimension. The
+classes $\mathcal{A}_d$ read, heuristically, as the radial restrictions of the isotropic
+admissible families of $\RR^d$. Take a family of operators on $L^1(\RR^d)$ satisfying the evident
+analogue of (A1)--(A8) and (ND), with kernels invariant under the orthogonal group, and push the
+kernels forward under an orthogonal projection onto a line. What comes out satisfies (A1)--(A8)
+and (ND) on the line, with the restriction of $\xi \mapsto F(|\xi|)$ as its exponent: pushforward
+under a linear map commutes with convolution and carries probability measures to probability
+measures and dilations to dilations; the reflection of the line is induced by an orthogonal map;
+and a rotation invariant measure carried by a hyperplane is $\delta_0$. A linear
+image of a self-decomposable law is self-decomposable, which is the nesting argument of
+\ref{prop:dimension-filtration}(1). The converse would need the analogue of
+\ref{thm:main-characterization} in dimension $d$, which this article does not prove. So the
+classes are defined by the exponent condition and not by the families, and only the exponent
+condition is used. In these terms \ref{prop:dimension-filtration}(3) says that the lattice-step members
+of the line's theory, the $\Cin$ rays among them, are not radial restrictions of isotropic
+admissible families valid in every dimension, and are outside the type G laws, not merely
+outside $\mathcal{S}$.
+
+\emph{Two questions, and what the lemma below settles.} The first is settled in the literature, by a theorem of Sato's; the second, to the author's knowledge, is not. The first is whether $\mathcal{S}$ is all of the type G slice, that is whether the
+mixing subordinator of a self-decomposable Gaussian variance mixture is itself
+self-decomposable. The held sources prove the implication in the direction this chapter uses
+and not its converse. \sscite{halgreen1979self} announces on p. 14 and proves on pp. 15--16
+that for a pure variance mixture self-decomposability of the mixing law implies
+self-decomposability of the mixture, and the question left open there is a different one, the
+mean-variance case. \sscite{barndorffnielsen1977infinite} gives infinite divisibility of the
+mixture from infinite divisibility of the mixing law, in $\RR^r$ for every $r$ (pp. 309--311).
+One level up the corresponding statement is an equivalence: $\varphi(s^2/2)$ is the transform
+of a symmetric extended generalized gamma convolution if and only if $\varphi$ is the transform
+of a generalized gamma convolution (\sscite{bondesson1992generalized}, Thm. 7.3.1, pp. 115--116,
+proved in both directions), which is the Thorin-level twin of \ref{prop:thorin-subclass}(3). At the level of class L the converse is false, and this is known: \sscite{sato2001subordination}, Theorem~1.2, constructs a self-decomposable law of type G that is the Gaussian mixture of no self-decomposable law on the half-line, the mixing law being determined by the mixture (his Lemma~3.1).
+% CHANGED 2026-09-19 (R192, left by batch S2; referee B finding 10(iii), with Sato's (3.7) read
+% from the held copy this session): "what this paper adds is an explicit family with its
+% constants" is withdrawn. Sato's own witness is explicit, and it is printed here; what is new is
+% the crossing of the dimensions and the identification at the top. Safe direction: a novelty
+% claim is dropped.
+His witness is explicit as well: the delay profile of his (3.7), p.~8, is $2s^{-1/2}$ on
+$(0,1/(a+b)) \cup [1/a,\infty)$ and $-2s^{-1/2} + c$ on $[1/(a+b),1/a)$, for fixed $a > b > 0$ and
+a constant $c$ chosen to keep it nonnegative --- a power with a rising piece inserted, which is
+the design of the family below with a slope where that family has a jump. What is new here is
+therefore not the explicitness. It is the crossing of the dimensions one at a time,
+\ref{lem:filtration-strictness}(3), and the identification at the top,
+\ref{prop:dimension-filtration}(4):
+\ref{lem:filtration-strictness}(1) exhibits an admissible exponent that is of the type G form of
+\ref{def:delay-data} and is not subordinated. Reading that as an answer to the question as
+posed uses the radial theorem, which makes the type G form the class of variance mixtures, and
+the existence of the delay law at \ref{rem:bridge-subordination}, which makes the mixing law a
+law at all. The second question is whether the filtration is strict inside the admissible cone,
+and in particular whether $\mathcal{A}_2 = \mathcal{A}_\infty$. It is strict at the bottom, which
+is \ref{lem:filtration-strictness}(3): one admissible exponent lies in $\mathcal{A}_2$ and not in
+$\mathcal{A}_3$, another in $\mathcal{A}_1$ and not in $\mathcal{A}_2$, and the first separates
+$\mathcal{A}_2$ from $\mathcal{A}_\infty$ as well. Admissibility in the
+plane therefore does not already force the subordination picture. The top of the filtration is settled by \ref{prop:dimension-filtration}(4):
+$\mathcal{A}_\infty = \mathcal{S}$, by the radial theorem applied to the remainders of
+self-decomposability.
+% CHANGED 2026-09-19 (R193, left by batch S2; referee E finding 4.2 asked for the sentence, and
+% the librarian's search of the same day is what it reports: notes/reviews/cone/
+% SOURCES-round2-2026-09-19.md, Part 3).
+% 2026-09-20: the TODO left here for the librarian is done. The six papers were acquired by the
+% author and read in full (notes/reviews/cone/SOURCES-round2-new-papers-2026-09-20.md); the
+% sentence below reports that reading.
+\emph{We have not found this equivalence stated.} The sufficiency half is classical and is in
+print more than once: in dimension one (\sscite{halgreen1979self}; \sscite{sato2001subordination},
+Theorem~1.1); for normal variance mixtures in a dimension $r$ that does not enter the hypothesis
+on the mixing law, which are self-decomposable when the mixing law is, and ``self-decomposable in
+any dimension'' for the generalized hyperbolic family at zero drift
+(\sscite{barndorffnielsen1982normal}, pp.~147 and~149); and in a fixed dimension for an
+operator-stable subordinand (\sscite{barndorffnielsen2001multivariate}, Theorem~6.1, whose
+Example~6.2 shows that self-decomposability of the subordinand alone does not suffice). None of
+these states a converse. The literature on type G laws on $\RR^d$
+(\sscite{maejima2002type}; \sscite{aoyama2007characterizations};
+\sscite{barndorffnielsen2006some}), read in full, takes an infinitely divisible mixing law, fixes the
+dimension, and does not treat the question. So the direction from self-decomposability in every
+dimension to a self-decomposable mixing law is, as far as these sources go, stated here for the
+first time; the sentence records what was read, on 2026-09-19 and 2026-09-20, and not an
+exhaustive search. In the coordinate $x = \log r^2$ the same fact has a second reading:
+\ref{eq:radial-profile} says that the polar profile is the convolution of the delay measure with
+the law of $\log w$, $w$ a chi-square variable with $d$ degrees of freedom, and those laws
+recentred at $\log d$ are an approximate identity, which is a second way to see why monotonicity in every dimension forces monotonicity of $k_{\mathrm I}$. That route is not carried out here, and clause (4) does not need it.
+
+\emph{The family behind the lemma, and the numerics.} Writing the reading above produced an
+answer to the first question and a witness for the second, and both are
+\ref{lem:filtration-strictness}, stated at one parameter point of the following family. Take
+$0 < \beta < 1$, $0 < a < b$, $c > 0$ and the delay profile
+$k_{\mathrm I}(u) = u^{-\beta} + c\,\mathbf{1}_{[a,b]}(u)$. It satisfies the two integrability
+conditions of \ref{def:causal-admissible} and has no nonincreasing version, so its
+$F_{\mathrm I}$ is a Bernstein function and is not causally admissible. By
+\ref{eq:radial-profile} the polar profiles of the associated isotropic laws are
+\[
+  2^{1+\beta}\,\frac{\Gamma(d/2+\beta)}{\Gamma(d/2)}\,r^{-2\beta}
+   + 2c\Bigl[P\Bigl(\frac d2,\frac{r^2}{2a}\Bigr)
+            - P\Bigl(\frac d2,\frac{r^2}{2b}\Bigr)\Bigr],
+\]
+$P$ here being the regularized lower incomplete gamma function. The lemma takes
+$\beta = \tfrac12$, $a = 1$, $b = 2$, where the bracket is
+$\operatorname{erf}(r/\sqrt2) - \operatorname{erf}(r/2)$ at $d = 1$ and
+$e^{-r^2/4} - e^{-r^2/2}$ at $d = 2$.
+
+What stays here rather than in the lemma is the numerics. At those parameters the polar profile
+is nonincreasing in dimension $d$ exactly for $c \le c_d$, with $c_1 \approx 12.61$,
+$c_2 \approx 5.24$, $c_3 \approx 3.21$ and $c_d \to 0$; the thresholds were computed numerically
+from those one-variable inequalities, and the lemma asserts memberships only at $c = 4$ and
+$c = 8$, where each inequality is elementary and is proved. Two sufficient conditions at $d = 1$
+are worth comparing, since the second is what lets one hypothesis carry both values of $c$.
+Dropping the negative half of the derivative of the bump term leaves $c\,r^2e^{-r^2/2} \le 1$ for
+every $r$, that is $c \le e/2$; keeping it and bounding $\log(1/p) \le (1-p)/\sqrt p$ leaves
+$c(\tfrac32 - \sqrt2) \le 1$, that is $c \le 6 + 4\sqrt2 \approx 11.66$, which is within eight per
+cent of $c_1$ and is the hypothesis of \ref{lem:filtration-strictness}(1). Because $c_d \to 0$ the
+family leaves every $\mathcal{A}_d$ eventually while staying of type G for every $c > 0$, which is
+why $\mathcal{A}_\infty$ is not the type G slice.
+\end{remark}
+
+% NEW NODE (2026-09-15, module B step 2, R163): the vocabulary the two constructions need in order
+% to be statements. It is def:causal-admissible with the monotonicity of the profile dropped and the
+% measurability that field supplied put in its place, together with the polar profile the remark
+% above computes. Nothing cited enters it: the two readings that make the classes geometric -- the
+% radial theorem and Sato's polar criterion -- are the remark's, are cited there, and are not
+% asserted here, so this node opens no ledger entry and needs none. The Lean type is
+% Skeleton.DelayDatum; it carries no sorry, a structure being a definition, so the node is \leanok.
+% Placed after the remark because the remark is where the reading lives; the definition is used
+% only by lem:filtration-strictness below.
+\begin{definition}[delay data, the type G exponents, and the polar profiles]
+\label{def:delay-data}
+\uses{def:causal-admissible}
+\lean{Skeleton.DelayDatum, Skeleton.DelayDatum.exponent, Skeleton.IsTypeG,
+Skeleton.polarProfile}\leanok
+A \emph{delay datum} is a pair $(b_0, k_{\mathrm I})$ with $b_0 \ge 0$ and
+$k_{\mathrm I} : (0,\infty) \to [0,\infty)$ measurable, subject to
+$\int_0^1 k_{\mathrm I}(u)\,du < \infty$ and $\int_1^\infty k_{\mathrm I}(u)\,u^{-1}du < \infty$.
+Its exponent is
+\[
+  F_{\mathrm I}(\sigma) = b_0\,\sigma
+   + \int_0^\infty \bigl(1 - e^{-\sigma u}\bigr)\,k_{\mathrm I}(u)\,\frac{du}{u},
+  \qquad \sigma \ge 0 ,
+\]
+and its \emph{polar profile in dimension $d$}, for an integer $d \ge 1$, is
+\begin{equation}\label{eq:polar-profile}
+  k_d(r) := \frac{2}{\Gamma(d/2)}\int_0^\infty v^{d/2-1}e^{-v}\,
+   k_{\mathrm I}\Bigl(\frac{r^2}{2v}\Bigr)\,dv, \qquad r > 0 .
+\end{equation}
+Write $\mathcal{G}$ for the set of functions of the form $F(\omega) = F_{\mathrm I}(\omega^2/2)$,
+$\omega \in \RR$, for a delay datum. These are type G exponents, the exponents of Gaussian
+variance mixtures with an infinitely divisible mixing law, and they are those whose mixing law
+has a \Levy{} measure of the form $k_{\mathrm I}(u)\,du/u$; a mixing law with an atomic \Levy{}
+measure gives a type G exponent that is not in $\mathcal{G}$.
+\statusT\quad\emph{(Vocabulary, and no claim. This is \ref{def:causal-admissible} with the
+monotonicity of the delay profile dropped and the measurability that field supplied put in its
+place, so every causally admissible datum is a delay datum and
+$\mathcal{S} \subseteq \mathcal{G}$. Two geometric readings are not asserted here: that
+$\mathcal{G}$ is the class of exponents of the symmetric type G laws, the variance mixtures of
+the centred normal law with an infinitely divisible mixing law, which is the radial theorem
+(ledger A23, spent by \ref{prop:dimension-filtration}(3)) together with the existence of the
+delay law at \ref{rem:bridge-subordination}, and is \ref{rem:dimension-filtration}'s reading;
+and that $k_d$ being nonincreasing is self-decomposability on $\RR^d$ of the isotropic law with
+radial exponent $F$, which is the polar criterion, spent by \ref{prop:dimension-filtration}(2)
+for a causally admissible datum and not asserted here for a general one. The definition reads
+only the displayed forms, so no dimension theory and no ledger entry enters it. \ref{eq:polar-profile} is \ref{eq:radial-profile}, restated so that the lemma
+below stands on its own; at $d = 1$ it is \ref{eq:bridge-scaling} with the folding factor
+$2 = |S^0|$ in place, so $k_1$ is the folded spatial profile \ref{eq:bridge-profile} of $F$. The
+Lean type is \texttt{Skeleton.DelayDatum}, which is \texttt{CausalAdmissible} without its
+\texttt{k\_antitone} field, and \texttt{Skeleton.DelayDatum.ofCausal} is the inclusion.)}
+\end{definition}
+
+% NEW NODE (2026-09-15, module B step 2, R163): the two constructions of the P-0009 pass, stated on
+% the author's decision of 2026-09-15. Typed as Skeleton.filtration_strictness_typeG and
+% Skeleton.filtration_strictness_dimension, both sorry, so the node is \notready and the proof below
+% is the proof of record. It spends NO ledger entry: what the argument needs where a reader would
+% expect Bernstein's theorem is uniqueness of the DELAY DATA, and prop:bridge-strictness(1) does not
+% carry it (it turns membership in S into an existential over data) while ledger A11 carries it only
+% at its citation -- the admitted statement there is the existence equivalence alone. This article
+% proves what is needed, as prop:laplace-uniqueness-locally-finite, which is [T] and Lean core; the
+% derivative formula and the dominated limit at sigma -> infinity are the rest. Finding recorded in
+% Formalization/SKELETON.md section 27.
+% The hypothesis of clause (1) is c <= 6 + 4 sqrt 2 rather than the remark's c <= e/2 because the
+% sharper elementary bound is what covers c = 4 and c = 8, so clause (2) does not have to repeat the
+% admissibility argument. See the remark for the comparison and for the numerical thresholds.
+% CHANGED 2026-09-19 (R191; the author's decision D3, a widening authorized at the second external
+% review round of module B): CLAUSE (3) IS ADDED, and with it the node becomes [A]. The strictness
+% of the chain A_1 > A_2 > A_3 was drawn in rem:dimension-filtration, in a figure caption and in
+% the article's section 1, and was a clause of no statement (referee B finding 5). It is one now,
+% and the referee's two missing steps are written into the proof: that k_d^{(c)} IS the polar
+% profile of the law with radial exponent F^{(c)}(|xi|) -- the d-dimensional computation of
+% prop:dimension-filtration(2) reads monotonicity only in its last line, which is now said -- and
+% that a rotation-invariant \Levy{} measure of a self-decomposable law has a nonincreasing radial
+% profile, which is Sato's polar criterion integrated over the sphere. Clause (3) therefore spends
+% A7 (the criterion, both directions) and A3 (the representation in dimension d, converse and
+% uniqueness), exactly the entries prop:dimension-filtration spends, and the status line changes
+% from \statusT to \statusA. NO LEAN CHANGES: the two sorry'd declarations state clauses (1) and
+% (2), clause (3) is prose-only, and the annotation says so. The \uses edge to
+% prop:dimension-filtration is added, the classes A_d being defined there.
+\begin{lemma}[the slice inside the type G exponents, and the polar profiles across dimensions]
+\label{lem:filtration-strictness}
+\uses{def:delay-data,def:causal-admissible,lem:bridge-exponents,lem:profile-integrability,prop:bridge-strictness,prop:laplace-uniqueness-locally-finite,thm:main-characterization,prop:dimension-filtration}
+\lean{Skeleton.filtration_strictness_typeG, Skeleton.filtration_strictness_dimension}\notready
+For $c > 0$ let $D^{(c)}$ be the delay datum with drift $0$ and profile
+\[
+  k^{(c)}_{\mathrm I}(u) = u^{-1/2} + c\,\mathbf{1}_{[1,2]}(u), \qquad u > 0 ,
+\]
+let $F^{(c)}_{\mathrm I}$ be its exponent, put
+$F^{(c)}(\omega) := F^{(c)}_{\mathrm I}(\omega^2/2)$, and write $k^{(c)}_d$ for its polar profile
+\ref{eq:polar-profile}.
+\begin{enumerate}
+\item \emph{The subordinated slice is strictly smaller than the type G exponents.}
+$\mathcal{S} \subseteq \mathcal{G}$; and for $0 < c \le 6 + 4\sqrt2$ the function $F^{(c)}$ is
+admissible in the sense of \ref{thm:main-characterization}, with Gaussian coefficient $0$ and
+folded profile $k^{(c)}_1$, and lies in $\mathcal{G} \setminus \mathcal{S}$. Hence
+$\mathcal{S} \subsetneq \mathcal{G}$.
+\item \emph{The polar profiles cross the dimensions one at a time.} For $c = 4$ the profiles
+$k^{(4)}_1$ and $k^{(4)}_2$ are nonincreasing on $(0,\infty)$ and $k^{(4)}_3$ is not; for $c = 8$
+the profile $k^{(8)}_1$ is nonincreasing on $(0,\infty)$ and $k^{(8)}_2$ is not.
+\item \emph{The filtration is strict at the bottom.} In the notation of
+\ref{prop:dimension-filtration}, $F^{(8)} \in \mathcal{A}_1 \setminus \mathcal{A}_2$ and
+$F^{(4)} \in \mathcal{A}_2 \setminus \mathcal{A}_3$. Hence
+$\mathcal{A}_1 \supsetneq \mathcal{A}_2 \supsetneq \mathcal{A}_3$, and $F^{(4)}$ separates
+$\mathcal{A}_2$ from $\mathcal{A}_\infty$ as well, that class lying inside $\mathcal{A}_3$.
+\end{enumerate}
+\statusA\quad\ledger{A7}\quad\ledger{A3}\quad\emph{(\textbf{Assignment.} Clauses (1) and (2) are
+$[T]$ and spend no ledger entry; clause (3), added on 2026-09-19 (R191, the author's decision D3),
+reads clause (2) through two cited facts in dimension $d$, both of them the ones
+\ref{prop:dimension-filtration} spends. \ledger{A7} carries the definition of a self-decomposable
+law on $\RR^d$ and the polar criterion --- that an infinitely divisible law on $\RR^d$ is
+self-decomposable if and only if its \Levy{} measure has the polar form with a nonincreasing
+radial profile along every ray --- at both of its directions: the sufficiency for the two
+memberships, the necessity for the two exclusions. \ledger{A3} is read at its anchor in dimension
+$d$, at the converse clause of the \Levy--Khintchine representation, which turns the computed
+triplet into a law, and at its uniqueness clause, which identifies the \Levy{} measure of any law
+with the given exponent. What they do not carry, and what the proof below writes out, are the two
+steps the external review found missing: that $k^{(c)}_d$ \emph{is} the polar profile of the law
+with radial exponent $F^{(c)}(|\xi|)$, which is the computation of
+\ref{prop:dimension-filtration}(2) read at a datum with no monotonicity --- that computation uses
+monotonicity only in its last line --- and that a rotation-invariant \Levy{} measure of a
+self-decomposable law has a nonincreasing radial profile, which is the polar criterion averaged
+over the sphere. Both are $[T]$.
+\textbf{Clause (3) is prose-only}: the two typed declarations state clauses (1) and (2), and
+nothing of clause (3) is typed, this article having no theory of self-decomposable laws on
+$\RR^d$ --- which is also why clauses (1) and (2) are stated at the polar profiles, the objects
+the criterion evaluates, and clause (3) at the classes.
+\textbf{Stated, not machine-checked.} Both earlier clauses are typed, as
+\texttt{Skeleton.filtration\_strictness\_typeG} and
+\texttt{Skeleton.filtration\_strictness\_dimension}, and both carry \texttt{sorry}; the proof
+below is the proof of record. \textbf{Clauses (1) and (2) spend no ledger entry.} Where a reader
+expects Bernstein's theorem --- to rule out every causally admissible datum with the given
+exponent, clause (1) of \ref{prop:bridge-strictness} being an existential over data --- what is
+needed is uniqueness of the delay data, and A11 is admitted at its existence equivalence only. The
+uniqueness this article proves, \ref{prop:laplace-uniqueness-locally-finite}, supplies it, with
+the derivative formula from the proof of \ref{prop:bridge-strictness}(2) and one dominated limit.
+\textbf{One geometric reading is still not asserted here}: that $\mathcal{G}$ is the class of type
+G exponents in the sense of variance mixtures is the radial theorem (A23), and it is
+\ref{rem:dimension-filtration}'s reading, not a clause of this lemma. The other one is clause (3)
+since 2026-09-19. \textbf{The hypothesis of
+clause (1)} is the exact threshold of the elementary bound in the proof, and is what carries both
+$c = 4$ and $c = 8$; the cruder condition $c \le e/2$ of \ref{rem:dimension-filtration}, which
+drops the negative half of one derivative, would not, and the numerical threshold, close to
+$12.61$, is recorded there. \textbf{Why \texttt{notready}, and the price} (2026-09-15, written at
+the statement): about $550$--$850$ Lean lines, in six pieces --- the datum, the closed form of the
+polar profile, the admissibility clause, the monotonicity bounds, the two explicit failures, and
+the uniqueness argument --- of which the second is blocked in one place that is not a matter of
+effort, the regularized incomplete gamma function being absent from Mathlib at the pinned
+version, so that dimension $3$ would have to be written out by hand. A second cost the printed
+argument hides: a delay datum has no bridge in the development, every consumer so far having had
+the monotonicity field, so the five other fields of \ref{eq:sd-profile} would have to be
+reproved for it. No node of this article reads any clause of this lemma. Not attempted.)}
+\end{lemma}
+
+\begin{proof}
+Throughout $m = (d+1)/2$, and $P(s,x) = \Gamma(s)^{-1}\int_0^x v^{s-1}e^{-v}\,dv$ is the
+regularized lower incomplete gamma function.
+
+\emph{The datum.} $k^{(c)}_{\mathrm I}$ is nonnegative and measurable, and
+\[
+  \int_0^1 k^{(c)}_{\mathrm I}(u)\,du = 2, \qquad
+  \int_1^\infty k^{(c)}_{\mathrm I}(u)\,\frac{du}{u} = 2 + c\log 2 ,
+\]
+both finite. So $D^{(c)}$ is a delay datum and $F^{(c)} \in \mathcal{G}$. That
+$\mathcal{S} \subseteq \mathcal{G}$ is \ref{def:delay-data} read against
+\ref{def:causal-admissible}: a causally admissible datum is a delay datum, its profile being
+nonincreasing and hence measurable.
+
+\emph{The profile has no nonincreasing version.} Choose $\delta \in (0,\tfrac12)$ with
+$(1-\delta)^{-1/2} - (1+\delta)^{-1/2} < c$, which is possible because the left side tends to $0$
+as $\delta$ decreases to $0$. For $u_1 \in (1-\delta,1)$ and $u_2 \in (1,1+\delta)$,
+\[
+  k^{(c)}_{\mathrm I}(u_1) = u_1^{-1/2} < (1-\delta)^{-1/2} < (1+\delta)^{-1/2} + c
+   < u_2^{-1/2} + c = k^{(c)}_{\mathrm I}(u_2) ,
+\]
+while $u_1 < u_2$. If a nonincreasing $g$ agreed with $k^{(c)}_{\mathrm I}$ almost everywhere then,
+both intervals having positive measure, there would be such a pair with
+$g(u_i) = k^{(c)}_{\mathrm I}(u_i)$, and $g(u_1) \ge g(u_2)$ would contradict the display. So
+$D^{(c)}$ is not a causally admissible datum.
+
+\emph{What the bridge computation reads.} Of the four steps in the proof of
+\ref{lem:bridge-exponents}, only the second reads the monotonicity of the delay profile. The
+finiteness of $\nu_2(x) = \int_0^\infty g_u(x)k_{\mathrm I}(u)\,du/u$ off the origin uses
+$g_u(x)/u \le 16/x^4$ below $u = 1$ and $g_u \le 1$ above it, against the two integrability
+conditions; the \Levy{} condition is a Tonelli exchange against
+$\int_\RR (1 \wedge x^2)g_u \le 1 \wedge u$ and \ref{lem:profile-integrability}; and the exponent
+identity is a second Tonelli exchange. All three read the two integrability conditions and nothing
+else, so they hold for a delay datum verbatim. Hence for any delay datum $(b_0, k_{\mathrm I})$
+the pair $(b_0/2,\,2x\nu_2(x))$ satisfies every requirement \ref{eq:sd-profile} makes except
+possibly the monotonicity of the profile, and its exponent is $F_{\mathrm I}(\omega^2/2)$; so the
+datum's exponent is admissible as soon as that profile is nonincreasing. The substitution
+$u = r^2/2v$ that produces \ref{eq:bridge-scaling} identifies the profile with $k_1$, the polar
+profile \ref{eq:polar-profile} at $d = 1$, the folding factor $2$ being $|S^0|$.
+
+\emph{The polar profiles in closed form.} Split \ref{eq:polar-profile} at the two summands of
+$k^{(c)}_{\mathrm I}$. For the power, $k_{\mathrm I}(r^2/2v) = (r^2/2v)^{-1/2}$ turns the integral
+into a gamma integral and gives $2^{3/2}r^{-1}\Gamma(m)/\Gamma(d/2)$. For the bump,
+$\mathbf{1}_{[1,2]}(r^2/2v) = \mathbf{1}_{[r^2/4,\,r^2/2]}(v)$, so that summand contributes
+$2c\,[P(d/2, r^2/2) - P(d/2, r^2/4)]$. Hence
+\begin{equation}\label{eq:filtration-polar}
+  k^{(c)}_d(r) = \frac{2^{3/2}\,\Gamma(m)}{\Gamma(d/2)}\,\frac1r
+   + 2c\Bigl[P\Bigl(\frac d2,\frac{r^2}2\Bigr) - P\Bigl(\frac d2,\frac{r^2}4\Bigr)\Bigr],
+   \qquad r > 0 ,
+\end{equation}
+which is smooth on $(0,\infty)$; the bracket is
+$\operatorname{erf}(r/\sqrt2) - \operatorname{erf}(r/2)$ at $d = 1$ and $e^{-r^2/4} - e^{-r^2/2}$
+at $d = 2$. Since $\partial_x P(s,x) = x^{s-1}e^{-x}/\Gamma(s)$,
+\[
+  \frac{\partial}{\partial r}P\Bigl(\frac d2, \frac{r^2}{2a}\Bigr)
+   = \frac{2}{r\,\Gamma(d/2)}\Bigl(\frac{r^2}{2a}\Bigr)^{d/2}e^{-r^2/2a} ,
+\]
+so multiplying the derivative of \ref{eq:filtration-polar} by $r^2\Gamma(d/2)$ and writing
+$z = r^2/2$ shows that it is nonpositive at $r$ if and only if
+\begin{equation}\label{eq:filtration-criterion}
+  c\,z^m\bigl(e^{-z} - 2^{-d/2}e^{-z/2}\bigr) \le \tfrac12\Gamma(m), \qquad z = \tfrac12 r^2 .
+\end{equation}
+
+\emph{Two elementary bounds.} First, $\log(1/p) \le (1-p)/\sqrt p$ for $0 < p \le 1$: with
+$x = 1/p \ge 1$ this reads $\log x \le (x-1)/\sqrt x$, an equality at $x = 1$ where the right side
+has the larger derivative from then on, since $1/x \le (x+1)/(2x^{3/2})$ is
+$2\sqrt x \le x + 1$. Second, for $\lambda \in (0,1)$ and $m > 0$ the function
+$(1-p)^m(p-\lambda)$ on $[\lambda,1]$ is maximal at $p = (m\lambda+1)/(m+1)$, with value
+$m^m(1-\lambda)^{m+1}/(m+1)^{m+1}$.
+
+\emph{Where the polar profile is nonincreasing.} Put $p = e^{-z/2}$ and $\lambda = 2^{-d/2}$, so
+that $e^{-z} - \lambda e^{-z/2} = p(p-\lambda)$, which is positive only for $p > \lambda$, and
+there $z = 2\log(1/p) \le 2(1-p)/\sqrt p$. So for $m \le 2$, using $p^{1-m/2} \le 1$ and then the
+second bound,
+\[
+  z^m\bigl(e^{-z} - \lambda e^{-z/2}\bigr) \le 2^m(1-p)^m p^{1-m/2}(p-\lambda)
+   \le 2^m(1-p)^m(p-\lambda) \le \frac{(2m)^m(1-\lambda)^{m+1}}{(m+1)^{m+1}} .
+\]
+At $d = 1$, where $m = 1$, $\lambda = 2^{-1/2}$ and $\Gamma(m) = 1$, the right side is
+$(1-2^{-1/2})^2/2 = (\tfrac32-\sqrt2)/2$, so \ref{eq:filtration-criterion} holds at every $z$ as
+soon as $c(\tfrac32-\sqrt2) \le 1$, that is as soon as $c \le 6 + 4\sqrt2$, the two numbers being
+reciprocal: $(\tfrac32-\sqrt2)(6+4\sqrt2) = 9 - 8 = 1$. At $d = 2$, where $m = \tfrac32$,
+$\lambda = \tfrac12$ and $\Gamma(m) = \sqrt\pi/2$, the right side is
+$3^{3/2}5^{-5/2} = (3/5)^{3/2}/5$, so at $c = 4$ the criterion holds at every $z$ as soon as
+$4\cdot 3^{3/2}5^{-5/2} \le \sqrt\pi/4$, that is $(16/5)(3/5)^{3/2} \le \sqrt\pi$, that is, after
+squaring, $6912/3125 \le \pi$, which holds, the left side being less than $2.22$. Since $4$ and
+$8$ are both below $6+4\sqrt2$, this gives that $k^{(c)}_1$ is nonincreasing for
+$0 < c \le 6+4\sqrt2$ and that $k^{(4)}_2$ is nonincreasing.
+
+\emph{Where it is not.} If \ref{eq:filtration-criterion} fails at one $z_0 > 0$ then $k^{(c)}_d$
+has a positive derivative at $r_0 = \sqrt{2z_0}$, so it is strictly increasing near $r_0$; being
+continuous, it agrees with no nonincreasing function almost everywhere either. At $d = 2$ and
+$c = 8$ take $z_0 = \tfrac12$. Then $e^{-z_0} > 3/5$ and $e^{-z_0/2} < 4/5$ --- the first is
+$e < 25/9$, the second $e > (5/4)^4 = 625/256$ --- so
+$e^{-z_0} - \tfrac12 e^{-z_0/2} > 3/5 - 2/5 = 1/5$; and $z_0^{3/2} = 2^{-3/2} > 7/20$, since
+$400 > 392$. The left side of \ref{eq:filtration-criterion} therefore exceeds
+$8 \cdot \tfrac7{20} \cdot \tfrac15 = \tfrac{14}{25}$, while its right side $\sqrt\pi/4$ is below
+$0.45$ because $\pi < 3.24$. At $d = 3$ and $c = 4$ take $z_0 = 1$, where
+$\Gamma(m) = \Gamma(2) = 1$. Then $e^{-1} > 9/25$, again because $e < 25/9$, while
+$2^{-3/2} < 9/25$ because $625 < 648$ and $e^{-1/2} < 61/100$ because $e > (100/61)^2$. So
+\[
+  e^{-1} - 2^{-3/2}e^{-1/2} > \frac9{25} - \frac9{25}\cdot\frac{61}{100} = \frac{351}{2500} ,
+\]
+and the left side of \ref{eq:filtration-criterion} exceeds $4\cdot 351/2500 > \tfrac12$. So
+$k^{(8)}_2$ and $k^{(4)}_3$ are not nonincreasing, which completes clause (2).
+
+\emph{No causal ancestor.} Suppose $F^{(c)} \in \mathcal{S}$. By \ref{prop:bridge-strictness}(1)
+the function $\sigma \mapsto F^{(c)}(\sqrt{2\sigma}) = F^{(c)}_{\mathrm I}(\sigma)$ is causally
+admissible, so there are $b_0' \ge 0$ and a nonincreasing $k'$ satisfying the two integrability
+conditions whose exponent is $F^{(c)}_{\mathrm I}$ on $[0,\infty)$. The differentiation step in the
+proof of \ref{prop:bridge-strictness}(2) dominates the $\sigma$-derivative of the integrand by
+$e^{-\sigma u/2}k_{\mathrm I}(u)$ and reads the two integrability conditions and nothing else, so
+it applies to both data and gives
+\[
+  b_0' + \int_0^\infty e^{-\sigma u}k'(u)\,du
+   = \int_0^\infty e^{-\sigma u}k^{(c)}_{\mathrm I}(u)\,du , \qquad \sigma > 0 .
+\]
+Both integrals are finite and tend to $0$ as $\sigma$ grows: for $\sigma \ge 1$ the integrand is
+at most $k_{\mathrm I}$ on $(0,1)$ and at most $k_{\mathrm I}(u)u^{-1}$ on $(1,\infty)$, since
+$e^{-u} \le u^{-1}$ there, and it tends to $0$ at every $u > 0$, so dominated convergence applies.
+Hence $b_0' = 0$, and the measures $k'(u)\,du$ and $k^{(c)}_{\mathrm I}(u)\,du$ on $(0,\infty)$
+have equal finite Laplace transforms on $(0,\infty)$. By
+\ref{prop:laplace-uniqueness-locally-finite} they are equal, so $k'$ is a nonincreasing version of
+$k^{(c)}_{\mathrm I}$, which the second step excludes. So $F^{(c)} \notin \mathcal{S}$ for every
+$c > 0$; for $0 < c \le 6+4\sqrt2$ the fifth step makes $F^{(c)}$ admissible with Gaussian
+coefficient $0$ and profile $k^{(c)}_1$, and clause (1) follows.
+
+\emph{The polar profile is the polar profile.} Clause (3) reads clause (2) through the polar
+criterion, and the reading needs two steps. The first is that $k^{(c)}_d$ is the polar profile of
+a law on $\RR^d$ with radial exponent $\xi \mapsto F^{(c)}(|\xi|)$, which is the computation of
+\ref{prop:dimension-filtration}(2) carried out at a datum that need not be monotone. That
+computation builds $\nu_d(dx) = \bigl(\int_0^\infty g^{(d)}_u(x)\,k_{\mathrm I}(u)\,du/u\bigr)dx$
+and establishes, in this order: that $\nu_d$ is finite off the origin and satisfies the \Levy{}
+condition, by a Tonelli exchange against
+$\int_{\RR^d}(1 \wedge |x|^2)g^{(d)}_u \le 1 \wedge du$; that
+$F_{\mathrm I}(|\xi|^2/2) = \tfrac12\xi\cdot(b_0I)\xi + \int(1 - \cos\xi\cdot x)\,\nu_d(dx)$, by a
+second Tonelli exchange; that this is therefore the exponent of an infinitely divisible law,
+isotropic because its transform is, whose \Levy{} measure is $\nu_d$; and that the polar profile
+of $\nu_d$, namely $|S^{d-1}|r^df_d(r)$ with $f_d$ the radial density, is \ref{eq:radial-profile},
+by the substitution $u = r^2/2v$. Each of those steps reads the two integrability conditions of
+the datum and nothing else --- the first two are integral bounds, the third is the converse clause
+of the representation in dimension $d$ with its uniqueness clause, and the fourth is a change of
+variables. Monotonicity of $k_{\mathrm I}$ enters only in the last line of that proof, where the
+polar profile is concluded to be nonincreasing. So the computation applies verbatim to the delay
+datum $D^{(c)}$, and gives an isotropic infinitely divisible law $\mu^{(c)}_d$ on $\RR^d$ with
+radial exponent $F^{(c)}(|\xi|)$ and \Levy{} measure of polar profile $k^{(c)}_d$,
+\ref{eq:polar-profile} being \ref{eq:radial-profile}.
+
+\emph{A rotation-invariant \Levy{} measure of a self-decomposable law has a nonincreasing radial
+profile.} This is the second step, and it is the polar criterion averaged over the sphere. Let
+$\mu$ be self-decomposable on $\RR^d$ with \Levy{} measure $\nu$. The criterion gives a finite
+measure $\lambda$ on the unit sphere and, for $\lambda$-almost every direction $\xi$, a
+nonincreasing $k_\xi : (0,\infty) \to [0,\infty)$ with
+$\nu(B) = \int_{S^{d-1}}\lambda(d\xi)\int_0^\infty \mathbf 1_B(r\xi)\,k_\xi(r)\,dr/r$. Take $B$ of
+the form $\{x : |x| \in A\}$ for a Borel $A \subseteq (0,\infty)$ and put
+$K(r) := \int_{S^{d-1}}k_\xi(r)\,\lambda(d\xi)$, a function with values in $[0,\infty]$ that is
+nonincreasing, each integrand being so. Then $\nu\{|x| \in A\} = \int_A K(r)\,dr/r$ for every such
+$A$. If moreover $\nu$ is rotation invariant with radial density $f$, the same quantity is
+$|S^{d-1}|\int_A f(r)\,r^{d-1}dr = \int_A |S^{d-1}|r^df(r)\,dr/r$. Two measures on $(0,\infty)$
+that agree on every Borel set are equal, so $|S^{d-1}|r^df(r) = K(r)$ for almost every $r$: the
+polar profile agrees almost everywhere with a nonincreasing function.
+
+\emph{Clause (3).} Both $F^{(4)}$ and $F^{(8)}$ are admissible, $4$ and $8$ being below
+$6 + 4\sqrt2$, so both lie in $\mathcal{A}_1$, which is the whole admissible cone
+(\ref{prop:dimension-filtration}(1)). For $F^{(4)} \in \mathcal{A}_2$: the first step gives an
+infinitely divisible law on $\RR^2$ with radial exponent $F^{(4)}(|\xi|)$ whose \Levy{} measure
+has polar profile $k^{(4)}_2$, which clause (2) says is nonincreasing, so the law is
+self-decomposable by the polar criterion. For the two exclusions, suppose
+$\xi \mapsto F^{(c)}(|\xi|)$ were the exponent of a self-decomposable law $\mu$ on $\RR^d$, with
+$(c,d) = (8,2)$ or $(4,3)$. An exponent determines the law, so $\mu$ is the $\mu^{(c)}_d$ of the
+first step, whose \Levy{} measure is rotation invariant with radial density $f^{(c)}_d$ and polar
+profile $k^{(c)}_d$. By the second step $k^{(c)}_d$ agrees almost everywhere with a nonincreasing
+function; but $k^{(c)}_d$ is continuous and, by the paragraph \emph{where it is not} above,
+strictly increasing on an interval, so it agrees with no nonincreasing function almost everywhere
+--- given $r < s$, points $u_n \downarrow r$ and $v_n \uparrow s$ of the conull agreement set give
+$k^{(c)}_d(u_n) \ge k^{(c)}_d(v_n)$, and continuity would force $k^{(c)}_d(r) \ge k^{(c)}_d(s)$ at
+every such pair. That contradiction gives $F^{(8)} \notin \mathcal{A}_2$ and
+$F^{(4)} \notin \mathcal{A}_3$. The last sentence of the clause is
+$\mathcal{A}_\infty \subseteq \mathcal{A}_3$, which is the nesting of
+\ref{prop:dimension-filtration}(1).
+\end{proof}
+
+% CHANGED (2026-09-15, module B step 2, R161): the closing CHECK is rewritten. Its question is
+% still open in the literature, and the round that read the held sources is recorded there: no
+% source settles it, Bondesson settles the analogue one class up, and a construction that answers
+% it in the negative is written out at rem:dimension-filtration and is not yet a node. The remark's
+% own text is untouched. (2026-09-17: the construction is lem:filtration-strictness since R163, and
+% the filtration itself is prop:dimension-filtration since R166.)
+\begin{remark}[what crosses the bridge, and what does not]\label{rem:bridge-crossings}
+Three of the causal article's later results have images and one has none. The \emph{exact
+cascade implementation} crosses: the rational Laplace transform of the causal Gamma increments
+becomes the rational spectrum of the \Matern{} increments, and the causal pole--zero sections
+become forward--backward first-order sections in $x$ (\ref{prop:matern-cascade}). The \emph{cone
+geometry} crosses as a map of cones but not as a map of extreme rays, by
+\ref{prop:bridge-strictness}: the image of a causal Dickman ray has the smooth positive profile
+of \ref{prop:thorin-subclass}(4), not a step. The \emph{moment and tail dictionary} crosses with
+a change of exponent, since $\mathbb{E}|\BM_T|^{2n} = (2n-1)!!\;\mathbb{E}T^n$, so the spatial
+family has $2n$ finite moments exactly when the causal one has $n$. What does not cross as an
+\emph{object} is the memory line: the causal signaling form and its embodied jet live on the
+inversion operator of the memory half-line, which exists because of the boundary and embodiment
+structure of time, and the spatial theory has no such second operator. % CHANGED 2026-09-19 (R195, the author's decision at the second review round): the \ref into
+% chapter 12 is replaced by prose. Module C is not published, and a reference from a module-B
+% chapter into a module-C statement would break at a repository split; the mathematics of the
+% sentence is unchanged and what it announces is named as further work.
+% TODO(module C): cite thm:joint-locality here once module C is released.
+What does cross is the
+memory line's \emph{equation}: the causal locality theorem, that the memory-line evolution is a
+local second-order operator exactly for the Bessel family, has as its image here a statement that
+the Student-t scale space solves a local second-order equation in $(t,x)$ jointly, with the same
+Bessel operator now acting along the scale axis. That statement is left for further work and is
+made nowhere in this module; what belongs to this chapter is the substitution
+$\sigma \mapsto \omega^2/2$, which turns $\partial_t$ into $-\partial_x^2$, a parabolic equation
+into an elliptic one. So the causal local corner maps to the spatial jointly local corner; the
+asymmetry that remains is that the spatial theory has no signaling problem and no state to read
+a jet off, and that, not any failure of the bridge, is why the two articles' second halves
+differ.
+% CHECK (draft, checks for \S9, item 7; the literature round is 2026-09-15, R161): whether the
+% subordinated slice coincides with the symmetric self-decomposable laws of type G (variance
+% mixtures of normals with infinitely divisible mixing) or is strictly smaller (mixing law
+% self-decomposable) is OPEN IN THE HELD LITERATURE, and the sources are now read, so the
+% literature paragraph can be written either way. What they give, with pages, is in
+% rem:dimension-filtration: Halgreen 1979 pp. 14-16 proves the implication in the direction the
+% bridge uses and leaves a DIFFERENT question open (the mean-variance case); Barndorff-Nielsen and
+% Halgreen 1977 pp. 309-311 give infinite divisibility of the mixture in every dimension;
+% Bondesson 1992 Thm. 7.3.1 pp. 115-116 settles the analogue one class up, at the Thorin level, as
+% an EQUIVALENCE. None states the converse at the level of class L.
+% What the same round found and did not state as a node: an explicit admissible exponent of type G
+% whose mixing subordinator is not self-decomposable, which answers the question in the negative.
+% It is the closing paragraph of rem:dimension-filtration and SKELETON.md section 23, and it is a
+% candidate lemma for the author. Until the author decides, the CHECK stands and nothing in this
+% chapter asserts an answer; no statement here reads it either way.
+\end{remark}

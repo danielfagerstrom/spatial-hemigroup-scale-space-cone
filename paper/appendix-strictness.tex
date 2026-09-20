@@ -1,0 +1,192 @@
+% Appendix A of module B: the proof of lem:filtration-strictness, moved out of section 4.6
+% on 2026-09-20 (the author's decision D8 on the second review round: obvious appendix
+% material moves, for readability). The statement stays in 04-bridge.tex under its marker;
+% this is the proof of record, copied from the blueprint (chapter 9), unchanged.
+
+\section{The proof of Lemma~\ref{lem:filtration-strictness}}\label{app:strictness}
+
+The lemma is stated in \S\ref{sec:witness}. The notation is that of
+Definition~\ref{def:delay-data}.
+
+\begin{proof}
+Throughout $m = (d+1)/2$, and $P(s,x) = \Gamma(s)^{-1}\int_0^x v^{s-1}e^{-v}\,dv$ is the
+regularized lower incomplete gamma function.
+
+\emph{The datum.} $k^{(c)}_{\mathrm I}$ is nonnegative and measurable, and
+\[
+  \int_0^1 k^{(c)}_{\mathrm I}(u)\,du = 2, \qquad
+  \int_1^\infty k^{(c)}_{\mathrm I}(u)\,\frac{du}{u} = 2 + c\log 2 ,
+\]
+both finite. So $D^{(c)}$ is a delay datum and $F^{(c)} \in \mathcal{G}$. That
+$\mathcal{S} \subseteq \mathcal{G}$ is Definition~\ref{def:delay-data} read against
+Definition~\ref{def:causal-admissible}: a causally admissible datum is a delay datum, its profile
+being nonincreasing and hence measurable.
+
+\emph{The profile has no nonincreasing version.} Choose $\delta \in (0,\tfrac12)$ with
+$(1-\delta)^{-1/2} - (1+\delta)^{-1/2} < c$, which is possible because the left side tends to $0$
+as $\delta$ decreases to $0$. For $u_1 \in (1-\delta,1)$ and $u_2 \in (1,1+\delta)$,
+\[
+  k^{(c)}_{\mathrm I}(u_1) = u_1^{-1/2} < (1-\delta)^{-1/2} < (1+\delta)^{-1/2} + c
+   < u_2^{-1/2} + c = k^{(c)}_{\mathrm I}(u_2) ,
+\]
+while $u_1 < u_2$. If a nonincreasing $g$ agreed with $k^{(c)}_{\mathrm I}$ almost everywhere then,
+both intervals having positive measure, there would be such a pair with
+$g(u_i) = k^{(c)}_{\mathrm I}(u_i)$, and $g(u_1) \ge g(u_2)$ would contradict the display. So
+$D^{(c)}$ is not a causally admissible datum.
+
+\emph{What the bridge computation reads.} Of the four steps in the proof of
+Lemma~\ref{lem:bridge-exponents}, only the second reads the monotonicity of the delay profile.
+The finiteness of $\nu_2(x) = \int_0^\infty g_u(x)k_{\mathrm I}(u)\,du/u$ off the origin uses
+$g_u(x)/u \le 16/x^4$ below $u = 1$ and $g_u \le 1$ above it, against the two integrability
+conditions; the \Levy{} condition is a Tonelli exchange against
+$\int_\RR (1 \wedge x^2)g_u \le 1 \wedge u$ and Lemma~\ref{lem:profile-integrability}; and the
+exponent identity is a second Tonelli exchange. All three read the two integrability conditions
+and nothing else, so they hold for a delay datum verbatim. Hence for any delay datum
+$(b_0, k_{\mathrm I})$ the pair $(b_0/2,\,2x\nu_2(x))$ satisfies every requirement
+\ref{eq:sd-profile} makes except possibly the monotonicity of the profile, and its exponent is
+$F_{\mathrm I}(\omega^2/2)$; so the datum's exponent is admissible as soon as that profile is
+nonincreasing. The substitution $u = r^2/2v$ that produces \ref{eq:bridge-scaling} identifies
+the profile with $k_1$, the polar profile \ref{eq:polar-profile} at $d = 1$, the folding factor
+$2$ being $|S^0|$.
+
+\emph{The polar profiles in closed form.} Split \ref{eq:polar-profile} at the two summands of
+$k^{(c)}_{\mathrm I}$. For the power, $k_{\mathrm I}(r^2/2v) = (r^2/2v)^{-1/2}$ turns the integral
+into a gamma integral and gives $2^{3/2}r^{-1}\Gamma(m)/\Gamma(d/2)$. For the bump,
+$\mathbf{1}_{[1,2]}(r^2/2v) = \mathbf{1}_{[r^2/4,\,r^2/2]}(v)$, so that summand contributes
+$2c\,[P(d/2, r^2/2) - P(d/2, r^2/4)]$. Hence
+\begin{equation}\label{eq:filtration-polar}
+  k^{(c)}_d(r) = \frac{2^{3/2}\,\Gamma(m)}{\Gamma(d/2)}\,\frac1r
+   + 2c\Bigl[P\Bigl(\frac d2,\frac{r^2}2\Bigr) - P\Bigl(\frac d2,\frac{r^2}4\Bigr)\Bigr],
+   \qquad r > 0 ,
+\end{equation}
+which is smooth on $(0,\infty)$; the bracket is
+$\operatorname{erf}(r/\sqrt2) - \operatorname{erf}(r/2)$ at $d = 1$ and $e^{-r^2/4} - e^{-r^2/2}$
+at $d = 2$. Since $\partial_x P(s,x) = x^{s-1}e^{-x}/\Gamma(s)$,
+\[
+  \frac{\partial}{\partial r}P\Bigl(\frac d2, \frac{r^2}{2a}\Bigr)
+   = \frac{2}{r\,\Gamma(d/2)}\Bigl(\frac{r^2}{2a}\Bigr)^{d/2}e^{-r^2/2a} ,
+\]
+so multiplying the derivative of \ref{eq:filtration-polar} by $r^2\Gamma(d/2)$ and writing
+$z = r^2/2$ shows that it is nonpositive at $r$ if and only if
+\begin{equation}\label{eq:filtration-criterion}
+  c\,z^m\bigl(e^{-z} - 2^{-d/2}e^{-z/2}\bigr) \le \tfrac12\Gamma(m), \qquad z = \tfrac12 r^2 .
+\end{equation}
+
+\emph{Two elementary bounds.} First, $\log(1/p) \le (1-p)/\sqrt p$ for $0 < p \le 1$: with
+$x = 1/p \ge 1$ this reads $\log x \le (x-1)/\sqrt x$, an equality at $x = 1$ where the right side
+has the larger derivative from then on, since $1/x \le (x+1)/(2x^{3/2})$ is
+$2\sqrt x \le x + 1$. Second, for $\lambda \in (0,1)$ and $m > 0$ the function
+$(1-p)^m(p-\lambda)$ on $[\lambda,1]$ is maximal at $p = (m\lambda+1)/(m+1)$, with value
+$m^m(1-\lambda)^{m+1}/(m+1)^{m+1}$.
+
+\emph{Where the polar profile is nonincreasing.} Put $p = e^{-z/2}$ and $\lambda = 2^{-d/2}$, so
+that $e^{-z} - \lambda e^{-z/2} = p(p-\lambda)$, which is positive only for $p > \lambda$, and
+there $z = 2\log(1/p) \le 2(1-p)/\sqrt p$. So for $m \le 2$, using $p^{1-m/2} \le 1$ and then the
+second bound,
+\[
+  z^m\bigl(e^{-z} - \lambda e^{-z/2}\bigr) \le 2^m(1-p)^m p^{1-m/2}(p-\lambda)
+   \le 2^m(1-p)^m(p-\lambda) \le \frac{(2m)^m(1-\lambda)^{m+1}}{(m+1)^{m+1}} .
+\]
+At $d = 1$, where $m = 1$, $\lambda = 2^{-1/2}$ and $\Gamma(m) = 1$, the right side is
+$(1-2^{-1/2})^2/2 = (\tfrac32-\sqrt2)/2$, so \ref{eq:filtration-criterion} holds at every $z$ as
+soon as $c(\tfrac32-\sqrt2) \le 1$, that is as soon as $c \le 6 + 4\sqrt2$, the two numbers being
+reciprocal: $(\tfrac32-\sqrt2)(6+4\sqrt2) = 9 - 8 = 1$. At $d = 2$, where $m = \tfrac32$,
+$\lambda = \tfrac12$ and $\Gamma(m) = \sqrt\pi/2$, the right side is
+$3^{3/2}5^{-5/2} = (3/5)^{3/2}/5$, so at $c = 4$ the criterion holds at every $z$ as soon as
+$4\cdot 3^{3/2}5^{-5/2} \le \sqrt\pi/4$, that is $(16/5)(3/5)^{3/2} \le \sqrt\pi$, that is, after
+squaring, $6912/3125 \le \pi$, which holds, the left side being less than $2.22$. Since $4$ and
+$8$ are both below $6+4\sqrt2$, this gives that $k^{(c)}_1$ is nonincreasing for
+$0 < c \le 6+4\sqrt2$ and that $k^{(4)}_2$ is nonincreasing.
+
+\emph{Where it is not.} If \ref{eq:filtration-criterion} fails at one $z_0 > 0$ then $k^{(c)}_d$
+has a positive derivative at $r_0 = \sqrt{2z_0}$, so it is strictly increasing near $r_0$; being
+continuous, it agrees with no nonincreasing function almost everywhere either. At $d = 2$ and
+$c = 8$ take $z_0 = \tfrac12$. Then $e^{-z_0} > 3/5$ and $e^{-z_0/2} < 4/5$ --- the first is
+$e < 25/9$, the second $e > (5/4)^4 = 625/256$ --- so
+$e^{-z_0} - \tfrac12 e^{-z_0/2} > 3/5 - 2/5 = 1/5$; and $z_0^{3/2} = 2^{-3/2} > 7/20$, since
+$400 > 392$. The left side of \ref{eq:filtration-criterion} therefore exceeds
+$8 \cdot \tfrac7{20} \cdot \tfrac15 = \tfrac{14}{25}$, while its right side $\sqrt\pi/4$ is below
+$0.45$ because $\pi < 3.24$. At $d = 3$ and $c = 4$ take $z_0 = 1$, where
+$\Gamma(m) = \Gamma(2) = 1$. Then $e^{-1} > 9/25$, again because $e < 25/9$, while
+$2^{-3/2} < 9/25$ because $625 < 648$ and $e^{-1/2} < 61/100$ because $e > (100/61)^2$. So
+\[
+  e^{-1} - 2^{-3/2}e^{-1/2} > \frac9{25} - \frac9{25}\cdot\frac{61}{100} = \frac{351}{2500} ,
+\]
+and the left side of \ref{eq:filtration-criterion} exceeds $4\cdot 351/2500 > \tfrac12$. So
+$k^{(8)}_2$ and $k^{(4)}_3$ are not nonincreasing, which completes clause (2).
+
+\emph{No causal ancestor.} Suppose $F^{(c)} \in \mathcal{S}$. By
+Proposition~\ref{prop:bridge-strictness}(1) the function
+$\sigma \mapsto F^{(c)}(\sqrt{2\sigma}) = F^{(c)}_{\mathrm I}(\sigma)$ is causally admissible, so
+there are $b_0' \ge 0$ and a nonincreasing $k'$ satisfying the two integrability conditions
+whose exponent is $F^{(c)}_{\mathrm I}$ on $[0,\infty)$. The differentiation step in the proof of
+Proposition~\ref{prop:bridge-strictness}(2) dominates the $\sigma$-derivative of the integrand
+by $e^{-\sigma u/2}k_{\mathrm I}(u)$ and reads the two integrability conditions and nothing else,
+so it applies to both data and gives
+\[
+  b_0' + \int_0^\infty e^{-\sigma u}k'(u)\,du
+   = \int_0^\infty e^{-\sigma u}k^{(c)}_{\mathrm I}(u)\,du , \qquad \sigma > 0 .
+\]
+Both integrals are finite and tend to $0$ as $\sigma$ grows: for $\sigma \ge 1$ the integrand is
+at most $k_{\mathrm I}$ on $(0,1)$ and at most $k_{\mathrm I}(u)u^{-1}$ on $(1,\infty)$, since
+$e^{-u} \le u^{-1}$ there, and it tends to $0$ at every $u > 0$, so dominated convergence applies.
+Hence $b_0' = 0$, and the measures $k'(u)\,du$ and $k^{(c)}_{\mathrm I}(u)\,du$ on $(0,\infty)$
+have equal finite Laplace transforms on $(0,\infty)$. By the uniqueness of the Laplace transform
+of a locally finite measure on the half-line, proved in the line paper for the Thorin
+representation (Proposition~\ref{prop:laplace-uniqueness-locally-finite}), they are equal, so
+$k'$ is a nonincreasing version of $k^{(c)}_{\mathrm I}$, which the second step excludes. So
+$F^{(c)} \notin \mathcal{S}$ for every $c > 0$; for $0 < c \le 6+4\sqrt2$ the fifth step makes
+$F^{(c)}$ admissible with Gaussian coefficient $0$ and profile $k^{(c)}_1$, and clause (1)
+follows.
+
+\emph{The polar profile is the polar profile.} Clause (3) reads clause (2) through the polar
+criterion, and the reading needs two steps. The first is that $k^{(c)}_d$ is the polar profile of
+a law on $\RR^d$ with radial exponent $\xi \mapsto F^{(c)}(|\xi|)$, which is the computation of
+Proposition~\ref{prop:dimension-filtration}(2) carried out at a datum that need not be monotone.
+That computation builds
+$\nu_d(dx) = \bigl(\int_0^\infty g^{(d)}_u(x)\,k_{\mathrm I}(u)\,du/u\bigr)dx$ and establishes, in
+this order: that $\nu_d$ is finite off the origin and satisfies the \Levy{} condition, by a
+Tonelli exchange against $\int_{\RR^d}(1 \wedge |x|^2)g^{(d)}_u \le 1 \wedge du$; that
+$F_{\mathrm I}(|\xi|^2/2) = \tfrac12\xi\cdot(b_0I)\xi + \int(1 - \cos\xi\cdot x)\,\nu_d(dx)$, by a
+second Tonelli exchange; that this is therefore the exponent of an infinitely divisible law,
+isotropic because its transform is, whose \Levy{} measure is $\nu_d$; and that the polar profile
+of $\nu_d$, namely $|S^{d-1}|r^df_d(r)$ with $f_d$ the radial density, is
+\ref{eq:radial-profile}, by the substitution $u = r^2/2v$. Each of those steps reads the two
+integrability conditions of the datum and nothing else. Monotonicity of $k_{\mathrm I}$ enters
+only in the last line of that proof, where the polar profile is concluded to be nonincreasing. So
+the computation applies verbatim to $D^{(c)}$ and gives an isotropic infinitely divisible law
+$\mu^{(c)}_d$ on $\RR^d$ with radial exponent $F^{(c)}(|\xi|)$ and \Levy{} measure of polar
+profile $k^{(c)}_d$, \ref{eq:polar-profile} being \ref{eq:radial-profile}.
+
+\emph{A rotation-invariant \Levy{} measure of a self-decomposable law has a nonincreasing radial
+profile.} This is the second step, and it is the polar criterion averaged over the sphere. Let
+$\mu$ be self-decomposable on $\RR^d$ with \Levy{} measure $\nu$. The criterion gives a finite
+measure $\lambda$ on the unit sphere and, for $\lambda$-almost every direction $\xi$, a
+nonincreasing $k_\xi : (0,\infty) \to [0,\infty)$ with
+$\nu(B) = \int_{S^{d-1}}\lambda(d\xi)\int_0^\infty \mathbf 1_B(r\xi)\,k_\xi(r)\,dr/r$. Take $B$ of
+the form $\{x : |x| \in A\}$ with $A \subseteq (0,\infty)$ Borel and put
+$K(r) := \int_{S^{d-1}}k_\xi(r)\,\lambda(d\xi)$, a function with values in $[0,\infty]$ that is
+nonincreasing, each integrand being so. Then $\nu\{|x| \in A\} = \int_A K(r)\,dr/r$ for every such
+$A$; and if $\nu$ is rotation invariant with radial density $f$, the same quantity is
+$|S^{d-1}|\int_A f(r)\,r^{d-1}dr = \int_A|S^{d-1}|r^df(r)\,dr/r$. Two measures on $(0,\infty)$
+agreeing on every Borel set are equal, so $|S^{d-1}|r^df(r) = K(r)$ for almost every $r$: the
+polar profile agrees almost everywhere with a nonincreasing function.
+
+\emph{Clause (3).} Both $F^{(4)}$ and $F^{(8)}$ are admissible, $4$ and $8$ being below
+$6+4\sqrt2$, so both lie in $\mathcal{A}_1$, which is the whole admissible cone
+(Proposition~\ref{prop:dimension-filtration}(1)). For $F^{(4)} \in \mathcal{A}_2$: the first step
+gives an infinitely divisible law on $\RR^2$ with radial exponent $F^{(4)}(|\xi|)$ whose \Levy{}
+measure has polar profile $k^{(4)}_2$, which clause (2) says is nonincreasing, so the law is
+self-decomposable by the polar criterion. For the two exclusions, suppose
+$\xi \mapsto F^{(c)}(|\xi|)$ were the exponent of a self-decomposable law $\mu$ on $\RR^d$, with
+$(c,d) = (8,2)$ or $(4,3)$. An exponent determines the law, so $\mu$ is the $\mu^{(c)}_d$ of the
+first step, whose \Levy{} measure is rotation invariant with radial density $f^{(c)}_d$ and polar
+profile $k^{(c)}_d$. By the second step $k^{(c)}_d$ agrees almost everywhere with a nonincreasing
+function; but it is continuous and strictly increasing on an interval, by the paragraph
+\emph{where it is not} above, so it agrees with no nonincreasing function almost everywhere ---
+given $r < s$, points $u_n \downarrow r$ and $v_n \uparrow s$ of the conull agreement set give
+$k^{(c)}_d(u_n) \ge k^{(c)}_d(v_n)$, and continuity would force $k^{(c)}_d(r) \ge k^{(c)}_d(s)$ at
+every such pair. Hence $F^{(8)} \notin \mathcal{A}_2$ and $F^{(4)} \notin \mathcal{A}_3$. The last
+sentence of the clause is the nesting $\mathcal{A}_\infty \subseteq \mathcal{A}_3$ of
+Proposition~\ref{prop:dimension-filtration}(1).
+\end{proof}

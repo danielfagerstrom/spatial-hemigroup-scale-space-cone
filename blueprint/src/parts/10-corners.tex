@@ -1,0 +1,1500 @@
+% !TEX root = ../print.tex
+% Draft \S10 --- The corners: Matern, Student-t, symmetric stable
+%
+% Source: draft/spatial-hemigroup-scale-space.md, \S10 (lines 584-664).
+%
+% SPLIT (draft Proposition 10.2): the draft states the Matern family in six clauses, of
+% which the exponent, the transforms and the moments are computations and the kernel density
+% and its tail are classical Fourier pairs. The node is split so that the computations stay
+% [T] and only the density and the tail are cited: prop:matern-exponent [T],
+% prop:matern-density [A].
+%
+% CHANGED (prop:thorin-subclass clause 4): the draft states that the spatial Thorin measure
+% is "the image of U_I under theta -> sqrt(2 theta)". It is TWICE that image. The factor is
+% checked against the Matern member in the proof: with the causal Gamma data U_I = gamma
+% delta_1 the image is gamma delta_{sqrt 2}, and (10.1) then returns half the right exponent.
+% The draft should carry the factor 2.
+%
+% CHANGED (thm:matern clause 4): the draft's clause on rational stage transfer functions
+% carries a check asking which rational functions are admissible; the general statement is
+% prop:rational-increments. The node states the single-pole-pair case only, which is what the
+% theorem uses, and refers the general case forward.
+
+\chapter{The corners: \Matern{}, Student-t, symmetric stable}
+\label{ch:corners}
+
+\ref{thm:main-characterization} is a machine: one symmetric self-decomposable law in, one scale
+space out. This chapter runs it on the three named families, says what each is, what cuts it
+out of the cone and what it costs, and organises the three by the symmetric Thorin subclass, of
+which the \Matern{} family is the single-atom member. Two general dials come first.
+
+% draft: Proposition 10.1
+% twin: hcs prop:moment-criterion (ledger A7 there) for clause (1); clause (2) has no causal
+% node, the causal article stating the tail dichotomy in a remark.
+% CHANGED (proof 2026-09-10, wave 4): clause (2)'s hypothesis is corrected. It read "if k
+% vanishes beyond tau"; it now reads that tau is the LEAST such radius and that k is not
+% identically zero. Both riders are needed and neither was decorative: at k == 0, the pure
+% Gaussian, every tau satisfies the old hypothesis while the moment is finite at every alpha
+% (Sato treats nu = 0 separately, Remark 26.3); and at a tau strictly larger than the radius the
+% old statement asserted divergence on a range where its own first half asserts convergence.
+% Ledger A14's entry already recorded the right reading -- "Sato's c is an infimum; the
+% blueprint's tau is the same number" -- and the statement did not carry it. The Lean
+% declaration Skeleton.moments_tails_bounded is repaired the same way, and the interface
+% admitted on the trust boundary (SpatialLine.moments_tails_divergence) is the corrected
+% divergence branch alone.
+\begin{proposition}[moments and tails]\label{prop:moments-tails}
+\uses{thm:main-characterization,lem:selfdecomposable-exponents}
+\lean{SpatialLine.moments_tails_criterion, SpatialLine.moments_tails_variance,
+Skeleton.moments_tails_bounded, SpatialLine.moments_tails_divergence,
+Skeleton.moments_tails_heavy, SpatialLine.moments_tails_completely_monotone}\notready
+Let $F$ be admissible with data $(a,k)$, and let $X_t$ be the displacement at canonical scale
+$t$.
+\begin{enumerate}
+\item \emph{(Moments.)} For $n \ge 1$, $\mathbb{E}|X_t|^n < \infty$ if and only if
+$\int_1^\infty x^{n-1}k(x)\,dx < \infty$. When finite, the variance is
+$\mathbb{E}X_t^2 = t^2\bigl(2a + \int_0^\infty x\,k(x)\,dx\bigr)$, the two terms being the
+jitter and the second moment of the catalogue.
+\item \emph{(Tails.)} If $k \not\equiv 0$ and $\tau$ is the least radius beyond which $k$
+vanishes, then $\mathbb{E}\exp(\alpha|X_t|\log|X_t|) < \infty$ for every $\alpha < 1/(\tau t)$
+and for no $\alpha > 1/(\tau t)$: the tail is of order $e^{-|x|\log|x|/(\tau t)}$. If $k$
+vanishes beyond no $\tau$, the tail is heavier than every such rate. In particular a completely monotone $k$,
+being positive on all of $(0,\infty)$, puts the whole Thorin subclass on the heavy side, and no
+kernel other than the Gaussians themselves has a Gaussian or lighter tail.
+\end{enumerate}
+\statusA\quad\ledger{A11}\quad\ledger{A13}\quad\ledger{A14}\quad\emph{(\textbf{Assignment.} \ledger{A13}
+carries the moment criterion for infinitely divisible laws, in the submultiplicative-weight
+form, and \ledger{A14} the two-sided tail statement for a \Levy{} law whose jump measure has
+bounded support. What they do not carry: the translation into the folded profile --- the \Levy{}
+measure of $X_t$ is the $t$-dilate of $k(x)x^{-1}dx$ folded, so
+$\int_{|x|>1}|x|^n\,\nu_2(dx) = \int_1^\infty x^{n-1}k(x)\,dx$ up to the dilation --- and the
+variance formula, which is the second difference $2\omega^{-2}(1 - \hat\mu_t(\omega))$ at the
+origin evaluated on both sides; both are \textbf{[T]}, elementary, and written out below. The
+variance clause in particular spends no ledger entry at all: the finiteness of
+$\mathbb{E}X_t^2$ is a conclusion of its own argument and not an appeal to \ledger{A13}. The last
+sentence of clause (2) spends one entry more, and \ledger{A11} is named above for it: that a
+completely monotone profile is a mixture of exponentials is Bernstein's theorem, and it is how the
+profile is seen to be positive at every $x > 0$; the comparison of the two regimes that follows is
+\textbf{[T]}. (\texttt{SpatialLine.moments\_tails\_completely\_monotone} reaches
+\texttt{bernstein\_completely\_monotone} through
+\texttt{completely\_monotone\_support\_unbounded}. The status line did not name the entry, and the
+annotation called the whole sentence \textbf{[T]}, until 2026-09-19; see the marker below.)
+Of \ledger{A14} only the divergence branch is admitted in Lean,
+and only at a lower bound for the radius, which is what the last sentence consumes; the
+finiteness branch of clause (2) is cited and not admitted, no proof spending it.)}
+\end{proposition}
+
+% CHANGED (2026-09-19, article mirror of module B, R174): TWO CHANGES, neither to a clause.
+% (a) THE STATUS LINE NAMES \ledger{A11}, and the annotation says where it is spent. The last
+% sentence of clause (2) -- that a completely monotone profile is positive on all of (0,infinity),
+% so that the whole Thorin subclass sits on the heavy side -- passes through Bernstein's theorem,
+% in the prose proof ("a completely monotone k is a mixture of exponentials") and in the Lean
+% (SpatialLine.moments_tails_completely_monotone reaches bernstein_completely_monotone through
+% completely_monotone_support_unbounded, IsCompletelyMonotone being the derivative condition). The
+% node named A13 and A14 only, and the annotation called that sentence [T]. This is a DISCLOSURE,
+% in the safe direction: the article names one more cited fact and claims no more. No statement,
+% tag, status or declaration changes, and A11 is admitted already (as the existence equivalence,
+% at prop:thorin-subclass), so no trust-boundary name is added.
+% (b) The proof's use of the THORIN MEASURE is replaced by an anonymous representing measure (the
+% register pass's item 22: "U" appeared here, in the chapter's first proof, long before
+% prop:thorin-subclass introduces it). Bernstein's theorem is named where it is used.
+% CHANGED (2026-09-11, draft sync, R103): a "proof of record 2026-09-09, wave 3" block stood
+% here describing the equivalence of clauses (1) and (2), sigma-finiteness of U, the averaging
+% step and uniqueness of U -- which is prop:thorin-subclass's proof, not this node's (this node
+% has no such clauses and no U). It is moved, verbatim, to above prop:thorin-subclass's proof.
+% CHANGED (proof of record 2026-09-10, wave 5): the VARIANCE paragraph is rewritten to the
+% machine-checked route. The printed route differentiates eq:levy-khintchine twice under the
+% integral sign; the obligation is a second difference of the transform at the origin, which
+% needs one dominated convergence rather than two differentiations and which delivers the
+% finiteness of E X_t^2 rather than assuming it (Fatou at the origin). The printed route is
+% kept as a marked remark. The consequence for the axiom line is recorded in the annotation:
+% SpatialLine.moments_tails_variance prints Lean core, so ledger A13 is not on the variance
+% clause's path.
+\begin{proof}[Proof of the parts held \textbf{[T]}]
+The \Levy{} measure of $X_t$ is the $t$-dilate of $\nu = k(x)x^{-1}dx$, folded to the two-sided
+measure $\nu_2$; so
+$\int_{|x|>1}|x|^n\,\nu_2(dx) = \int_{1/t}^\infty (tx)^n\,k(x)\,x^{-1}dx$, which is finite
+exactly when $\int_1^\infty x^{n-1}k(x)\,dx$ is, the integrand being locally bounded away from
+the origin. Applying A13 with the submultiplicative weight $\max(|x|,1)^n$ gives clause (1)'s
+criterion: that weight agrees with $|x|^n$ on $\{|x| > 1\}$, the only region the criterion
+integrates over, and has a finite integral against the law exactly when $|x|^n$ does, since
+$|x|^n \le \max(|x|,1)^n \le |x|^n + 1$; the weight $|x|^n$ itself is not submultiplicative.
+% CHANGED (2026-09-11, draft sync, R104): read "Applying A13 with the weight |x|^n". That weight
+% is not submultiplicative in Sato's Def. 25.2, so Thm. 25.3 does not apply to it; the entry's
+% weight is (|x| v 1)^n since R49 corrected blueprint/AXIOMS.md. Textual: the two moments are
+% finite together and the weights agree where the criterion integrates. Mirrored in the draft.
+
+For the variance, what has to be evaluated is a second difference of the transform at the
+origin and not a second derivative. Write $C = t^2(2a + \int_0^\infty x\,k(x)\,dx)$, finite by
+hypothesis. The half-angle formula $1 - \cos u = 2\sin^2(u/2)$ gives, for every real $c$ and
+every $\omega \ne 0$,
+\[
+  \bigl(1 - \cos c\omega\bigr)\frac{2}{\omega^2}
+   = c^2\Bigl(\frac{\sin(c\omega/2)}{c\omega/2}\Bigr)^2 \le c^2 ,
+\]
+an identity rather than an estimate, so the same line supplies the pointwise limit $c^2$ as
+$\omega \to 0$, a dominating function, and the inequality $1 - \cos u \le u^2/2$. On the
+exponent side, reading it at $c = tx$ inside \ref{eq:sd-profile} and dominating by $t^2xk(x)$
+gives $2\omega^{-2}F(t\omega) \to C$; hence $F(t\omega) \to 0$, and since
+$ye^{-y} \le 1 - e^{-y} \le y$ for $y \ge 0$, the same limit holds for
+$2\omega^{-2}(1 - e^{-F(t\omega)})$. On the measure side, $\mu_t$ being a probability measure,
+$1 - \hat\mu_t(\omega) = \int(1 - \cos\omega x)\,\mu_t(dx)$; Fatou's lemma along a sequence
+$\omega_m \to 0$ turns the exponent-side limit into $\int x^2\,\mu_t(dx) \le C$, so the second
+moment is finite --- a conclusion of the argument, not a hypothesis of it --- and dominated
+convergence with the dominating function $x^2$ then gives
+$2\omega^{-2}(1 - \hat\mu_t(\omega)) \to \int x^2\,\mu_t(dx)$. The two limits are limits of the
+same function, so $\mathbb{E}X_t^2 = C$. The mean vanishes because $|x| \le 1 + x^2$ makes $x$
+integrable against $\mu_t$ and $\mu_t$ is reflection-symmetric.
+
+\emph{Remark, not machine-checked.} A second route to the variance evaluates
+$\mathbb{E}X_t^2 = -\partial_\omega^2 e^{-F(t\omega)}|_{\omega = 0} = t^2F''(0)$ and
+differentiates \ref{eq:levy-khintchine} twice under the integral sign to obtain
+$F''(0) = 2a + \int_{(0,\infty)}x^2\,\nu(dx)$. It reaches the same constant and costs a
+dominating function for each of the two differentiations, where the second difference costs one
+and delivers the finiteness of $\mathbb{E}X_t^2$ along the way.
+
+For the last
+sentence of (2), a completely monotone $k$ is a mixture of exponentials by Bernstein's theorem
+(A11): $k(x) = \int e^{-\theta x}\,V(d\theta)$ for a positive measure $V$, which is not the zero
+measure because $k \not\equiv 0$. Some window $[0,\theta_0]$ then carries positive mass, and on it
+$e^{-\theta x} \ge e^{-\theta_0x}$, so $k(x) \ge e^{-\theta_0x}\,V([0,\theta_0]) > 0$ at every
+$x > 0$; hence $k$ vanishes beyond no $\tau$, and the heavy branch of A14 applies. Finally, if $k \equiv 0$
+then $F = a\omega^2$ and the kernel is Gaussian, while if $k \not\equiv 0$ then $F$ has a
+nonzero jump catalogue and A14's tail floor forbids a Gaussian tail: fixing $x_0 > 0$ with
+$k(x_0) \ne 0$, the catalogue reaches the radius $x_0$, so the floor holds at every
+$\alpha' > 1/(x_0t)$, and one such $\alpha'$ suffices, since
+$\alpha'|x|\log|x| \le \alpha x^2$ once $|x| \ge (2\alpha'/\alpha)^2$ --- write
+$\log|x| = 2\log\sqrt{|x|} \le 2\sqrt{|x|}$ --- while the law is a probability measure, so the
+divergence cannot come from the bounded part. No case distinction between a bounded and an
+unbounded catalogue is needed at this step, one radius the catalogue reaches being enough.
+\end{proof}
+
+The two dials are turned by one object, the tail of $k$: polynomial moment weight by its decay,
+super-exponential tail order by its support. The $\Cin$ rays and their superpositions, with
+bounded support, are the best-localized members of the cone and have every moment; the price is
+the echo structure of \ref{lem:cin-delay-equation}. Completely monotone profiles buy echo-free
+kernels realizable by first-order sections (Chapter~\ref{ch:implementation}) at the price of
+tails no lighter than exponential.
+
+% draft: Proposition 10.2, clauses (1), (2), (4) --- SPLIT, see the header note.
+% twin: hcs prop:gamma-family + prop:gamma-kernels + prop:gamma-moments
+% (Hemigroup.SelfDecomposableExponent.gammaExponent_toRealExponent,
+%  ...gammaExponent_laplace_kernel, ...gammaExponent_moments)
+% CHANGED (proof of record 2026-09-10, wave 5): clause (3)'s proof is rewritten to the
+% machine-checked route, and the \uses edge to prop:bridge-families is REMOVED with it. The
+% printed proof imported the Gamma mixture from that node; the mixing law is a Gamma law with a
+% known Laplace transform and is CONSTRUCTED here in three lines, after which
+% prop:fourier-uniqueness identifies the two measures. So clause (3) does not depend on
+% chapter 9 at all, and the edge said it did. The identification of the Matern family as the
+% image of the causal Gamma family is still prop:bridge-families(2)'s content and that node
+% still cites this one; the direction of the dependency is what changed. The variance route
+% through prop:moments-tails(1) survives as a marked remark: it is machine-checked, it is
+% independent, and it does not reach the general even moment.
+% CHANGED (author's decision 2026-09-10): SpatialLine.matern_moments_integrable is DROPPED from
+% the \lean tag. It is the A13 route of the remark at the end of the proof -- a second and
+% independent part-proof of the finiteness conjunct, machine-checked but spending a
+% trust-boundary name -- and naming it beside matern_moments made a [T] node's tag list an
+% axiom-spending declaration, which is exactly the shape a blind fidelity reviewer should query.
+% The declaration stays in SpatialLine/Moments.lean as a corollary, with a docstring line
+% saying it is no longer a node declaration; A13's ledger entry still lists it as a consumer,
+% which remains true, and the entry's own [A] node is prop:moments-tails, not this one. The
+% node's four remaining declarations print Lean core, so the tag and the \statusT now agree.
+\begin{proposition}[the \Matern{} family: exponent, transforms, moments]\label{prop:matern-exponent}
+\uses{lem:selfdecomposable-exponents,lem:profile-integrability,prop:moments-tails,prop:fourier-uniqueness,thm:main-characterization}
+\lean{SpatialLine.matern_exponent, SpatialLine.matern_transforms,
+SpatialLine.matern_moments, SpatialLine.matern_gamma_mixture}\leanok
+\notes{gamma-matern-corner}
+For $\gamma > 0$:
+\begin{enumerate}
+\item \emph{(Exponent.)} $F(\omega) = \gamma\log(1 + \omega^2)$ is admissible, with Gaussian
+coefficient $a = 0$ and folded profile $k(x) = 2\gamma e^{-x}$; the profile at range $\theta$ is
+$k(x) = 2\gamma e^{-x/\theta}$, with exponent $\gamma\log(1 + \theta^2\omega^2)$.
+\item \emph{(Transforms.)} $e^{-F(t\omega)} = (1 + t^2\omega^2)^{-\gamma}$, and the increments
+have transfer functions $\bigl((1 + s^2\omega^2)/(1 + t^2\omega^2)\bigr)^{\gamma}$, rational in
+$\omega$ for integer $\gamma$.
+\item \emph{(Moments.)} Every moment is finite: $X_t \seq \BM_T$ with $T$ Gamma-distributed of
+shape $\gamma$ and scale $2t^2$, so
+$\mathbb{E}X_t^{2n} = (2n-1)!!\,(2t^2)^n\,\Gamma(\gamma+n)/\Gamma(\gamma)$, and in particular
+$\mathbb{E}X_t^2 = 2\gamma t^2$.
+\end{enumerate}
+\statusT\quad\emph{(Every clause is machine-checked, and the node's footprint is Lean core:
+finiteness of every moment follows from the even moments by $|x|^n \le 1 + x^{2n}$, and the
+mixture is constructed rather than cited. \textbf{Changed 2026-09-10 (author's decision).} The
+Lean tag used to name a fifth declaration, \texttt{SpatialLine.matern\_moments\_integrable},
+which proves the finiteness conjunct a second time through \ref{prop:moments-tails}(1) and
+spends ledger A13 in doing so. That is the remark below: a genuine and independent part-proof,
+but not the node's grounding, and a $[T]$ node whose tag names an axiom-spending declaration
+reads as though it were. The declaration stays in the library as a corollary; the tag now names
+only what the node rests on, so what the tag lists and what the node's status claims agree.)}
+\end{proposition}
+
+% CHANGED (proof of record 2026-09-09): clause (1)'s proof is rewritten to the machine-checked
+% route, which is shorter than the printed one in two places and longer in one. Longer: the
+% domination that makes the differentiation legitimate is now written out, because it is the
+% whole content of the step and because it is uniform in omega, which is what lets the identity
+% be proved on all of R at once rather than on a neighbourhood. Shorter: (i) the two
+% integrability conditions are the SAME two dominating functions read on (0,1) and (1,infinity),
+% so lem:profile-integrability is not spent -- that lemma converts the \Levy{} condition into these
+% two, and here the two are what is checked directly; (ii) lem:selfdecomposable-exponents is not
+% spent either. Exhibiting the pair (a,k) of eq:sd-profile IS admissibility in the sense of
+% thm:main-characterization, so the appeal was a step the statement does not need; and the range
+% theta comes out of the computation itself, so it is not obtained from that lemma's dilation
+% identity. The uses edges are kept: clauses (2) and (3) still consume those nodes.
+\begin{proof}
+\leanok
+(1) Fix $\theta > 0$ and write $p = 1/\theta$. The integrand
+$(1 - \cos\omega x)\,e^{-px}x^{-1}$ is nonnegative on $(0,\infty)$ and, since
+$1 - \cos u \le u^2/2$, is bounded there by $\tfrac12\omega^2\,x\,e^{-px}$, so it is integrable
+for every $\omega$; its derivative in $\omega$ is $\sin(\omega x)\,e^{-px}$, whose modulus is at
+most $e^{-px}$ \emph{uniformly in} $\omega$. Differentiation under the integral sign is
+therefore legitimate at every $\omega$ with one and the same dominating function, and gives
+\[
+  \frac{d}{d\omega}\int_0^\infty (1 - \cos\omega x)\,e^{-px}\,\frac{dx}{x}
+   = \int_0^\infty \sin(\omega x)\,e^{-px}\,dx = \frac{\omega}{p^2+\omega^2},
+\]
+which is also the derivative of $\tfrac12\log(1 + \omega^2/p^2)$. The two functions of $\omega$
+therefore differ by a constant, and both vanish at $\omega = 0$, so
+\[
+  \int_0^\infty (1 - \cos\omega x)\,e^{-x/\theta}\,\frac{dx}{x}
+   = \tfrac12\log\bigl(1 + \theta^2\omega^2\bigr).
+\]
+Hence $F(\omega) = \gamma\log(1+\theta^2\omega^2)$ is of the form \ref{eq:sd-profile} with
+$a = 0$ and $k(x) = 2\gamma e^{-x/\theta}$, which is nonnegative and nonincreasing on
+$(0,\infty)$. Its two integrability conditions are the two dominating functions above read on
+the two halves of the range: $\int_0^1 x\,k(x)\,dx \le 2\gamma$ and
+$\int_1^\infty k(x)\,x^{-1}dx \le 2\gamma\int_1^\infty e^{-x/\theta}dx < \infty$. Exhibiting the
+pair $(0, 2\gamma e^{-\cdot/\theta})$ is what admissibility asks for, so the argument stops
+there; the range $\theta$ is carried by the computation and needs no separate dilation step.
+
+(2) is (1) read through the similarity form of \ref{thm:main-characterization}: the increment
+transfer function is the ratio of the endpoint transforms, the denominators being nonvanishing.
+
+(3) Let $\Gamma_{\gamma,2t^2}$ be the Gamma law of shape $\gamma$ and scale $2t^2$, that is the
+law on $(0,\infty)$ with density $u^{\gamma-1}e^{-u/2t^2}/(\Gamma(\gamma)(2t^2)^{\gamma})$. Its
+Laplace transform is $\int_0^\infty e^{-\sigma u}\,\Gamma_{\gamma,2t^2}(du) =
+(1 + 2t^2\sigma)^{-\gamma}$ for $\sigma \ge 0$, one Gamma integral; so the Gaussian mixture
+$\int_0^\infty g_u\,\Gamma_{\gamma,2t^2}(du)$ --- the law of $\BM_T$ with $T$ so distributed ---
+has cosine transform $(1 + 2t^2\cdot\omega^2/2)^{-\gamma} = (1 + t^2\omega^2)^{-\gamma}$, which
+by (2) is the transform of the kernel at scale $t$. Both are symmetric probability measures, so
+\ref{prop:fourier-uniqueness} identifies them and $X_t \seq \BM_T$. Conditioning on $T$,
+$\mathbb{E}X_t^{2n} = \mathbb{E}[T^n]\,\mathbb{E}[\BM_1^{2n}] = (2n-1)!!\;\mathbb{E}T^n$ with
+$\mathbb{E}[\BM_v^{2n}] = (2n-1)!!\,v^n$ and
+$\mathbb{E}T^n = (2t^2)^n\Gamma(\gamma+n)/\Gamma(\gamma)$; the two are the same Gamma integral
+read at half-integer and at integer argument. Every moment is then finite, since
+$|x|^n \le 1 + x^{2n}$, and $n = 1$ with $\Gamma(\gamma+1) = \gamma\Gamma(\gamma)$ gives
+$\mathbb{E}X_t^2 = 2\gamma t^2$.
+
+\emph{Remark.} Finiteness of every moment also follows from \ref{prop:moments-tails}(1), the
+profile decaying exponentially, and the variance from the variance formula there:
+$\mathbb{E}X_t^2 = t^2\int_0^\infty x\,2\gamma e^{-x}dx = 2\gamma t^2$. That route is machine-
+checked too and is independent of this one; it does not reach the general even moment.
+\end{proof}
+
+% draft: Proposition 10.2, clauses (3), (5), (6) --- SPLIT, see the header note.
+% SKELETON NOTE (phase B, 2026-09-09): Mathlib (v4.31.0) carries no modified Bessel function
+% and no error function, so SpatialLine/Corners.lean DEFINES besselK by the integral
+% representation DLMF (10.32.9) -- which is what this entry's own sources define it by -- and
+% erfc by its defining integral. The Lean statements of this node, of prop:student-t(2), of
+% thm:joint-locality(2) and of prop:thorin-subclass(5) are against those definitions. The
+% consequence to keep in view is that A16 and A19 become statements about that integral, with
+% no Mathlib API behind the name; SKELETON.md question Q10 asks the review to confirm the
+% primitive. The gamma = 1 special value needs K_{1/2}(z) = sqrt(pi/2z) e^{-z} and is priced L
+% for that reason, while the gamma = 1/2 value is an S computation from the definitions.
+% CHANGED (review 2026-09-09, R20): the power of t in the tail was WRONG and is corrected from
+% t^{-gamma-1/2} to t^{-gamma} (the draft, \S10, carries the same error). From the scaling
+% phi_t = t^{-1}phi_1(./t) and phi_1(y) ~ c|y|^{gamma-1}e^{-|y|} one gets t^{-1}(|x|/t)^{gamma-1}
+% = t^{-gamma}|x|^{gamma-1}; the same follows from K_nu(z) ~ sqrt(pi/2z)e^{-z} in the displayed
+% density, and the check at gamma = 1 settles it, the Laplace kernel being e^{-|x|/t}/(2t) with
+% t-power -1 and not -3/2. The Lean statement (Skeleton.matern_density_tail) had the constant
+% quantified INSIDE the scope of t, so it absorbed the error and asserted nothing about t; it
+% now quantifies the constant first, which is what makes the exponent a claim.
+% CHANGED (proof 2026-09-09, wave 2): Skeleton.matern_density_gaussian_limit was FALSE as typed
+% and gained the hypothesis that the kernels are SYMMETRIC. It is the review's R7 defect at a
+% third site. The declaration quantified over probability measures constrained only by their
+% COSINE transform -- which determines a measure's symmetrisation and nothing more -- and
+% concluded weak convergence, a statement about the whole measure. Counterexample: add to the
+% Matern law nu_n the odd signed measure of density (1/2) nu_n(x) sgn(x); the sum is a
+% probability measure with the same cosine transform, and for the bounded continuous odd
+% g = arctan its integral tends to (1/2)E|arctan N| > 0 while the Gaussian limit gives 0. The
+% repair is R7's own -- symmetry of the kernels, which (A3) gives for every family here and
+% which prop:two-members already assumes -- and it narrows nothing. The statement of record
+% below is unaffected: the blueprint says "the kernel of the Matern family", and that family's
+% kernels are symmetric; what was missing was in the LEAN quantification, not in the prose.
+% CHANGED (2026-09-14, R156; a NARROWING of the naming sentence): the density is called the
+% Matern kernel of smoothness gamma - 1/2 only where it is one, gamma > 1/2. The displayed
+% function is a probability density for every gamma > 0, but a Matern COVARIANCE function is
+% bounded at the origin, which needs smoothness gamma - 1/2 > 0; at gamma = 1/2 it is K_0, which
+% diverges logarithmically. The variance-gamma identification, which is what the ledger entry
+% A15 carries and what the later nodes read, holds on the whole range and is stated so. Same
+% finding as R156 at prop:two-members (the external review's finding C); mirrored in the draft.
+\begin{proposition}[the \Matern{} family: the kernel and its tail]\label{prop:matern-density}
+\uses{prop:matern-exponent,prop:kernel-regularity,prop:levy-continuity,prop:moments-tails}
+\lean{Skeleton.matern_density, SpatialLine.matern_density_special, Skeleton.matern_density_tail,
+SpatialLine.matern_density_gaussian_limit}\notready
+\notes{gamma-matern-corner}
+For $\gamma > 0$ and $t > 0$ the kernel of the \Matern{} family at canonical scale $t$ has the
+density
+\[
+  \phi_t(x) = \frac{1}{\sqrt\pi\,\Gamma(\gamma)\,t}
+   \Bigl(\frac{|x|}{2t}\Bigr)^{\gamma - \frac12}
+   K_{\gamma-\frac12}\Bigl(\frac{|x|}{t}\Bigr),
+\]
+for $\gamma > \tfrac12$ the \Matern{} kernel of smoothness $\gamma - \tfrac12$ and range $t$
+normalised to unit mass; for every $\gamma > 0$ these are the symmetric variance-gamma laws. Here
+$\gamma = 1$ gives the Laplace kernel $e^{-|x|/t}/(2t)$ at every $x \ne 0$, and
+$\gamma = \tfrac12$ gives $K_0(|x|/t)/(\pi t)$ at every $x$. The origin is excluded from the first
+of those two values because the display reads there as the product of $(|x|/2t)^{1/2} = 0$ with
+$K_{1/2}(0)$ and does not return $(2t)^{-1}$. The difference is on a null set and leaves the
+kernel, a density, unchanged.
+% CHANGED (2026-09-19, article mirror of module B, R174): the two special values and the null-set
+% exclusion are two sentences where they were one with an em-dash aside (the register pass's
+% item 13). The gamma = 1/2 value gains the words "at every x", which is what the R57 comment below
+% records of it and which the contrast with the gamma = 1 value now makes explicit. No claim
+% changes: the same two values, the same exclusion, the same reason.
+% CHANGED (2026-09-11, draft sync, R57): the gamma = 1 special value was stated without a domain.
+% SpatialLine.matern_density_special proves it for x /= 0 only: at x = 0 the closed form carries
+% the factor (|0|/2t)^{1/2} = 0 and the Laplace density is (2t)^{-1}. Narrowed to x /= 0, a
+% Lebesgue-null exception that leaves the kernel, a density, unchanged; the gamma = 1/2 value has
+% no exclusion (both sides read K_0(0)/(pi t) at the origin). Mirrored at draft Proposition 10.2(3).
+% CHANGED (2026-09-15, module B drafting, R164): the words "As |x| -> infinity," opened the tail
+% sentence and had been swept into the R57 comment line above by an editing slip, so the
+% statement of record read "phi_t(x) ~ ..." with no limit named; the checker strips comments, so
+% the printed statement lacked the words while the draft and the Lean (Skeleton.matern_density_tail,
+% a statement at infinity) had them. Restored on the statement's own line. Found when the paper
+% transcribed the node verbatim.
+As $|x| \to \infty$,
+$\phi_t(x) \sim c_\gamma\,t^{-\gamma}|x|^{\gamma-1}e^{-|x|/t}$: exponential tails, the
+heavy side of \ref{prop:moments-tails}(2), as for every completely monotone profile. As
+$\gamma \to \infty$ with $2\gamma t^2 = v$ held fixed, $\phi_t$ converges weakly to the
+Gaussian of variance $v$.
+\statusA\quad\ledger{A15}\quad\ledger{A16}\quad\emph{(\textbf{Assignment.} \ledger{A15} carries
+the Fourier pair, that the displayed density has transform $(1+t^2\omega^2)^{-\gamma}$, together
+with the identification of the family as the symmetric variance-gamma laws; \ledger{A16} carries
+the asymptotics of the modified Bessel function that give the tail. What they do not carry: the
+two special values, which are the displayed formula at $\gamma = 1$ and $\gamma = \tfrac12$;
+that the kernel is a density at all, which is \ref{prop:kernel-regularity}; and the Gaussian
+limit, which is \textbf{[T]} from $(1 + v\omega^2/2\gamma)^{-\gamma} \to e^{-v\omega^2/2}$ and
+\ref{prop:levy-continuity}.)}
+\end{proposition}
+
+% draft: Theorem 10.3
+% twin: hcs has no single node for this; the causal article states the Gamma corner across
+% prop:gamma-family, prop:gamma-kernels, prop:gamma-density and prop:thorin-subclass.
+% CHANGED (review 2026-09-09, Q11): the closing CONSEQUENCE -- that the Matern family is the
+% unique admissible family with every moment finite, exponential tails and an exact first-order
+% realization -- has MOVED OUT of this theorem into cor:matern-realization below, together with
+% the \uses edge to prop:matern-cascade and the closing paragraph of the proof. It rested on a
+% Chapter 14 node with no Lean scheduled, so it could not be typed, and a \lean tag that covers
+% only some of a node's clauses is the exception to the fidelity rule this split removes: the
+% tag below now names declarations for the equivalence, which is all the theorem asserts.
+\begin{theorem}[the \Matern{} theorem]\label{thm:matern}
+\uses{prop:matern-exponent,prop:matern-density,prop:thorin-subclass,prop:fourier-toolbox}
+\lean{SpatialLine.matern_theorem, SpatialLine.matern_thorin_atom, SpatialLine.matern_kernels,
+SpatialLine.matern_rational, SpatialLine.matern_rational_polynomial,
+SpatialLine.matern_gauge_profile, SpatialLine.matern_gauge}\leanok
+\notes{gamma-matern-corner}
+% CHANGED (2026-09-19, external review of module B, R170): two faults of the printed statement
+% against its declaration. (a) Clause (2) lacked the hypothesis of no Gaussian part:
+% a omega^2 + gamma log(1 + theta^2 omega^2) has a one-point Thorin measure and satisfies neither
+% (1) nor (3). SpatialLine.matern_theorem has `P.a = 0` and `thorinExponent 0` in that clause; the
+% print had dropped it (the fault of R167 again). (b) "The following are equivalent" covered
+% clause (4), which is an equivalence for a positive integer gamma only and is a separate
+% conjunct over m : N in the declaration; the opening sentence now says which clauses are
+% equivalent for which gamma, and "a single pole pair" is said of s < t, the stage at s = t being
+% the identity. Found by the referee. Safe direction; no Lean change.
+% CHANGED 2026-09-19 (R176, second external review round, referee B finding 2): THE FAMILY IS IN
+% ITS CANONICAL GAUGE, a hypothesis added. Clauses (3) and (4) are about the family's own kernels
+% and stages at the parameter t, so they are gauge-dependent: the referee's Phi'_{s,t} :=
+% Phi_{s^2,t^2} of a Matern family satisfies the axioms and (ND), has clause (1)'s profile, and
+% has stage transfer ((1 + theta^2 chi(s)^2 omega^2)/(1 + theta^2 chi(t)^2 omega^2))^gamma with
+% chi =/= id, so clause (4) as printed failed for it. The Lean had the hypothesis all along:
+% SpatialLine.matern_theorem takes hcos : fourierCos (mu 0 t) omega = exp(-P.exponent (t * omega)),
+% which IS the canonical gauge. So the print is brought to the declaration; the same hypothesis is
+% what prop:bridge-families already states where it needs it. Safe direction (a hypothesis added);
+% no Lean change. cor:matern-realization gets it too, for the same reason.
+For an admissible family \emph{in its canonical gauge} and $\gamma, \theta > 0$, clauses (1), (2)
+and (3) are equivalent, and
+when $\gamma$ is a positive integer they are equivalent to clause (4).
+\begin{enumerate}
+\item The profile is a single exponential, $k(x) = 2\gamma e^{-x/\theta}$, and $a = 0$.
+\item The family lies in the symmetric Thorin subclass of \ref{prop:thorin-subclass} with
+Gaussian coefficient $0$ and the one-point Thorin measure $2\gamma\,\delta_{1/\theta}$.
+\item The kernels are \Matern{}: $\hat\phi_t(\omega) = (1 + \theta^2t^2\omega^2)^{-\gamma}$.
+\item The stage transfer functions are $\hat\mu_{s,t}(\omega) =
+\bigl((1 + \theta^2s^2\omega^2)/(1 + \theta^2t^2\omega^2)\bigr)^{\gamma}$ for all $s \le t$,
+rational in $\omega$, with a single pole pair when $s < t$.
+\end{enumerate}
+The parameter $\theta$ is a change of gauge and may be normalised to $1$.
+\statusT\quad\emph{(The headline of the chapter: the family of spatial statistics is, under the
+hemigroup axioms, the finite-moment, rational-spectrum, exactly implementable corner of scale
+space. Clause (4) is stated for integer $\gamma$ only. The draft's version asked, in a check,
+which rational functions in general are admissible stage transfer functions;
+\ref{prop:rational-increments} gives a class of them and the general question is open
+(\ref{rem:rational-converse} shows that its first clause has no converse), while the theorem uses
+only the single-pole-pair case, so the
+clause is narrowed to it here rather than left with an open quantifier. \emph{The canonical gauge}
+is a hypothesis since 2026-09-19 (R176): clauses (3) and (4) speak of the kernels and the stages
+at the parameter $t$, which is a statement about the family's gauge as well as about its exponent,
+and the declaration has read the gauge from the start. The four clauses are named
+by one declaration, \texttt{SpatialLine.matern\_theorem}, which assembles the four proved
+declarations over one profile and one family of kernels; it proves nothing new. Two residuals of
+that assembly are recorded here rather than hidden in it. Clauses (1)--(3) are equivalent at a
+\emph{given} pair $(\gamma,\theta)$ of positive reals, not merely as existential statements: the
+smoothness and range read off the profile are the ones appearing in the Thorin atom and in the
+transform. That is what the theorem means --- clause (4) reuses the $\theta$ of clauses
+(1)--(3), which the existential reading would leave unbound --- and it costs nothing, both
+directions of each equivalence producing the same pair. Clause (4) is stated at each integer
+$\gamma$ and each range $\theta$, so the four are not a single chain of equivalences at one
+$\gamma$; that is the theorem's own restriction of the clause to integer $\gamma$. And clause (3) is about the
+endpoint kernels while clause (4) is about the increments, so the bundling reads the increment
+family at its endpoint pair; the cascade law relating the two is a hypothesis of the bundle, as it
+is of \texttt{matern\_rational}. Clause (4) is formalised twice. One declaration is the
+equivalence with clause (3), at the closed form
+$\bigl((1+\theta^2s^2\omega^2)/(1+\theta^2t^2\omega^2)\bigr)^{m}$; the other reads that closed
+form as a ratio of polynomials, the denominator a power of one quadratic strictly positive on
+the line --- so its two roots are a single conjugate pair off the real axis, which is the
+"rational in $\omega$ with a single pole pair" of the clause's own words. The closed form on its
+own does not carry it, and the integer restriction is what makes it statable: at a non-integer
+exponent there is no ratio of polynomials at all. The pole-pair declaration reads the increments
+at $0 < s \le t$, the collapsed left endpoint being the endpoint-kernel clause (3) rather than
+this one. The closing sentence is formalised at the \emph{profile},
+$k_{\gamma,\theta}(x) = k_{\gamma,1}(x/\theta)$ on $(0,\infty)$: it is a statement about the
+family --- the $(\gamma,\theta)$ member is the $(\gamma,1)$ member with the displacement axis
+rescaled --- and it is false without $\theta > 0$. The frequency-side identity
+$F_{\gamma,\theta}(\omega) = F_{\gamma,1}(\theta\omega)$ is named beside it and is definitional,
+both sides being $\gamma\log(1+\theta^2\omega^2)$; on its own it would carry none of the
+sentence's content.)}
+\end{theorem}
+
+% CHANGED (proof of record 2026-09-09): rewritten to the machine-checked route, in three
+% places, and one arithmetic slip is corrected.
+%  (a) (1) iff (2) no longer goes through prop:thorin-subclass and Bernstein's theorem. The
+%      checked proof evaluates both sides: the forward direction is the integral of
+%      prop:matern-exponent(1) against a one-point measure, the backward direction is
+%      uniqueness of the pair. That spends A3's uniqueness clause where the printed route
+%      spent A11, and it is the cheaper of the two -- clause (2) is stated here as the
+%      representation eq:thorin at a Dirac, not as membership of a named class, so the class
+%      is not needed to read it.
+%  (b) CORRECTION. The pair of gamma log(1 + theta^2 omega^2) was printed as
+%      (0, 2 gamma theta^{-1} e^{-x/theta} x^{-1} dx). The factor theta^{-1} is spurious:
+%      prop:matern-exponent(1) says the profile at range theta is k(x) = 2 gamma e^{-x/theta},
+%      and the \Levy{} measure is k(x) x^{-1} dx, so the pair is
+%      (0, 2 gamma e^{-x/theta} x^{-1} dx). The Lean statement carries the correct profile and
+%      the error was in this proof alone; the draft's Theorem 10.3 should be corrected with it.
+%  (c) THE STEP THE PRINTED PROOF SKIPPED. Uniqueness of the pair identifies the \Levy{}
+%      MEASURES, hence the profiles only almost everywhere, while clauses (1) and (3) assert a
+%      pointwise identity on (0,infinity) (R9's narrowing). The passage between the two is not
+%      a measure-theoretic triviality and is now written out; it is ours and [T].
+%  (d) (3) iff (4): the printed proof recovers the endpoint transform "by letting s -> 0",
+%      which is not needed -- the increment formula is stated at s = 0 and is read there. What
+%      IS needed, and was not printed, is the value at the collapsed pair s = t = 0.
+\begin{proof}\leanok
+\emph{(1) if and only if (2).} With $k(x) = 2\gamma e^{-x/\theta}$ and $a = 0$, take
+$U = 2\gamma\,\delta_{1/\theta}$. Then \ref{eq:thorin} reads
+$\tfrac12\cdot 2\gamma\log(1 + \omega^2\theta^2) = \gamma\log(1+\theta^2\omega^2)$, which is the
+exponent computed in \ref{prop:matern-exponent}(1); so (1) implies (2) with that one-point
+measure, the factor $2$ of the folded profile cancelling the $\tfrac12$ of \ref{eq:thorin}.
+Conversely, a one-point $U = 2\gamma\,\delta_{1/\theta}$ makes the right-hand side of
+\ref{eq:thorin} that same exponent, so $F(\omega) = \gamma\log(1+\theta^2\omega^2)$, and the
+next paragraph's uniqueness argument returns the single exponential.
+
+\emph{(1) implies (3)} is \ref{prop:matern-exponent}(1)--(2) after the gauge change
+$t \mapsto \theta t$, which \ref{prop:matern-exponent}(1) supplies directly at range $\theta$.
+
+\emph{(3) implies (1).} Reading the transform at the canonical scale $t = 1$ and taking
+logarithms turns clause (3) into $F(\omega) = \gamma\log(1+\theta^2\omega^2)$; the other scales
+say nothing further. The computation in \ref{prop:matern-exponent}(1) shows that this exponent
+has the pair $(0, 2\gamma e^{-x/\theta}x^{-1}dx)$, and the pair of an exponent is unique
+(\ref{prop:fourier-toolbox}(3)), so $a = 0$ and the \Levy{} measure is that one. Uniqueness of the
+pair is an identity of \emph{measures}, so it gives $k(x) = 2\gamma e^{-x/\theta}$ for almost
+every $x > 0$; the pointwise identity on $(0,\infty)$ follows because $k$ is nonincreasing there
+while $2\gamma e^{-\cdot/\theta}$ is continuous. Indeed the set on which the two agree is
+co-null, hence meets every subinterval of $(0,\infty)$; approaching a given $x > 0$ from the
+left through that set gives $k(x) \le 2\gamma e^{-y/\theta}$ for points $y < x$ arbitrarily
+close to $x$, whence $k(x) \le 2\gamma e^{-x/\theta}$, and approaching from the right gives the
+reverse inequality. (Monotonicity of the comparison function is not used; continuity of one
+side and monotonicity of the other suffice.)
+
+\emph{(3) if and only if (4)}, for integer $\gamma$, is \ref{prop:matern-exponent}(2) read in
+both directions. Forwards, the cascade law makes the increment transfer function the ratio of
+the two endpoint transforms, the denominators being nonvanishing; at the collapsed pair
+$s = t = 0$ the same law reads $\hat\mu_{0,1} = \hat\mu_{0,1}\hat\mu_{0,0}$ with
+$\hat\mu_{0,1} > 0$, so $\hat\mu_{0,0} = 1$, which is clause (4) there. Backwards, clause (4) at
+$s = 0$ is the endpoint transform of clause (3); no limit in $s$ is needed.
+\end{proof}
+
+% CHANGED (review 2026-09-09, Q11): this corollary is new; its statement and proof are the
+% closing consequence of thm:matern, moved out so that that theorem's \lean tag covers all of
+% what it asserts. No Lean is scheduled here, the realization clause resting on
+% prop:matern-cascade (Chapter 14, no Lean); the node is therefore untagged, like the Chapter 14
+% nodes it depends on, rather than carrying a tag that covers part of it.
+\begin{corollary}[the \Matern{} families of integer index are the ones realized by identical first-order sections]
+\label{cor:matern-realization}
+\uses{thm:matern,prop:matern-exponent,prop:matern-density,prop:matern-cascade,prop:kernel-regularity}
+\notes{gamma-matern-corner}
+% CHANGED 2026-09-19 (R190; the author's decision D2, a widening authorized at the second external
+% review round of module B): THE STATEMENT IS WIDENED, and it becomes an equivalence of three
+% clauses. What it said until today prescribed the pair's transfer function,
+% (1 + theta^2 s^2 omega^2)/(1 + theta^2 t^2 omega^2), so that the converse direction was clause
+% (4) of thm:matern restated and the three summaries of the article -- the abstract, section 1 and
+% the conclusions, all of which say only "cascades of identical first-order recursive filters, run
+% forward and backward" -- claimed more than the corollary proved (referee B finding 3, referee E
+% section 2.2). The pair is now arbitrary, (1 + p^2 omega^2)/(1 + q^2 omega^2), and the zero is
+% FORCED to vanish at the stage from the origin: the kernel from the origin is absolutely
+% continuous (prop:kernel-regularity), so its transform tends to 0 at infinity, while the ratio
+% tends to (p/q)^{2 gamma}. That is the referee's five-line argument, checked here. The hypothesis
+% is weakened at the same time, from every stage to ONE kernel from the origin, which is what the
+% argument reads; the \uses edge to prop:kernel-regularity is added for it. No Lean is scheduled
+% here and none is affected. The new clause (3) is where the widening sits; clauses (1) and (2)
+% say what the node said before, with the pair no longer prescribed.
+% CHANGED (2026-09-19, article mirror of module B, R174): "knot ladder" is glossed at this, its
+% first use in the blueprint (the register pass's item 5; the term is chapter 14's vocabulary and
+% was used here two chapters before prop:knot-exactness introduces the knots). A gloss, no change
+% of content.
+% CHANGED (2026-09-19, external review of module B, R170): NARROWED AGAIN, to the integer index,
+% and the section is defined in the statement. R168 narrowed the class of sections and missed
+% the index: a finite cascade of first-order sections has a rational transfer function, and the
+% Matern stage of non-integer index is not rational, so "the Matern family" was false for
+% gamma not an integer (prop:matern-cascade assumes integer gamma). The moments and the tail are
+% now stated as what they are, consequences, and not as part of what is unique. Found by the
+% referee. The statement read: "The Matern family is the unique admissible family with every
+% moment finite, exponential tails, and an exact realization by a cascade of identical
+% first-order forward--backward sections at every knot ladder."
+Let $(\Phis{s}{t})$ be an admissible family in its canonical gauge and let $\gamma$ be a positive
+integer. Call a symmetric kernel \emph{a cascade of $\gamma$ identical forward--backward pairs of
+first-order sections} when its transform is
+$\bigl((1+p^2\omega^2)/(1+q^2\omega^2)\bigr)^{\gamma}$ for some $p, q \ge 0$, the pair being the
+first-order forward--backward section pair of \ref{prop:matern-cascade} with pole range $q$ and
+zero range $p$. Then the following are equivalent.
+\begin{enumerate}
+\item The family is \Matern{} of index $\gamma$: its exponent is
+$F(\omega) = \gamma\log(1+\theta^2\omega^2)$ for some $\theta > 0$.
+\item Every stage is such a cascade: for all $0 \le s < t$ the increment $\mu_{s,t}$ is a cascade
+of $\gamma$ identical pairs, with $p$ and $q$ depending on the pair of scales.
+\item One kernel from the origin is such a cascade: for some $t > 0$ the kernel $\phi_t$ is.
+\end{enumerate}
+In (1) the pair of the stage from $s$ to $t$ is $(p,q) = (\theta s, \theta t)$; in (3) the zero
+necessarily vanishes, $p = 0$ and $q = \theta t$. Such a family has every moment finite and
+exponential tails.
+% CHANGED (2026-09-18, module B register pass, R168): NARROWED. The clause read "an exact
+% realization by first-order forward--backward sections at every knot ladder", which is not
+% unique to the Matern family: by prop:rational-increments(1) every finite mixture of Matern
+% members with integer exponent weights is realized exactly by first-order forward--backward lag
+% sections at every knot ladder, and it has every moment finite and exponential tails as well.
+% The proof below always argued from "a cascade of gamma such sections", all with one transfer
+% function, which is clause (4) of thm:matern; the statement now says what the proof proves.
+% CHANGED 2026-09-19 (R176, referee B finding 2): the canonical gauge is a hypothesis here too. The
+% transfer function (1 + theta^2 s^2 omega^2)/(1 + theta^2 t^2 omega^2) prescribes how the pole and
+% the zero depend on the two scales, so both directions read the gauge; in a gauge chi =/= id the
+% same family's stage carries chi(s) and chi(t). Safe direction (a hypothesis added).
+\statusT\quad\emph{(The engineering reading of \ref{thm:matern}, and the reason the family is
+the one spatial statistics and recursive filtering both arrive at. It is stated as a corollary
+rather than as a clause of the theorem because its realization half is proved in
+Chapter~\ref{ch:implementation}, where the sections are constructed; no formalisation is
+scheduled for it.
+\textbf{The pair is not prescribed} (2026-09-19, R190, the author's decision D2). Until today the
+statement fixed the pair's transfer function to $(1+\theta^2s^2\omega^2)/(1+\theta^2t^2\omega^2)$,
+which ties the pole and the zero to the two scales in advance; with that prescription the converse
+is clause (4) of \ref{thm:matern} restated. The statement now lets the pair be any
+$(1+p^2\omega^2)/(1+q^2\omega^2)$, so that what is characterised is the \emph{shape} of the
+realization --- a cascade of identical first-order forward--backward pairs --- and not a formula
+already containing the answer. The three summaries of the article that announce the corollary are
+then correct as they stand.
+\textbf{Where the hypothesis bites, and how little of it is needed.} Clause (3) asks for
+\emph{one} kernel from the origin, so the stages between two positive scales may be dropped from
+the hypothesis altogether; and the number of pairs cannot vary from stage to stage, by the proof's
+last paragraph. What may not be dropped is the word \emph{identical}: an admissible family whose
+kernel from the origin is a cascade of first-order forward--backward pairs of different ranges
+need not be \Matern{}, and the second example of \ref{rem:rational-converse} is one ---
+$F(\omega) = 2\log(1+\omega^2) - \log(1+\omega^2/4)$, whose kernel from the origin at scale $t$
+has transform
+$\bigl[(1 + t^2\omega^2/4)/(1 + t^2\omega^2)\bigr]\cdot(1 + t^2\omega^2)^{-1}$, a cascade of two
+pairs, one carrying a zero of range $t/2$ and one a pure pole of range $t$. The example the
+external review gave is the same phenomenon with three pairs: $k(x) = 6e^{-x} - 2e^{-2x}$, which is
+positive ($6e^{-x} \ge 2e^{-x} > 2e^{-2x}$) and nonincreasing
+($k'(x) = -2e^{-x}(3 - 2e^{-x}) < 0$) and satisfies both integrability conditions, has
+$F(\omega) = 3\log(1+\omega^2) - \log(1+\omega^2/4)$ by \ref{prop:matern-exponent}(1) at the two
+rates. Neither family has a single-exponential profile.
+\textbf{Not claimed}: that the pair is realized by a \emph{stable} recursion for every $(p,q)$ ---
+the realization of \ref{prop:matern-cascade} is read at $p < q$, which the proof derives, and the
+sections there are the ones with positive coefficients; and anything about non-integer index,
+where the stage is not rational at all.)}
+\end{corollary}
+
+\begin{proof}
+\emph{(1) implies (2).} A \Matern{} family of positive integer index $\gamma$ and range $\theta$
+has, by \ref{prop:matern-cascade} read in the gauge $t \mapsto \theta t$, the stage transfer
+functions $\bigl((1+\theta^2s^2\omega^2)/(1+\theta^2t^2\omega^2)\bigr)^\gamma$ at every pair of
+scales, realized by $\gamma$ identical forward--backward pairs of first-order sections; so every
+stage is a cascade of the kind named, with $(p,q) = (\theta s, \theta t)$, and $p < q$.
+
+\emph{(2) implies (3)} is the stage from $s = 0$, which in the canonical gauge is the kernel
+$\phi_t = \mu_{0,t}$ from the origin, at any $t > 0$.
+
+\emph{(3) implies (1).} Suppose $\hat\phi_t(\omega) = \bigl((1+p^2\omega^2)/(1+q^2\omega^2)\bigr)
+^{\gamma}$ for some $t > 0$ and some $p, q \ge 0$. First $q > p$. The transform of a probability
+measure is bounded by $1$ in modulus, so the ratio $(1+p^2\omega^2)/(1+q^2\omega^2)$ is bounded on
+the line, which forces $q \ge p$; and $q = p$ would make $\hat\phi_t \equiv 1$, hence
+$\phi_t = \delta_0$ and $\Phis{0}{t} = \mathrm{Id}$, against (ND). Next $p = 0$. By
+\ref{prop:kernel-regularity} the kernel $\mu_{0,t}$ from the origin is absolutely continuous, so
+its transform tends to $0$ at infinity --- the Fourier transform of an integrable function does,
+and $\hat\phi_t$ is that transform --- while
+\[
+  \Bigl(\frac{1 + p^2\omega^2}{1 + q^2\omega^2}\Bigr)^{\gamma}
+  \ \longrightarrow\ \Bigl(\frac pq\Bigr)^{2\gamma}
+  \qquad (|\omega| \to \infty),
+\]
+a positive number unless $p = 0$. So $p = 0$ and $q > 0$. Reading the canonical gauge,
+$e^{-F(t\omega)} = (1+q^2\omega^2)^{-\gamma}$ for every $\omega$, that is
+$F(t\omega) = \gamma\log(1+q^2\omega^2)$; substituting $\omega \mapsto \omega/t$ gives
+$F(\omega) = \gamma\log(1+\theta^2\omega^2)$ with $\theta := q/t > 0$, which is clause (1).
+
+\emph{The index is not free.} Suppose the kernels from the origin at two scales are cascades of
+$\gamma$ and $\gamma'$ identical pairs. Each gives, by the paragraph just proved, an exponent
+$\gamma\log(1+\theta^2\omega^2) = \gamma'\log(1+\theta'^2\omega^2)$; dividing by $\log|\omega|$
+and letting $|\omega| \to \infty$ gives $2\gamma = 2\gamma'$. So the number of pairs is the same
+at every scale, and it is the index.
+
+\emph{The consequences.} Every moment of such a family is finite by \ref{prop:matern-exponent}(3),
+and the tail is exponential by \ref{prop:matern-density}.
+\end{proof}
+
+% draft: Proposition 10.4
+% twin: hcs prop:thorin-subclass (ledger A21 there); clauses (4) and (5) are new.
+% SKELETON NOTE (review 2026-09-09, R19): CLAUSE (3) IS UNTYPED, and deliberately. The phase B
+% declaration Skeleton.thorin_subclass_ggc carried the class of symmetric extended generalized
+% gamma convolutions as a parameter whose defining hypothesis was clause (1)'s own form, so it
+% was provable in [T] and carried none of A17 -- an [A] clause discharged by a tautology.
+% Defining the class instead from A17's own statement-as-used is not available either: that
+% statement is a MOMENT GENERATING function on real sigma, and the laws this node is about have
+% none (the Student-t law has no exponential moment at any sigma =/= 0), while the reading that
+% does apply to them is the same formula at sigma = i omega, whose +-theta pairing the ledger
+% explicitly does NOT carry. So the declaration was withdrawn; the \lean tag below covers
+% clauses (1)-(2), (4) and (5). Nothing downstream consumes clause (3) by name.
+% CHANGED (proof 2026-09-10, wave 6): CLAUSE (3) IS MOVED OUT into lem:thorin-ggc below and
+% this node is leanok. The reason is R27's, at a statement rather than at a declaration, and it
+% is the reason the wave 5 merge gave for lem:polya-student-exclusion: all three declarations
+% this tag names are now proved, and the one clause with no Lean -- clause (3), untyped since
+% the review for the reasons in the SKELETON NOTE above -- would have held the whole node
+% notready by itself. Split, each part is honest: what this node claims is what its three
+% declarations prove, and clause (3) is an [A] lemma of its own on ledger A17, with no Lean
+% scheduled and the reason written into it. THE CLAUSE NUMBERING IS UNCHANGED -- (1), (2), (4),
+% (5), with (3) absent and named where it went -- because renumbering would silently invalidate
+% every existing reference to prop:thorin-subclass(4) and (5), of which prop:student-t's
+% annotation alone has two. The split adds one uses edge, from the new lemma to this node, and
+% none here.
+% CHANGED (2026-09-11, R79, under the safe-direction delegation): clause (5) closed with "with the
+% Matern, Student-t and stable families in the smallest class and the Cin rays outside the middle
+% one" -- a membership sentence of exactly the shape R44 found at prop:bridge-strictness(4), at a
+% \leanok node whose three declarations prove the representation equivalence, the bridge identity
+% and the strict inclusion, and nothing about any named family. The Matern part is this node's own
+% one-atom case, the stable part is prop:stable-family's Thorin density, the Cin part is
+% prop:bridge-strictness(4); the Student-t part is prop:student-t(3), which is sorry on A18. The
+% sentence is moved to the paragraph after the proof with each membership sent to the node that
+% states it, and the clause keeps the chain of strict inclusions, which is what thorin_strictness
+% proves. No proof changed.
+% CHANGED (2026-09-11, R120, under the safe-direction delegation): the tag now covers clause (4)'s
+% second sentence. thorin_bridge proved only the forward map, while the clause also says that
+% U_I |-> U is a linear bijection of the two domains and that the bridge restricts to a bijection
+% of the causal Thorin subclass onto the symmetric one. Three declarations are added:
+% thorin_bridge_onto (every symmetric Thorin member is the bridge image of a causal one, with
+% b_0 = 2a and U twice the image of U_I), thorin_bridge_measure_injective and
+% thorin_bridge_measure_linear; all three print Lean core. The printed "hence every symmetric
+% Thorin measure is twice the image of a causal one" rested on the term-by-term correspondence of
+% the integrability conditions; the proof of record is rewritten to the checked route, which
+% CONSTRUCTS the causal datum and COMPUTES its exponent (the causal Frullani integral under U_I),
+% and bounds the causal integrability fields by the spatial Thorin integral at omega = 1. The
+% term-by-term correspondence is kept as a marked remark. No statement changed.
+% CHANGED (2026-09-19, article mirror of module B, R174): the paragraph between clause (2) and
+% clause (4) no longer carries ledger ids or formalisation scheduling, which is the register pass's
+% item 11: a statement of record says what is true, and where an entry binds and what is scheduled
+% belong to the annotation. It still says that the third member of the equivalence is
+% lem:thorin-ggc, why it is stated apart (the reading of Thorin's definition, not Bernstein's
+% theorem) and that the numbering skips (3) -- a reader needs the last of these to read the
+% numbering, and it is a fact and not an apology. The entry (A17), the contrast with A11 and the
+% scheduling are now the first sentence of the annotation. No clause and no Lean changes; the
+% numbering itself is unchanged, for the reason the wave 6 block above gives.
+% CHANGED 2026-09-19 (R175, second external review round of module B, referee B finding 1): THE
+% INTEGRABILITY CONDITION OF eq:thorin IS RESTATED, and the description of the bridge's target in
+% clause (4) -- now clause (3) -- is NARROWED. The condition printed until today,
+% int_(0,1] log(1/theta) U + int_(1,infty) theta^{-2} U < infinity, does not control U near
+% theta = 1 (log(1/theta) vanishes there and the second integral starts above it): the referee's
+% U = sum_n delta_{1 - 1/n^2} satisfies it with sum log(1/theta_n) = log 2, is not locally finite,
+% and makes the right-hand side of eq:thorin infinite at every omega =/= 0. Clause (2) was not
+% false -- the identity it asserts forces the strong condition anyway -- but three things around it
+% were: (a) the (2) implies (1) step "which the same three regimes make finite", which needs
+% U((0,1]) < infinity and not the printed pair of integrals; (b) "the two domains of Thorin
+% measures" in clause (4), the printed domain being strictly larger than the image of the causal
+% one; (c) the term-by-term correspondences in the remark after the proof and in the proof of
+% lem:thorin-ggc, Bondesson's (7.1.2) being int (1+theta^2)^{-1} V + int_{|theta|<=1} |log theta^2| V,
+% which DOES control V on compacta. The condition is now the single integral
+% int log(1 + theta^{-2}) U < infinity, which is what every proof of the node uses, what the Lean
+% reads off one frequency (thorin_lintegral_ne_top, then thorin_measure_facts for the two
+% integrals and for U((0,1]) < infinity), and what corresponds to the causal condition and to
+% Bondesson's; it is equivalent to the printed pair together with local finiteness on (0,infty).
+% Clause (3) (formerly (4)) no longer says "the two domains": it says linear, injective, and onto
+% the Thorin measures of the symmetric Thorin members, which is exactly what the three
+% declarations thorin_bridge_measure_linear, thorin_bridge_measure_injective and
+% thorin_bridge_onto prove (the last is stated for a U representing the exponent of an SDProfile,
+% not for an arbitrary U in a domain). Nothing in the Lean is false or vacuous under the weak
+% condition: no declaration takes it as a hypothesis and concludes from it --
+% thorin_subclass_representation asserts it in the forward direction and carries it inertly in the
+% converse, where the identity does the work.
+% CHANGED 2026-09-19 (R175, referee B finding 11): THE CLAUSES ARE RENUMBERED 1, 2, 3, 4. The gap
+% at (3) dates from the wave 6 split (the block above), which kept the numbering so as not to
+% invalidate references, and the author's standing decision was to renumber at the draft sync. The
+% draft is frozen (ADR-0008), so the sync will not come; every reference to the old (4) and (5) in
+% the blueprint and in paper-b is updated in the same commit.
+\begin{proposition}[the symmetric Thorin subclass]\label{prop:thorin-subclass}
+\uses{lem:selfdecomposable-exponents,prop:matern-exponent,lem:bridge-exponents,prop:bridge-families,prop:bridge-strictness,prop:fourier-toolbox,prop:laplace-uniqueness-locally-finite,lem:quadratic-growth}
+\lean{SpatialLine.thorin_subclass_representation, SpatialLine.thorin_bridge,
+SpatialLine.thorin_bridge_onto, SpatialLine.thorin_bridge_measure_injective,
+SpatialLine.thorin_bridge_measure_linear, SpatialLine.thorin_strictness}\leanok
+\notes{gamma-matern-corner}
+For an admissible $F$ with data $(a,k)$ the following are equivalent.
+\begin{enumerate}
+\item $k$ is completely monotone.
+\item $F$ has a symmetric Thorin representation
+\begin{equation}\label{eq:thorin}
+  F(\omega) = a\,\omega^2
+   + \tfrac12\int_{(0,\infty)} \log\Bigl(1 + \frac{\omega^2}{\theta^2}\Bigr)\,U(d\theta),
+  \qquad U \ge 0, \quad
+  \int_{(0,\infty)}\log\Bigl(1 + \frac{1}{\theta^2}\Bigr)\,U(d\theta) < \infty .
+\end{equation}
+\end{enumerate}
+A third member of the equivalence --- that the kernels are symmetric extended generalized gamma
+convolutions in Thorin's sense --- is stated apart, as \ref{lem:thorin-ggc}, because it rests on
+the reading of Thorin's definition rather than on Bernstein's theorem.
+
+Moreover:
+\begin{enumerate}
+\item[(3)] \emph{(The bridge on Thorin subclasses.)} If $F_{\mathrm I}$ is causally admissible
+with completely monotone profile $k_{\mathrm I} = \int e^{-\theta u}\,U_{\mathrm I}(d\theta)$,
+then $F_{\mathrm I}(\cdot^2/2)$ is a symmetric Thorin member with $a = \tfrac12 b_0$ and $U$
+equal to \emph{twice} the image of $U_{\mathrm I}$ under $\theta \mapsto \sqrt{2\theta}$; the
+map $U_{\mathrm I} \mapsto U$ is linear and injective, and carries the causal Thorin measures
+onto the Thorin measures of the symmetric Thorin members, so the subordination bridge restricts
+to a linear bijection of the causal Thorin subclass onto the symmetric one.
+\item[(4)] \emph{(Strictness the other way.)} The subordinated slice $\mathcal{S}$ of
+\ref{prop:bridge-strictness} is strictly larger than the symmetric Thorin subclass: the image
+of the causal ray with profile $k_{\mathrm I} = \mathbf 1_{(0,\tau)}$ has the explicit profile
+$k(x) = 2\,\erfc\bigl(x/\sqrt{2\tau}\bigr)$, which is not completely monotone. So the symmetric
+Thorin subclass is strictly inside $\mathcal{S}$, which is strictly inside the admissible cone.
+\end{enumerate}
+\statusA\quad\ledger{A11}\quad\emph{(\textbf{Assignment.} The third member of the equivalence is
+\ref{lem:thorin-ggc}: it is the one that rests on \ledger{A17} rather
+than on \ledger{A11}, and the one for which no formalisation is scheduled; the statement above
+says where it went and says no more, the entry and the scheduling being recorded here (2026-09-19,
+R174). \ledger{A11} carries
+Bernstein's theorem, which is clause (1) if and only if (2) --- a completely monotone $k$ is
+$\int e^{-\theta x}U(d\theta)$ for a unique positive $U$. What it does not carry: the computation
+$\int_0^\infty (1-\cos\omega x)e^{-\theta x}x^{-1}dx = \tfrac12\log(1+\omega^2/\theta^2)$ and
+the Tonelli that turns it into \ref{eq:thorin}; the integrability correspondence; and clauses
+(3) and (4) entirely, which are \textbf{[T]} computations on \ref{eq:bridge-profile}. An atom
+of $U$ at $\theta = 0$ is excluded because it would make $k$ bounded below and
+$\int_1^\infty k(x)x^{-1}dx$ infinite; that too is \textbf{[T]}. The formalisation admits
+\ledger{A11} as the \emph{existence equivalence only}: the uniqueness of the Thorin measure is
+\ref{prop:laplace-uniqueness-locally-finite}, which this article proves, so the uniqueness half of
+the entry is never cited. The declarations for (1) if and only if (2), for the forward map of
+(3) and for (4) spend that one name and \ledger{A3}'s uniqueness clause, and nothing else:
+clauses (3) and (4) reach \ledger{A11} at its two opposite directions --- (3) at the easy one, a
+Laplace transform is completely monotone, and (4) at the forward one, in the contradiction ---
+and reach \ledger{A3} through the identification of a quantified profile with the subordinated
+one, which is an almost-everywhere identity upgraded to a pointwise one by the continuity of the
+transform. The three declarations for the rest of (3) --- that every symmetric Thorin member is
+the image of a causal one, and that $U_{\mathrm I} \mapsto U$ is linear and injective --- spend
+no interface: the causal datum is constructed and its exponent computed. \emph{The integrability
+condition of \ref{eq:thorin} and the formal statement.} \texttt{thorin\_subclass\_representation}
+asserts, beside the identity, the pair of integrals
+$\int_{(0,1]}\log(1/\theta)\,U(d\theta) + \int_{(1,\infty)}\theta^{-2}U(d\theta) < \infty$, which
+is what the printed condition was until 2026-09-19 (R175). The displayed condition is the
+equivalent one the proofs use: it is the Thorin integral at $\omega = 1$, which
+\texttt{thorin\_lintegral\_ne\_top} reads off the finiteness of the exponent, and
+\texttt{thorin\_measure\_facts} derives from it the two integrals above \emph{and} the
+$\sigma$-finiteness and local finiteness ($U((0,1]) < \infty$) that the converse direction
+needs. The pair of integrals alone does not give the last of these, which is why it is no longer
+what the display prints. \emph{The formal statement of (2) says one
+thing more than the display:} \texttt{thorin\_subclass\_representation} bundles into the same
+equivalence that the folded measure $U$ of \ref{eq:thorin} is \emph{unique}, so the Lean is
+strictly stronger than the printed clause, which asserts existence only. The uniqueness is
+\ref{prop:laplace-uniqueness-locally-finite} read at the tail of $k$, proved here and free of
+\ledger{A11}'s own uniqueness half; the display does not carry it because no consumer in this
+article cites it, and the paragraph above says why the entry's uniqueness clause is never
+spent.
+\textbf{Attribution of clause (3)} (2026-09-19, R196, left by batch S2; the page was read at the
+held copy this session). Both directions, with the correspondence of the measures, are
+Bondesson's Theorem~7.3.1, p.~115: if $\varphi$ is the moment generating function of a
+generalized gamma convolution then $\psi(s) = \varphi(s^2/2)$ is that of a symmetric extended
+generalized gamma convolution, and conversely; and the proof on pp.~115--116 computes the
+spectral measure of $\psi$ as the image of that of $\varphi$ under $t \mapsto \pm\sqrt{2t}$, the
+left extremity $a$ of $\varphi$ becoming the coefficient $a/2$ of $s^2$ in $\psi$. Read at
+$s = i\omega$ --- which is \ref{lem:thorin-ggc} --- that is this clause. What belongs to this
+article is the folded normalisation, $U$ twice the restriction of the spectral measure to
+$(0,\infty)$; the linearity and injectivity of the measure map; the verification that the
+constructed causal datum is causally admissible; and that all of it is machine-checked.)}
+\end{proposition}
+
+% CHANGED (2026-09-11, draft sync, R103): the wave 3 block below stood at prop:moments-tails,
+% whose proof it does not describe; it is this node's (1) <=> (2) and the uniqueness of U, and is
+% moved here verbatim but for "at theta = 1", which reads "at x = 1" (R106, next comment).
+% CHANGED (proof of record 2026-09-09, wave 3): the proof of the equivalence of clauses (1)
+% and (2) is rewritten to the machine-checked route (repo CLAUDE.md, author's decision of the
+% same day). Three steps the printed argument left implicit are now stated, because the
+% formalisation had to supply each of them: sigma-finiteness of U, which the transform's
+% finiteness at x = 1 gives; that the integrability condition of eq:thorin is a
+% CONSEQUENCE of the identity and not a further hypothesis; and, in the converse direction,
+% that the reconstructed profile k' satisfies the \Levy{} condition at all, which follows by
+% averaging the frequency identity against a standard Gaussian law. Uniqueness of U is now a
+% paragraph of its own and runs on prop:laplace-uniqueness-locally-finite rather than on the
+% uniqueness half of A11, which is therefore NOT admitted as an axiom; the annotation records
+% that. Clauses (4) and (5) are untouched and remain unformalised.
+% CHANGED (2026-09-11, draft sync, R106): (1) implies (2) said U is sigma-finite "its transform
+% being finite at theta = 1". The transform int e^{-theta x} U(d theta) is a function of x (theta
+% is the integration variable), and what is finite is its value k(1); so "at x = 1", as the
+% draft already read.
+% CHANGED (proof of record 2026-09-10, wave 6): clauses (4) and (5) are rewritten to the
+% machine-checked route (repo CLAUDE.md, author's decision of 2026-09-09).
+% (4) gains two paragraphs, both of them steps the printed argument left implicit and the
+% formalisation had to supply. One is sigma-finiteness of U_I, which the Laplace hypothesis at
+% u = 1 gives for free and which the Tonelli needs. The other is the IDENTIFICATION of k: the
+% exponent determines the profile only up to a null set, while complete monotonicity is a
+% statement about every derivative at every point, so the passage from almost everywhere to
+% everywhere has to be made, and it is thm:matern's -- one side nonincreasing, the other a
+% continuous Laplace transform. Neither step changes the route; both were invisible in the
+% printed proof and are the reason wave 5 re-priced the clause.
+% (5)'s non-complete-monotonicity half is rewritten ENTIRELY. The printed argument compares an
+% exponential floor against the ASYMPTOTIC erfc(y) ~ sqrt(2 tau/pi) y^{-1}e^{-y^2}, which is
+% Watson's lemma and is more than the conclusion needs. The checked route is a bound at one
+% point: the floor c e^{-nx} comes from a single window of Bernstein's measure carrying positive
+% mass, the ceiling from the elementary comparison e^{-v^2} <= e^{-yv} on (y, infinity), and the
+% two are contradicted at an explicit x. The printed route is kept as a marked remark.
+\begin{proof}[Proof of the parts held \textbf{[T]}]
+\leanok
+\emph{(1) implies (2).} By A11, $k(x) = \int_{[0,\infty)} e^{-\theta x}\,U(d\theta)$ for a
+positive measure $U$ on $[0,\infty)$; an atom at $\theta = 0$ would make $k$ bounded below by a
+positive constant, so that $\int_1^\infty k(x)x^{-1}dx = \infty$, against admissibility. So $U$
+lives on $(0,\infty)$, and it is $\sigma$-finite, its transform being finite at $x = 1$.
+Tonelli with the computation of \ref{prop:matern-exponent}(1) gives
+\[
+  \int_0^\infty (1-\cos\omega x)\,k(x)\,\frac{dx}{x}
+  = \int_{(0,\infty)}\Bigl(\int_0^\infty (1-\cos\omega x)\,e^{-\theta x}\,\frac{dx}{x}\Bigr) U(d\theta)
+  = \tfrac12\int_{(0,\infty)}\log\Bigl(1 + \frac{\omega^2}{\theta^2}\Bigr)U(d\theta),
+\]
+which is \ref{eq:thorin}. The integrability condition of \ref{eq:thorin} is not a further
+hypothesis but a consequence of that identity: read at $\omega = 1$ the identity says that the
+integral is $2(F(1) - a)$, and $F(1)$ is finite for every admissible $F$ by
+\ref{lem:quadratic-growth}. Three regimes read off from it what the classical form of the
+condition states separately: $\log(1+\theta^{-2}) \ge 2\log(1/\theta)$ near $0$,
+$\ge \tfrac12\theta^{-2}$ at infinity, and $\ge \log 2$ on $(0,1]$, so that
+$\int_{(0,1]}\log(1/\theta)\,U(d\theta)$ and $\int_{(1,\infty)}\theta^{-2}\,U(d\theta)$ are
+finite and $U$ is finite on $(0,1]$, hence on every compact subset of $(0,\infty)$.
+
+\emph{(2) implies (1).} Given \ref{eq:thorin} with $U$ carried by $(0,\infty)$, set
+$k'(x) := \int_{(0,\infty)} e^{-\theta x}\,U(d\theta)$, which is finite for every $x > 0$: on
+$(0,1]$ the integrand is at most $1$ and $U$ is finite there, and on $(1,\infty)$ one has
+$e^{-\theta x} \le C_x\theta^{-2}$ against the second integral, both facts being the three
+regimes of the previous paragraph. It is the finiteness of $U$ on $(0,1]$ that is doing the work
+here, and it is the reason the displayed condition is the one printed: the two integrals alone
+leave $U$ free to put infinite mass just below $\theta = 1$. The displayed Tonelli, read
+backwards, says that $k$ and $k'$ have the same
+compensated integral $\int_0^\infty(1-\cos\omega x)\,\cdot\,dx/x$ at every frequency. That $k'$
+is the profile of a symmetric \Levy{} pair at all --- that is, that
+$\int_0^\infty (1\wedge x^2)\,k'(x)\,dx/x < \infty$ --- follows by averaging that identity over
+$\omega$ against a standard Gaussian law: Tonelli replaces the weight $1 - \cos\omega x$ by
+$1 - e^{-x^2/2}$, which lies between $\tfrac13(1 \wedge x^2)$ and $1 \wedge x^2$, so the \Levy{}
+condition transfers from $k$ to $k'$. Uniqueness of the pair (\ref{prop:fourier-toolbox}(3)) then
+identifies the two \Levy{} measures, hence $k$ and $k'$ almost everywhere on $(0,\infty)$, and hence
+everywhere there, $k$ being nonincreasing and $k'$ continuous. So $k$ is a Laplace transform, and
+A11 read the other way returns complete monotonicity.
+
+\emph{Uniqueness of $U$.} If $U'$ on $(0,\infty)$ also satisfies \ref{eq:thorin}, the previous
+paragraph applied to $U'$ gives $k(x) = \int e^{-\theta x}\,U'(d\theta)$ as well, so $U$ and $U'$
+have the same Laplace transform on $(0,\infty)$ and it is finite there; by
+\ref{prop:laplace-uniqueness-locally-finite}, $U' = U$. This does not spend the uniqueness half
+of A11: the Laplace uniqueness the argument needs is proved in this article.
+
+\emph{(3).} With $k_{\mathrm I}(u) = \int e^{-\theta u}\,U_{\mathrm I}(d\theta)$,
+\ref{eq:bridge-profile} and Tonelli give
+\[
+  k(x) = \int U_{\mathrm I}(d\theta)\;2x\int_0^\infty g_u(x)\,e^{-\theta u}\,\frac{du}{u}
+       = 2\int e^{-x\sqrt{2\theta}}\,U_{\mathrm I}(d\theta),
+\]
+by the first-passage identity used in \ref{prop:bridge-families}(2); substituting
+$\theta' = \sqrt{2\theta}$ this is $\int e^{-\theta'x}\,U(d\theta')$ with $U$ twice the image
+of $U_{\mathrm I}$, so $k$ is completely monotone, and the Gaussian coefficient is
+$\tfrac12 b_0$ by \ref{lem:bridge-exponents}. That $U_{\mathrm I}$ is $\sigma$-finite, which the
+Tonelli needs, is not a further hypothesis: $k_{\mathrm I}(1)$ is a real number, so the
+transform of $U_{\mathrm I}$ is finite at $u = 1$ against a weight vanishing nowhere.
+
+The identification of $k$ deserves a sentence, because the exponent determines it only up to a
+null set. What \ref{prop:fourier-toolbox}(3) returns, applied to the subordinated exponent and to
+any admissible $F$ with that exponent, is equality of the two \Levy{} measures, hence of the two
+profiles almost everywhere on $(0,\infty)$; the conclusions of this clause --- complete
+monotonicity, which is a statement about every derivative at every point --- are pointwise. The
+passage is the one \ref{thm:matern} makes: the two profiles are nonincreasing and the Laplace
+transform $\int e^{-\theta'x}U(d\theta')$ is continuous on $(0,\infty)$ by dominated convergence,
+and a nonincreasing function almost everywhere equal to a continuous one equals it everywhere,
+the good set meeting every subinterval on each side of a given point.
+
+The factor $2$ is the folding convention and is
+checked on the \Matern{} member: the causal Gamma data are $U_{\mathrm I} = \gamma\delta_1$,
+whence $U = 2\gamma\delta_{\sqrt2}$ and \ref{eq:thorin} returns
+$\tfrac12\cdot 2\gamma\log(1+\omega^2/2) = \gamma\log(1+\omega^2/2)$, which is
+\ref{prop:bridge-families}(2); the image without the factor would return half of it.
+
+\emph{The bridge is onto the symmetric Thorin subclass.} Let $F$ be admissible with data $(a,k)$
+and Thorin measure $U$ on $(0,\infty)$ as in \ref{eq:thorin}. Put $b_0 := 2a$, let
+$U_{\mathrm I}$ be half the image of $U$ under $\theta' \mapsto \theta'^2/2$, and let
+$k_{\mathrm I}(u) := \int e^{-\theta u}\,U_{\mathrm I}(d\theta)$ for $u > 0$. The transform is
+finite: the exponents satisfy
+$u\theta'^2/2 - (u\theta'/2 - u/2) = \tfrac u2\bigl((\theta' - \tfrac12)^2 + \tfrac34\bigr) \ge 0$,
+so $k_{\mathrm I}(u) \le \tfrac12 e^{u/2}\int e^{-u\theta'/2}\,U(d\theta')$, which the three
+regimes of (1) implies (2) make finite. Hence $k_{\mathrm I}$ is nonnegative and nonincreasing on
+$(0,\infty)$, and $U_{\mathrm I}$ is $\sigma$-finite. The exponent of $(b_0, k_{\mathrm I})$ is
+computed rather than identified. For $u > 0$ and $\sigma \ge 0$ one has
+$(1 - e^{-\sigma u})/u = \int_0^\sigma e^{-su}\,ds$, and integrating out $u$ first,
+\[
+  \int_0^\infty (1 - e^{-\sigma u})\,k_{\mathrm I}(u)\,\frac{du}{u}
+  = \int U_{\mathrm I}(d\theta)\int_0^\sigma \frac{ds}{s + \theta}
+  = \int \log\Bigl(1 + \frac{\sigma}{\theta}\Bigr)\,U_{\mathrm I}(d\theta)
+\]
+by Tonelli, twice. At $\sigma = \omega^2/2$ the substitution $\theta = \theta'^2/2$ turns
+$\log(1 + \sigma/\theta)$ into $\log(1 + \omega^2/\theta'^2)$ and $U_{\mathrm I}$ into
+$\tfrac12 U$, and $b_0\sigma = a\omega^2$, so $F_{\mathrm I}(\omega^2/2)$ is the right-hand side
+of \ref{eq:thorin}, which is $F(\omega)$. At $\sigma = 1$ the display gives admissibility. The two
+integrability conditions of the causal cone together say
+$\int_0^\infty \min(1,u)\,k_{\mathrm I}(u)\,du/u < \infty$, and $\min(1,u) \le e\,(1 - e^{-u})$
+for $u \ge 0$: for $u \le 1$ because $e\,(1 - e^{-u}) \ge e^u(1 - e^{-u}) = e^u - 1 \ge u$, and
+for $u \ge 1$ because $e\,(1 - e^{-u}) \ge e - 1 \ge 1$. So the conditions are bounded by
+$e\int \log(1 + 1/\theta)\,U_{\mathrm I}(d\theta)
+= \tfrac e2\int \log(1 + 2/\theta'^2)\,U(d\theta')$, and $\log(1 + 2x) \le 2\log(1 + x)$, which
+is $1 + 2x \le (1 + x)^2$, bounds that by $e$ times the Thorin integral of \ref{eq:thorin} at
+$\omega = 1$, finite because $F(1)$ is. Finally $\sqrt{2\cdot\theta'^2/2} = \theta'$ on
+$(0,\infty)$, so $U$ is twice the image of $U_{\mathrm I}$ under $\theta \mapsto \sqrt{2\theta}$.
+So every symmetric Thorin member is the bridge image of a causal Thorin member, with Gaussian
+coefficient and Thorin measures related as in (4); no uniqueness theorem and no part of A11 is
+used.
+
+\emph{The measure map is a linear bijection.} It is linear because taking an image measure and
+multiplying by $2$ both are. It is injective: if twice the images of $U_{\mathrm I}$ and
+$U_{\mathrm I}'$ under $\theta \mapsto \sqrt{2\theta}$ agree, so do the images, and the image of
+either under $\theta' \mapsto \theta'^2/2$, which inverts $\theta \mapsto \sqrt{2\theta}$ on
+$(0,\infty)$, returns the measure itself. Surjectivity onto the symmetric Thorin measures is the
+previous paragraph.
+
+\emph{Remark, not machine-checked.} The two conditions also correspond directly, without passing
+through an exponent. Write
+$C_{\mathrm I} := \int\log(1 + \theta^{-1})\,U_{\mathrm I}(d\theta)$ for the causal condition and
+$C := \int\log(1 + \theta'^{-2})\,U(d\theta')$ for \ref{eq:thorin}'s. Since $U$ is twice the image
+of $U_{\mathrm I}$ under $\theta \mapsto \sqrt{2\theta}$, the substitution $\theta'^2 = 2\theta$
+gives $C = 2\int\log(1 + v)\,U_{\mathrm I}(d\theta)$ with $v := 1/2\theta$, while
+$C_{\mathrm I} = \int\log(1 + 2v)\,U_{\mathrm I}(d\theta)$; and
+$\log(1+v) \le \log(1+2v) \le 2\log(1+v)$, the second inequality being $1 + 2v \le (1+v)^2$. So
+$C_{\mathrm I} \le C \le 2C_{\mathrm I}$, and each condition holds exactly when the other does.
+The checked route does not compare the conditions at all: it reads both off the finiteness of one
+exponent value.
+
+\emph{(4).} The causal ray has $k_{\mathrm I} = \mathbf 1_{(0,\tau)}$, and
+\ref{eq:bridge-profile} gives $k(x) = 2x\int_0^\tau g_u(x)\,du/u$. Substituting $v = x^2/2u$,
+so that $du/u = -dv/v$ and $g_u(x) = \sqrt{v/\pi}\,x^{-1}e^{-v}$,
+\[
+  \int_0^\tau g_u(x)\,\frac{du}{u}
+  = \frac{1}{\sqrt\pi\,x}\int_{x^2/2\tau}^\infty v^{-1/2}e^{-v}\,dv
+  = \frac{1}{x}\,\erfc\Bigl(\frac{x}{\sqrt{2\tau}}\Bigr),
+\]
+so $k(x) = 2\,\erfc(x/\sqrt{2\tau})$, identified pointwise by the passage of clause (3) ---
+$\erfc$ is continuous, being an integral over a moving half-line of an integrable function.
+
+It is not completely monotone, and one bound settles it. Suppose it were; then by A11 it is
+$\int e^{-\theta x}\,V(d\theta)$ for a positive $V$ on $[0,\infty)$, and $V \ne 0$ because
+$\erfc > 0$. Some window carries mass: $V(-\infty, n] > 0$ for an integer $n$, and that mass is
+finite because the transform is. On that window $e^{-\theta x} \ge e^{-nx}$, so
+\[
+  k(x) \;\ge\; c\,e^{-nx}, \qquad c := V(-\infty,n] > 0,
+\]
+for every $x > 0$. Against that, for $y \ge 1$ the comparison $e^{-v^2} \le e^{-yv}$ on
+$(y,\infty)$ gives $\int_y^\infty e^{-v^2}dv \le e^{-y^2}/y \le e^{-y^2}$, so
+$\erfc y \le 2e^{-y^2}$ and $k(x) \le 4e^{-x^2/2\tau}$ once $x \ge \sqrt{2\tau}$. Take
+$x \ge \max\bigl(\sqrt{2\tau},\,2\tau(n+1),\,4/c + 1\bigr)$. The middle bound gives
+$x^2/2\tau \ge (n+1)x$ and the last gives $4e^{-x} \le 4/x < c$, whence
+\[
+  k(x) \;\le\; 4e^{-x^2/2\tau} \;\le\; 4e^{-x}\,e^{-nx} \;<\; c\,e^{-nx} \;\le\; k(x),
+\]
+which is absurd. Its image is admissible by
+\ref{lem:bridge-exponents}, so it lies in $\mathcal{S}$ and not in the Thorin subclass; the
+other strict inclusion is \ref{prop:bridge-strictness}(4).
+
+\emph{Remark, not machine-checked.} A second route reads the same conclusion off the
+asymptotic $\erfc(x/\sqrt{2\tau}) \sim \sqrt{2\tau/\pi}\,x^{-1}e^{-x^2/2\tau}$, which says more
+than the contradiction needs: an upper bound of Gaussian type at one sufficiently large $x$ is
+enough, and the bound above costs a monotone comparison where the asymptotic costs Watson's
+lemma.
+\end{proof}
+
+Where the named families sit in the chain of (5) is said by their own nodes, not by this one: the
+\Matern{} family is the one-atom case of (2), so it lies in the symmetric Thorin subclass; the stable
+family's Thorin density is \ref{prop:stable-family}; the Student-t family's membership is
+\ref{prop:student-t}(3), machine-checked under the hypothesis that the causal delay law is a
+generalized gamma convolution, which is the cited fact \ref{rem:student-ggc} (\ledger{A18},
+unadmitted); and the
+$\Cin$ rays lie outside $\mathcal{S}$ by \ref{prop:bridge-strictness}(4). (Until 2026-09-11
+this sentence stood inside the strictness clause; fidelity ledger row R79. Its description of the Student-t
+membership was left as ``rests on \ledger{A18} and is not yet machine-checked'' when R160 made
+that clause conditional on 2026-09-15, and is corrected here; 2026-09-19, R174.)
+
+% draft: Proposition 10.4, clause (3)
+% SKELETON NOTE (2026-09-10, wave 6): NO LEAN IS SCHEDULED, and the reason is the one the
+% review recorded at R19 and the wave 6 split now states at a node of its own rather than in a
+% comment on somebody else's. A17's statement-as-used is a MOMENT GENERATING function on real
+% sigma; the laws this clause classifies have none (the Student-t law has no exponential moment
+% at any sigma =/= 0), and the reading that does apply to them is the same formula at
+% sigma = i omega, whose +-theta pairing the entry says in as many words that it does NOT carry
+% -- that pairing is prop:thorin-subclass (1) <=> (2) and is proved there. So a Lean definition
+% of the class by A17's formula would be empty at the members, and a definition post-pairing
+% would make this lemma a tautology, which is what the withdrawn Skeleton.thorin_subclass_ggc
+% was. Should the clause ever need a declaration, the missing step is a formal statement of
+% Bondesson's definition at imaginary argument: a librarian read of section 7.1 and a new ledger
+% entry, not a Lean exercise. Nothing downstream consumes this lemma.
+% CHECK (draft, checks for \S10, item 4): the \Levy-density form of the extended generalized
+% gamma convolutions -- that |x| times the two-sided \Levy{} density is completely monotone on
+% each half-line -- still wants its page in the source's \S7.1. Neither this lemma nor
+% prop:thorin-subclass uses that form; clause (1) there is the folded statement of it.
+% NEW as a node (2026-09-15, module B step 2, R160): the elementary half of lem:thorin-ggc, split
+% out and machine-checked on Lean core. What ledger A17 says in as many words that it does NOT
+% carry -- the pairing of +-theta at sigma = i omega -- is exactly this node. Three findings from
+% writing it down. The product of the two factors is the POSITIVE REAL (1 + omega^2/theta^2)^{-1},
+% so no branch of the complex logarithm has to be chosen and the printed proof's sum of two
+% complex logarithms is avoided. The modulus of a SINGLE factor already gives half the folded
+% integrand at every theta =/= 0, which is where the folding convention's factor 2 comes from and
+% why the symmetry of V is needed only to cancel the imaginary parts. And the fold is stated at
+% the measure: U = 2 V|_{(0,infty)}, so that eq:thorin's own factor 1/2 absorbs it.
+\begin{lemma}[Thorin's two-sided exponent at $\sigma = i\omega$]\label{lem:thorin-two-sided}
+\uses{prop:thorin-subclass}
+\lean{SpatialLine.thorin_pair_mul, SpatialLine.neg_log_norm_thorin_factor,
+SpatialLine.thorin_pair_compensator, SpatialLine.thorin_two_sided_fold}\leanok
+\notes{gamma-matern-corner}
+Let $V \ge 0$ be a measure on $\RR$ with $V\{0\} = 0$, invariant under $\theta \mapsto -\theta$,
+and let $U := 2\,V|_{(0,\infty)}$ be its fold onto the positive half-line. For $\theta \ne 0$ and
+$\omega \in \RR$,
+\[
+  \frac{\theta}{\theta - i\omega}\cdot\frac{-\theta}{-\theta - i\omega}
+   = \Bigl(1 + \frac{\omega^2}{\theta^2}\Bigr)^{-1},
+  \qquad
+  -\log\Bigl|\frac{\theta}{\theta - i\omega}\Bigr|
+   = \frac12\log\Bigl(1 + \frac{\omega^2}{\theta^2}\Bigr),
+  \qquad
+  \frac{i\omega\,\theta}{1+\theta^2} + \frac{i\omega\,(-\theta)}{1+(-\theta)^2} = 0 ,
+\]
+and consequently
+\[
+  -\int_{\RR}\log\Bigl|\frac{\theta}{\theta - i\omega}\Bigr|\,V(d\theta)
+   = \frac12\int_{(0,\infty)}\log\Bigl(1 + \frac{\omega^2}{\theta^2}\Bigr)\,U(d\theta) .
+\]
+So Thorin's two-sided exponent, read at $\sigma = i\omega$ with $b = 0$ and $V$ symmetric, is the
+right-hand side of \ref{eq:thorin} at $(a, U)$ with $a = \tfrac12c$: the first identity pairs
+$\pm\theta$ without choosing a branch of the logarithm, the third cancels the compensating terms,
+and the second says that the real part alone already supplies the folded integrand.
+\statusT\quad\emph{(Machine-checked to Lean core. The three pointwise identities are
+\texttt{thorin\_pair\_mul}, \texttt{neg\_log\_norm\_thorin\_factor} and
+\texttt{thorin\_pair\_compensator}; the fold is \texttt{thorin\_two\_sided\_fold}, which bundles
+the Gaussian term with the integral and concludes at \texttt{thorinExponentL}, this development's
+name for the right-hand side of \ref{eq:thorin}. Nothing is spent: no ledger entry is on the path.
+What this node deliberately does \emph{not} say is that the two-sided form is membership in
+Bondesson's class --- that is the reading of a definition, it is \ledger{A17}, and it is
+\ref{lem:thorin-ggc}.)}
+\end{lemma}
+
+% ADDED (2026-09-15, module B drafting, R165): a proof environment. The node went \leanok on
+% 2026-09-15 (R160) with its three identities and the fold machine-checked and no printed proof;
+% "see Lean" is not a proof (repo CLAUDE.md), and the paper transcribes the proof of record. The
+% proof below is the checked route: the three pointwise identities, then the fold as an even
+% integrand against a symmetric measure.
+\begin{proof}\leanok
+The three identities are pointwise computations at a fixed $\theta \ne 0$ and $\omega \in \RR$.
+For the first, the two denominators multiply to $(\theta - i\omega)(-\theta - i\omega)
+= -(\theta - i\omega)(\theta + i\omega) = -(\theta^2 + \omega^2)$, and the two numerators to
+$-\theta^2$, so the product is $\theta^2/(\theta^2 + \omega^2) = (1 + \omega^2/\theta^2)^{-1}$,
+a positive real number: no branch of a logarithm is chosen because none is taken. For the
+second, $|\theta - i\omega| = \sqrt{\theta^2 + \omega^2}$, so
+$-\log|\theta/(\theta - i\omega)| = \tfrac12\log\bigl((\theta^2+\omega^2)/\theta^2\bigr)
+= \tfrac12\log(1 + \omega^2/\theta^2)$. The third is $\theta + (-\theta) = 0$ over the common
+denominator $1 + \theta^2$, which is even in $\theta$.
+
+For the fold, the integrand of the left-hand side is, by the second identity,
+$\tfrac12\log(1 + \omega^2/\theta^2)$, an even function of $\theta$ that is finite off the
+origin; $V$ gives the origin no mass and is invariant under $\theta \mapsto -\theta$, so the
+integral over $\RR$ is twice the integral over $(0,\infty)$, and twice $V|_{(0,\infty)}$ is $U$.
+That is the displayed identity. Read at Thorin's exponent with $b = 0$, the compensating terms
+cancel in the pairs $\pm\theta$ by the third identity, the Gaussian term $\tfrac12 c\,\sigma^2$
+at $\sigma = i\omega$ is $-\tfrac12 c\,\omega^2$, and the pairs of logarithms contribute
+$-\log(1 + \omega^2/\theta^2)$ each by the first identity, which is twice the modulus identity;
+so the \Levy{} exponent, minus Thorin's, is $\tfrac12 c\,\omega^2 + \tfrac12\int_{(0,\infty)}
+\log(1 + \omega^2/\theta^2)\,U(d\theta)$, the right-hand side of \ref{eq:thorin} at
+$(\tfrac12 c, U)$.
+\end{proof}
+
+% CHANGED (2026-09-15, module B step 2, R160): THE NODE IS NARROWED TO THE DEFINITIONAL
+% TRANSLATION. It asserted the equivalence outright, [A] on A17, with the pairing computation
+% carried in its proof as an unchecked [T] step; the pairing is now lem:thorin-two-sided above,
+% machine-checked on Lean core, and what is left here is the one thing A17 supplies and no Lean
+% statement can: that membership in Bondesson's class IS the two-sided representation, read at
+% imaginary argument. The node stays notready and has no Lean, for the reason the skeleton note
+% above gives (a definition by A17's formula would be empty at the members of the family, and a
+% definition taken after the pairing would make the lemma a tautology -- the withdrawn
+% Skeleton.thorin_subclass_ggc, review R19); A17 stays unadmitted, grounding a name and not a
+% fact, and nothing downstream consumes the node. (P-0010: this is the second of the two entries
+% it asked about, and the answer is the same -- no admission is needed.)
+\begin{lemma}[the Thorin subclass is the symmetric generalized gamma convolutions]
+\label{lem:thorin-ggc}
+\uses{prop:thorin-subclass,lem:thorin-two-sided}
+\notready
+\notes{gamma-matern-corner}
+A symmetric law is an extended generalized gamma convolution in Thorin's sense exactly when its
+exponent has the two-sided form of \ref{lem:thorin-two-sided} --- that is, when it is
+$-\tfrac12c\,\sigma^2 - \int_{\RR\setminus\{0\}}\bigl(\log\tfrac{\theta}{\theta-\sigma}
+- \tfrac{\sigma\theta}{1+\theta^2}\bigr)V(d\theta)$ with $c \ge 0$ and $V \ge 0$ symmetric, read
+at $\sigma = i\omega$. The two minus signs are the convention used here, in which the exponent is
+minus the logarithm of the transform; the source writes the logarithm of the moment generating
+function, without them. Consequently, for an admissible $F$ with data $(a,k)$, the two equivalent
+conditions of \ref{prop:thorin-subclass} hold if and only if the kernels of the family are
+symmetric extended generalized gamma convolutions.
+\statusA\quad\ledger{A17}\quad\emph{(\textbf{Assignment.} \ledger{A17} carries the first
+sentence and nothing else: the definition of the extended generalized gamma convolutions, the
+identification of the symmetric members of that class, and the moment generating function that
+defines membership. The passage from that definition to \ref{eq:thorin} --- the pairing of
+$\pm\theta$ at $\sigma = i\omega$, which the entry says in as many words that it does not carry
+--- is \ref{lem:thorin-two-sided}, machine-checked on Lean core since 2026-09-15; the
+equivalence of the two integrability conditions is \textbf{[T]} (2026-09-19, R175: it was recorded
+here and in the proof as a term-by-term correspondence, which it is not --- the source's
+$\int(1+\theta^2)^{-1}V(d\theta)$ runs over all of $\RR\setminus\{0\}$, where \ref{eq:thorin}'s
+condition ran over $(1,\infty)$ alone until the same day).
+\emph{Why \texttt{notready}, and why it will stay so.} The entry's statement-as-used is a
+\emph{moment generating} function on real $\sigma$, and the laws this lemma classifies have no
+exponential moment at any $\sigma \ne 0$, so a Lean definition of the class by that formula would
+be empty at the members of the family; a definition taken after the pairing would make the lemma
+a tautology, which is what the withdrawn \texttt{Skeleton.thorin\_subclass\_ggc} was (statement
+review, R19). What is missing is a formal statement of Bondesson's definition at imaginary
+argument, which is a reading of the source and not a Lean exercise. Nothing downstream consumes
+this lemma, \ledger{A17} is not admitted, and its name is not on the trust boundary.)}
+\end{lemma}
+
+\begin{proof}
+By A17 a law belongs to the class exactly when its exponent is
+$-b\sigma - \tfrac12 c\sigma^2 - \int\bigl(\log\tfrac{\theta}{\theta-\sigma}
+- \tfrac{\sigma\theta}{1+\theta^2}\bigr)V(d\theta)$ for a positive $V$ on $\RR\setminus\{0\}$,
+and among these the symmetric ones are those with $b = 0$ and $V$ symmetric. Read at
+$\sigma = i\omega$, \ref{lem:thorin-two-sided} turns that into
+$\tfrac12 c\,\omega^2 + \tfrac12\int_{(0,\infty)}\log(1 + \omega^2/\theta^2)\,U(d\theta)$ with
+$U$ the fold of $V$: the compensating terms cancel in pairs, and the pairing of $\pm\theta$
+contributes $-\log(1 + \omega^2/\theta^2)$, which is twice the modulus identity there. That is
+\ref{eq:thorin} with $a = \tfrac12 c$.
+
+The source's integrability condition on $V$ and \ref{eq:thorin}'s on $U$ are equivalent, and the
+comparison is not term by term. The source asks for
+$\int_{\RR\setminus\{0\}}(1+\theta^2)^{-1}V(d\theta) < \infty$ and
+$\int_{|\theta|\le1}|\log\theta^2|\,V(d\theta) < \infty$; folded, these read
+$\int_{(0,\infty)}(1+\theta^2)^{-1}U(d\theta) < \infty$ and
+$\int_{(0,1]}2\log(1/\theta)\,U(d\theta) < \infty$. Each direction is an elementary comparison of
+integrands. Forwards: on $(0,1]$ one has $\log(1+\theta^{-2}) \le \log 2 + 2\log(1/\theta)$ and
+$(1+\theta^2)^{-1} \ge \tfrac12$, so the first condition bounds $U((0,1])$ and the second the
+logarithm; on $(1,\infty)$, $\log(1+\theta^{-2}) \le \theta^{-2} \le 2(1+\theta^2)^{-1}$.
+Backwards: $\log(1+\theta^{-2}) \ge \log 2$ on $(0,1]$ and
+$\ge \tfrac12\theta^{-2} \ge \tfrac12(1+\theta^2)^{-1}$ on $(1,\infty)$, while
+$2\log(1/\theta) \le \log(1+\theta^{-2})$ on $(0,1]$. So membership in the class is
+\ref{prop:thorin-subclass}(2), which is (1) by that node.
+\end{proof}
+
+The bijection in clause (3) is why the causal corners land on named spatial families with the
+same organisation: the causal Gamma family is the single atom of the causal Thorin subclass and
+the \Matern{} family the single atom of the symmetric one; the stable families correspond under
+$\theta \mapsto \sqrt{2\theta}$; and the causal Bessel family, \emph{if} its delay law is a
+generalized gamma convolution (\ref{rem:student-ggc}), maps to a Student-t family that is Thorin
+too. What clause (4) adds is that the bridge is a bijection of the
+\emph{Thorin} subclasses and an injection, not a bijection, of the whole cones.
+
+% draft: Proposition 10.5
+% twin: hcs prop:bessel-family (ledger A8 there)
+% CHANGED (review 2026-09-09, R25): Skeleton.bridge_families_bessel is added to the \lean tag.
+% Clause (1)'s identification of the kernel at canonical scale 1 IS that declaration -- the
+% conditioning computation, shared with prop:bridge-families(3) -- while student_density carries
+% only the scaling phi_t = t^{-1}phi_1(./t). Without it the tag covered clause (1) by halves.
+% CHANGED (proof 2026-09-10, wave 7): Skeleton.student_transform becomes
+% SpatialLine.student_transform -- clause (2) is proved -- and the annotation records which
+% ledger entries are off its path. The proved declaration's TYPE is not the skeleton's: the
+% causally admissible F and its Laplace-transform specification are dropped, neither being
+% mentioned by the conclusion. That is a strengthening (a hypothesis removed), so nothing that
+% cited the clause weakens, and the statement of record above is untouched. The node stays
+% notready on clauses (3) and (4) and on the causal input Skeleton.student_causal.
+% CHANGED (2026-09-19, article mirror of module B, R174): clause (4)'s closing commentary -- "and
+% the shape parameter is a dial on the number of finite moments, twice the causal count" -- is moved
+% into the annotation (the register pass's item 13), where the comparison with the causal count is
+% stated with both inequalities. The clause keeps the moment dichotomy and the tail, which is what
+% Skeleton.student_moments is typed on. Safe direction: the statement says less.
+% CHANGED (2026-09-15, module B step 2, R160): CLAUSE (3) IS CONDITIONAL ON THE THORIN
+% REPRESENTATION OF THE DELAY LAW, and the node leaves ledger A18 for \statusT. The clause
+% asserted self-decomposability and membership in the symmetric Thorin subclass outright, on the
+% strength of A18; it is now stated under the hypothesis that the inverse-gamma delay law is a
+% generalized gamma convolution -- which is what A18 says, and is now cited at the remark
+% rem:student-ggc below rather than admitted -- and is machine-checked under that hypothesis as
+% SpatialLine.student_thorin, spending only A3 and A11 through thorin_bridge, both already on the
+% trust boundary. Skeleton.student_causal is WITHDRAWN: it asserted the existence of a causally
+% admissible exponent with the inverse-gamma Laplace transform, which is self-decomposability
+% alone, while this clause's Thorin half needs the causal profile to be a Laplace transform; the
+% interface as typed dropped exactly what the clause consumes, and no route from it to the clause
+% existed. The node stays notready on clause (4) alone (Skeleton.student_moments).
+% CHANGED 2026-09-19 (R197; the author's decision D7, the notation half): ONE SENTENCE IS ADDED
+% at the end of the statement, saying which of the two things the letter a names here. The
+% external review's notation list has "a is the Gaussian coefficient everywhere and the Student-t
+% shape in Lemma 4.8, Proposition 5.10, Remark 5.11 and Table 3, and both live in the same
+% subsection". The author's decision is to keep the letter -- it is the causal article's and the
+% literature's for the shape -- and to say so here. The sentence claims nothing new: that the
+% Gaussian coefficient vanishes is what the proof of clause (3) computes under that clause's
+% hypothesis, and the sentence says so rather than asserting it unconditionally.
+\begin{proposition}[the Student-t family]\label{prop:student-t}
+\uses{prop:bridge-families,lem:bridge-exponents,prop:thorin-subclass,prop:moments-tails}
+\lean{SpatialLine.bridge_families_bessel, SpatialLine.student_density,
+SpatialLine.student_transform, SpatialLine.student_thorin, Skeleton.student_moments}\notready
+\notes{bessel-student-corner}
+For $a > 0$ let $T_1$ be the scaled inverse-gamma law of the causal Bessel family, with density
+$p_{T_1}(u) = u^{-a-1}e^{-1/(2u)}/(2^a\Gamma(a))$, and let $X_1 := \BM_{T_1}$. Then:
+\begin{enumerate}
+\item the kernel at canonical scale $1$ is
+$\phi_1(x) = \frac{\Gamma(a+\frac12)}{\sqrt\pi\,\Gamma(a)}\,(1+x^2)^{-a-\frac12}$, the
+Student-t law with $2a$ degrees of freedom in the scale in which the density is proportional to
+$(1+x^2)^{-a-1/2}$, and $\phi_t = t^{-1}\phi_1(\cdot/t)$;
+\item the transform is
+$e^{-F(\omega)} = \frac{2^{1-a}}{\Gamma(a)}\,|\omega|^aK_a(|\omega|)$;
+\item if $T_1$ is a generalized gamma convolution --- \ref{rem:student-ggc} --- then the law is
+self-decomposable and lies in the symmetric Thorin subclass;
+\item $\mathbb{E}|X_t|^n < \infty$ if and only if $n < 2a$, and the tail is
+$\phi_t(x) \sim c\,t^{2a}|x|^{-2a-1}$, polynomial.
+\end{enumerate}
+Throughout, $a$ is the shape parameter of the causal Bessel family --- the letter that family
+carries in the literature --- and not the Gaussian coefficient of \ref{eq:sd-profile}, which is a
+different number and vanishes for these members, as the proof of clause (3) computes under that
+clause's hypothesis.
+\statusT\quad\emph{(No ledger entry is spent, and the one fact this article does not prove about
+the corner --- that the inverse-gamma delay law is a generalized gamma convolution, \ledger{A18}
+--- is the \emph{hypothesis} of clause (3), cited at \ref{rem:student-ggc} and admitted nowhere.
+Clause (1) is the conditioning computation written out below; clause (2) is the causal transform
+at $\sigma = \omega^2/2$; clause (3) is \ref{lem:bridge-exponents} for the
+self-decomposability and \ref{prop:thorin-subclass}(3) for the Thorin half; clause (4) is the
+tail of clause (1) with \ref{prop:moments-tails}(1). The shape parameter is therefore a dial on
+the number of finite moments, and the count is twice the causal one, $n < 2a$ against $n < a$ for
+the delay; that sentence stood inside clause (4) until 2026-09-19 (R174).
+\emph{What is machine-checked}: clause (1) entire, as
+\texttt{SpatialLine.bridge\_families\_bessel} with \texttt{SpatialLine.student\_density}, and
+\textbf{clause (2)}, as \texttt{SpatialLine.student\_transform}, both on Lean core (2026-09-10);
+and \textbf{clause (3)} under its hypothesis, as \texttt{SpatialLine.student\_thorin}
+(2026-09-15), which spends \ledger{A3} and \ledger{A11} through
+\texttt{thorin\_bridge} and no name of its own. Neither
+\ledger{A18} nor \ledger{A16} is on the path of clause (2): the transform is obtained from the
+conditioning identity of clause (1) and the Laplace transform of the inverse-gamma delay law,
+and that Laplace transform is, after the exponential change of variables, the integral by which
+$K_a$ is \emph{defined} in this development --- so no asymptotic of the Bessel function is
+needed, and the causal exponent is never formed. \emph{The formal statement of (3) says two
+things more than the display:} the Gaussian coefficient of the spatial member vanishes, and its
+Thorin measure is twice the image of the causal one under $\theta \mapsto \sqrt{2\theta}$, both
+of which the checked route produces --- \ref{prop:thorin-subclass}(3) read at the hypothesis.
+The node stays \texttt{notready} on clause (4) alone.)}
+% CHECK (draft, checks for \S10, item 7): the scaling convention, so that the degrees of
+% freedom come out as $2a$ and not $a$, is fixed by the density in clause (1) and the rate in
+% $p_{T_1}$; the two should be read together whenever the family is quoted elsewhere.
+\end{proposition}
+
+\begin{proof}[Proof of the parts held \textbf{[T]}]
+(1) Conditioning on $T_1$, $\phi_1(x) = \int_0^\infty g_u(x)\,p_{T_1}(u)\,du$; the substitution
+$w = 1/u$ turns this into
+\[
+  \frac{1}{\sqrt{2\pi}\,2^a\Gamma(a)}\int_0^\infty w^{a-\frac12}e^{-w(1+x^2)/2}\,dw
+  = \frac{\Gamma(a+\frac12)}{\sqrt{2\pi}\,2^a\Gamma(a)}\Bigl(\frac{2}{1+x^2}\Bigr)^{a+\frac12}
+  = \frac{\Gamma(a+\frac12)}{\sqrt\pi\,\Gamma(a)}\,(1+x^2)^{-a-\frac12}.
+\]
+The scaling clause is \ref{prop:bridge-families}. (2) is the causal transform
+$e^{-F_{\mathrm I}(\sigma)} = \frac{2^{1-a}}{\Gamma(a)}(\sqrt{2\sigma})^aK_a(\sqrt{2\sigma})$
+evaluated at $\sigma = \omega^2/2$; the checked proof computes that Laplace integral rather than
+quoting it, and the computation is one substitution: with $A = 1/2$, $B = \sigma$ and
+$u = c\,e^{v}$, $c = \sqrt{A/B}$, the integral
+$\int_0^\infty u^{-a-1}e^{-1/(2u) - \sigma u}\,du$ becomes
+$2c^{-a}\int_0^\infty\cosh(av)\,e^{-2\sqrt{AB}\cosh v}\,dv$, which is the integral by which
+$K_a$ is defined here. No asymptotic of $K_a$ enters, at this or any order.
+
+\emph{(3).} Let $U_{\mathrm I}$ be a Thorin measure of $T_1$, as the hypothesis provides:
+$\mathbb{E}e^{-\sigma T_1}
+= \exp\{-\int_{(0,\infty)}\log(1 + \sigma/\theta)\,U_{\mathrm I}(d\theta)\}$ for $\sigma \ge 0$,
+with $\int_{(0,\infty)}\log(1 + \theta^{-1})\,U_{\mathrm I}(d\theta) < \infty$. That exponent is
+causally admissible with drift $0$ and delay profile
+$k_{\mathrm I}(u) = \int e^{-\theta u}\,U_{\mathrm I}(d\theta)$: a Laplace transform is
+nonnegative and nonincreasing, and the causal Frullani identity
+$\int_0^\infty(1 - e^{-\sigma u})e^{-\theta u}\,du/u = \log(1 + \sigma/\theta)$ with Tonelli
+turns the exponent of \ref{def:causal-admissible} into the Thorin integral, so that the two
+integrability windows follow from its finiteness at $\sigma = 1$ --- for $1 \wedge u \le
+e\,(1 - e^{-u})$ bounds the windows by the exponent there. By \ref{lem:bridge-exponents} the
+image $F_{\mathrm I}(\omega^2/2)$ is admissible, and by the mixture identity with clause (1) it
+is an exponent of the Student-t family: the law is self-decomposable. Complete monotonicity of
+the spatial profile --- membership in the symmetric Thorin subclass by
+\ref{prop:thorin-subclass}(1) iff (2) --- is \ref{prop:thorin-subclass}(3) read at that datum,
+which also returns the Thorin measure, twice the image of $U_{\mathrm I}$ under
+$\theta \mapsto \sqrt{2\theta}$, and the vanishing Gaussian coefficient.
+
+\emph{(4).} The
+tail of the density in (1) is $|x|^{-2a-1}$, so $\mathbb{E}|X|^n < \infty$ exactly when
+$n < 2a$, which also follows from $\mathbb{E}|\BM_T|^{2n} = (2n-1)!!\;\mathbb{E}T^n$ and
+$\mathbb{E}T_1^n < \infty$ exactly when $a > n$.
+\end{proof}
+
+% NEW as a node (2026-09-15, module B step 2, R160): the cited existence statement that
+% lem:student-subordinated and prop:student-t(3) now quantify over. It is where ledger A18 binds,
+% and it is a REMARK, on the model of rem:bridge-subordination -- cited, marked as not
+% machine-checked, consumed by no declaration -- so that the entry grounds no statement node and
+% is not admitted. The page anchor and the parameter reading are Halgreen's own: section 2,
+% pp. 14-15, at lambda = -a < 0, chi = 1, psi = 0, formulas (2), (3) and (5).
+\begin{remark}[the inverse-gamma delay law is a generalized gamma convolution]
+\label{rem:student-ggc}
+The hypothesis that \ref{lem:student-subordinated} and clause (3) above quantify over is a
+theorem of the literature, and it is the one thing about this corner that the article does not
+prove. For $a > 0$ the inverse-gamma law $T_1$ of shape $a$ is a generalized gamma convolution:
+there is a positive measure $U_{\mathrm I}$ on $(0,\infty)$ with
+$\int_{(0,\infty)}\log(1 + \theta^{-1})\,U_{\mathrm I}(d\theta) < \infty$ and
+\begin{equation}\label{eq:student-ggc}
+  \mathbb{E}e^{-\sigma T_1}
+   = \exp\Bigl\{-\int_{(0,\infty)}\log\Bigl(1 + \frac{\sigma}{\theta}\Bigr)
+       U_{\mathrm I}(d\theta)\Bigr\}, \qquad \sigma \ge 0 .
+\end{equation}
+That is ledger A18 --- Halgreen, \S2, pp. 14--15, read at $\lambda = -a < 0$, $\chi = 1$,
+$\psi = 0$, the parameters at which the generalized inverse Gaussian density of his (1) is the
+density $p_{T_1}$ of \ref{prop:student-t}. His (5) exhibits the measure: it has density
+$u(y) = g_a(2y)$ on $(0,\infty)$, where
+$g_\nu(x) = 2\{\pi^2x(J_\nu^2(\sqrt x) + Y_\nu^2(\sqrt x))\}^{-1}$ is Grosswald's, and his
+integrability conditions (3) --- $\int_0^1|\log y|\,U_{\mathrm I}(dy) < \infty$ and
+$\int_1^\infty y^{-1}U_{\mathrm I}(dy) < \infty$ --- are the displayed finiteness for a measure
+finite on the compact subsets of $(0,\infty)$; the displayed form is what finiteness of the
+exponent at $\sigma = 1$ says, and it is the form both consumers read. Being a generalized gamma
+convolution, $T_1$ is in particular self-decomposable, which is the weaker hypothesis
+\ref{lem:student-subordinated} quantifies over.
+
+This remark is \emph{not} machine-checked, and it is the only part of the Student-t corner that
+is not: the measure Halgreen exhibits is built from the Bessel functions $J_\nu$ and $Y_\nu$,
+of which this development has neither, and no route to \ref{eq:student-ggc} through the
+elementary theory is known to the author. Nothing in the article depends on the remark ---
+both consumers quantify over \ref{eq:student-ggc} or over its consequence instead --- so ledger
+A18 is not admitted as a Lean axiom and its name is not on the trust boundary.
+\end{remark}
+
+% CHANGED 2026-09-19 (R195, the author's decision at the second review round): the three
+% references into chapter 12 are replaced by prose. Module C is not published, and a reference
+% from a module-B chapter into a module-C statement would break at a repository split. What the
+% paragraph announces is named as further work and is asserted by no statement here.
+% TODO(module C): cite thm:scale-locality and thm:joint-locality here once module C is released.
+What cuts the Student-t family out of the cone is a locality principle, but not the one the
+causal article used for its ancestor. Two principles are in play, and both are left for further
+work: locality of the scale evolution, which selects the Gaussian ray alone, and locality of the
+scale \emph{space}, as the solution of a second-order equation in $(t,x)$ jointly, which selects
+exactly the Gaussian and the Student-t families. Neither is stated here.
+
+% draft: Proposition 10.6
+% twin: hcs prop:stable-family + prop:stable-moments
+% (Hemigroup.SelfDecomposableExponent.stableExponent_toRealExponent,
+%  ...stableExponent_lintegral_pow_kernel)
+\begin{proposition}[the symmetric stable family]\label{prop:stable-family}
+\uses{cor:semigroup-case,prop:moments-tails,prop:thorin-subclass,prop:bridge-families}
+\lean{SpatialLine.semigroup_case_profile, SpatialLine.semigroup_case_gaussian,
+SpatialLine.stable_family_moments, SpatialLine.stable_family_thorin,
+SpatialLine.stable_family_bridge}\leanok
+\notes{covariance-strata}
+For $0 < \alpha < 2$ the exponent $F(\omega) = |\omega|^\alpha$ is admissible with $a = 0$ and
+profile $k(x) = C_\alpha^{-1}x^{-\alpha}$, where
+$C_\alpha = \int_0^\infty (1-\cos u)\,u^{-1-\alpha}du$; its symmetric Thorin density is
+proportional to $\theta^{\alpha-1}d\theta$; the kernels are the symmetric $\alpha$-stable
+densities; $\mathbb{E}|X_t|^n < \infty$ if and only if $n < \alpha$; and the family is the only
+admissible one-parameter semigroup. It is the image under the bridge of the causal stable family
+of index $\alpha/2$. The Gaussian ray closes the family at $\alpha = 2$, with $k \equiv 0$ and
+$a = 1$.
+\statusT\quad\emph{(Everything is \ref{cor:semigroup-case} and \ref{prop:moments-tails}(1),
+except the Thorin density, which is the image of the causal one under
+\ref{prop:thorin-subclass}(3). \textbf{The phrase ``the kernels are the symmetric
+$\alpha$-stable densities'' is nomenclature, not a clause}: it names the classical family whose
+exponent is $|\omega|^\alpha$, and no declaration under the tag equates $\mu_{0,t}$ with a
+density formula. What the five declarations prove is the exponent, the profile with its
+constant, the Thorin density, the moment dichotomy and the Gaussian endpoint; the moment clause
+quantifies over any family with the prescribed cosine transform, which is the same family read
+by its transform rather than by a density. Absolute continuity itself is
+\ref{prop:kernel-regularity}, and the identification of the density with the classical closed
+form is not stated anywhere in this article. The heavy tails are the semigroup's doing: within
+the cone the semigroup members are the pure-power profiles, the only ones compatible with
+stationarity of the increments in the scale parameter, while every non-power profile with
+$\int_1^\infty x\,k < \infty$ has a
+finite variance. The extended semigroup class beyond $\alpha = 2$ is not in the cone at all.)}
+\end{proposition}
+
+% CHANGED (proof of record 2026-09-09, wave 3): a paragraph is added to the Thorin clause,
+% giving the route the formalisation took. The printed route -- the image of the causal
+% Thorin density under the bridge -- is kept because it is where the clause comes from and
+% because it is the reading that makes the corners correspond; the added paragraph is the
+% checked one, and it is shorter, needing neither prop:bridge-families(4) nor
+% prop:thorin-subclass(4), and needing NO interface at all -- the profile is EXHIBITED as a
+% Laplace transform rather than shown to be one, so Bernstein's theorem is not spent.
+% Only the POSITIVITY of C_alpha is used, which is why this clause is not blocked on the
+% constant that blocks cor:semigroup-case and stable_family_moments.
+% CHANGED (proof of record 2026-09-10, wave 4): a closing paragraph is added saying which of
+% the routes the proof gives is the machine-checked one, the node having gone leanok this wave.
+% Nothing above it is altered: the moment clause was formalised by exactly the argument already
+% printed, and the bridge paragraph stays because it is where the Thorin clause comes from.
+\begin{proof}\leanok
+The exponent, the profile and the constant are \ref{cor:semigroup-case}, as is the statement
+that this is the only admissible one-parameter semigroup. The moment criterion applied to
+$k(x) = C_\alpha^{-1}x^{-\alpha}$ gives $\int_1^\infty x^{n-1-\alpha}dx < \infty$ exactly when
+$n < \alpha$ (\ref{prop:moments-tails}(1)). The causal stable family of index $\alpha/2$ has
+$F_{\mathrm I}(\sigma) = \sigma^{\alpha/2}$, whose image is
+$2^{-\alpha/2}|\omega|^{\alpha}$ by \ref{prop:bridge-families}(4), a positive multiple of $F$;
+the causal Thorin density is proportional to $\theta^{\alpha/2-1}d\theta$, and its image under
+$\theta' = \sqrt{2\theta}$, with the Jacobian, is proportional to $\theta'^{\alpha-1}d\theta'$
+by \ref{prop:thorin-subclass}(3).
+
+The Thorin density is also reached directly, without the bridge and without
+Bernstein's theorem: for $c > 0$ the Gamma integral
+$\int_0^\infty e^{-\theta x}c\theta^{\alpha-1}d\theta = c\Gamma(\alpha)x^{-\alpha}$ exhibits the stable
+profile as a Laplace transform at $c = (C_\alpha\Gamma(\alpha))^{-1}$, and the Tonelli of
+\ref{prop:thorin-subclass} turns that into \ref{eq:thorin}. Only the positivity of
+$C_\alpha$ is used, not its value: the integrand is nonnegative, integrable --- at most
+$u^{1-\alpha}/2$ near the origin and at most $2u^{-1-\alpha}$ beyond $1$ --- and nonzero on
+$(0,1)$.
+
+Machine-checked: the exponent, the profile and the semigroup clause, which are
+\ref{cor:semigroup-case}; the moment criterion applied to the pure power, through
+\ref{prop:moments-tails}(1) as a cited interface (ledger \ledger{A13}); the Thorin density by
+the direct Gamma-integral route of the preceding paragraph; the bridge identity
+$(\omega^2/2)^{\alpha/2} = 2^{-\alpha/2}|\omega|^\alpha$; and the Gaussian endpoint. The image
+of the causal Thorin density under $\theta' = \sqrt{2\theta}$ is not the checked route: it is
+stated on \ref{prop:bridge-families}(4) and \ref{prop:thorin-subclass}(3), which are both
+machine-checked, but the checked proof of the Thorin clause does not pass through them, and the
+route is kept because it is the reading that makes the corners correspond.
+% CHANGED (2026-09-11, draft sync, R105): "neither of them formalised" was stale. Both nodes are
+% \leanok, prop:bridge-families(4) as SpatialLine.bridge_families_stable (BridgeCorners.lean) and
+% prop:thorin-subclass(4) as SpatialLine.thorin_bridge (ThorinBridge.lean, wave 6), neither
+% sorry and both on the axiom guard. What stays true is that stable_family_thorin takes the direct
+% Gamma-integral route, so the bridge route is not the checked one; the sentence now says that,
+% which is what the draft already read. No claim changed.
+\end{proof}
+
+% CHANGED (2026-09-19, article mirror of module B, R174): the citekeys the paper gave this remark
+% on 2026-09-18 (the author's review: each corner placed in its literature) are mirrored here, and
+% with them the pointer for the Bessel scale-space whose composition law the remark describes. The
+% text is otherwise unchanged.
+\begin{remark}[the literature of the \Matern{} corner]\label{rem:matern-literature}
+The kernels of \ref{thm:matern} are the \Matern{} covariance functions of spatial statistics,
+defined there by the spectral density $(1+\theta^2\omega^2)^{-\gamma}$ or as the Green's
+functions of a fractional Helmholtz operator (\sscite{whittle1954stationary};
+\sscite{lindgren2011explicit}; \sscite{porcu2024matern}). In image analysis the same kernels appear as
+Bessel potentials, and the Bessel scale-space built from them (\sscite{burgeth2005bessel})
+composes the family along the
+\emph{order} $\gamma$ at fixed range --- an additive semigroup in $\gamma$ that is explicitly
+not scale invariant --- with no composition law stated for the range family at fixed order. In
+natural-image statistics they appear as Bessel K forms, a statistical model of filter responses
+rather than a kernel family (see \sscite{pedersen2005alpha}). In none of these is the family derived from axioms on measurement,
+and the hemigroup is what makes the derivation possible: composed along the range the family is
+a two-parameter cascade whose increments are not stationary in the scale parameter, so no
+semigroup axiomatics can
+reach it, which is why the literature composed along the order instead. The probabilistic
+identity, the symmetric variance-gamma laws (\sscite{madan1990variance}), is what the
+classification actually sees.
+\end{remark}

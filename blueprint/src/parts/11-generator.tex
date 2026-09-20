@@ -1,0 +1,341 @@
+% !TEX root = ../print.tex
+% Draft \S11 --- The scale evolution in generator form
+%
+% Source: draft/spatial-hemigroup-scale-space.md, \S11 (lines 665-699).
+%
+% CHANGED (prop:scale-evolution): the draft leaves the signal class open, with a check
+% asking for the class of f on which the pointwise identity holds. The node fixes it as the
+% Schwartz class, which is the smallest choice that makes every step of the proof
+% unconditional and is enough for every later use (thm:non-enhancement, prop:jet-regularity).
+% Whether the evolution extends to a larger domain -- W^{2,1} for the Gaussian part, the full
+% \Levy{} generator domain in general -- is a question for the paper on the infinitesimal theory
+% and is not answered here.
+%
+% CHANGED (prop:corner-generators clause 4): the draft carries a check on the constants and
+% on whether the closed-form Student-t symbol is worth stating. The node states the Thorin
+% mixture with the constants worked out from prop:scale-evolution, and does NOT state the
+% closed form, which is not used anywhere.
+%
+% The full infinitesimal theory -- the scale-Cauchy problem, the identification of the
+% Choquet coordinates with the atomic generators, and Phillips' formula as the infinitesimal
+% form of the bridge -- is deferred to the paper on the infinitesimal theory; the drafted
+% statements are parked in deferred/scale-evolution.md and are not part of any release.
+
+\chapter{The scale evolution in generator form}
+\label{ch:generator}
+
+The classification is stated on the kernels; the chapters that follow use it on the evolution
+across scale, in the form the subject was first posed in. This chapter states that form and the
+generators of the corners, which is all the present article needs.
+
+% additive: the signal class, fixed here rather than left open; see the header note.
+% CHANGED (review 2026-09-09, Q9): the annotation now names the three Mathlib declarations that
+% carry the definition's three ancillary properties. The \lean tag names the class alone, which
+% is right for a definition node, and the annotation is where the provenance of the properties
+% belongs -- naming them there documents them without creating a proof obligation.
+% CHANGED (2026-09-19, article mirror of module B, R174): the annotation said the Schwartz class is
+% "the smallest choice" that makes prop:scale-evolution unconditional, an unproved superlative (the
+% register pass's item 16; the header note above uses the same word and is a comment, not the text
+% of record). It now says what is true: a choice, the simplest this article found, with no
+% minimality claimed. Annotation only; the definition, the tag and the status are untouched.
+\begin{definition}[the signal class]\label{def:signal-class}
+\lean{SpatialLine.SignalClass}\leanok
+$\mathcal{D} := \Sch$ is the Schwartz class on the line: smooth functions all of whose
+derivatives decay faster than every polynomial. It is contained in $\Lone$, is stable under
+differentiation, and its Fourier image is itself.
+\statusT\quad\emph{(A choice that makes every step of \ref{prop:scale-evolution}
+unconditional, and the simplest this article found; that no smaller class does is not claimed,
+and no other class is compared with it here. Enlarging it is a question for the paper on the
+infinitesimal theory. The three
+ancillary properties are standard and are carried in the formalisation by Mathlib rather than
+by declarations of ours: \texttt{SchwartzMap.integrable} for the inclusion in $\Lone$,
+\texttt{SchwartzMap.derivCLM} for stability under differentiation, and
+\texttt{SchwartzMap.fourierTransformCLE} for the Fourier image, with stability under convolution
+with a finite measure following from the first.)}
+\end{definition}
+
+% draft: Proposition 11.1
+% CHANGED (proof of record 2026-09-10): the proof of eq:evolution-signal is rewritten to the
+% machine-checked route. The printed proof read the identity as "the inverse transform of
+% eq:evolution-fourier", which presupposes that the generator may be applied under the inverse
+% transform at u(t,.). It may not: A_t is a Fourier multiplier on the Schwartz class and u(t,.)
+% is not Schwartz, since it inherits the kernel's tails. The commutation A_t(nu * f) =
+% nu * (A_t f), which is the step that repairs this, is now stated in the proof, and the
+% inversion is stated once as an identity for a symmetric probability measure and used twice.
+% The dominating function is named, and so is the decay of the pairing that makes it integrable
+% -- one power more than the symbol's growth consumes.
+% twin: hcs prop:scale-evolution and def:phillips-generator
+% (Hemigroup.SelfDecomposableExponent.phillipsGenerator) --- the causal generator has the
+% memory kernel where this one has symmetric second differences.
+\begin{proposition}[the scale evolution in generator form]\label{prop:scale-evolution}
+\uses{thm:main-characterization,lem:selfdecomposable-exponents,def:signal-class,lem:quadratic-growth}
+\lean{SpatialLine.scale_evolution_fourier, SpatialLine.scale_evolution_absconv,
+SpatialLine.scale_evolution_multiplier, SpatialLine.scale_evolution_signal,
+SpatialLine.scale_evolution_conjugation}\leanok
+\notes{covariant-memory-evolution}
+Let $F$ be admissible with data $(a,k)$ and $\varpi = -dk$, and let $u(t,\cdot) :=
+\mu_{0,t} * f$ be the scale space of $f \in \mathcal{D}$ in the canonical gauge. Then on the
+Fourier side
+\begin{equation}\label{eq:evolution-fourier}
+  \partial_t\hat u(t,\omega) = -\frac1t\,B(t\omega)\,\hat u(t,\omega),
+  \qquad
+  B(\omega) = \omega F'(\omega)
+   = 2a\,\omega^2 + \int_{(0,\infty)}\bigl(1 - \cos\omega v\bigr)\,\varpi(dv),
+\end{equation}
+for every $\omega$ and every $t > 0$, and on the signal side
+\begin{equation}\label{eq:evolution-signal}
+  \partial_t u(t,x) = \mathcal{A}_t u(t,x),
+  \qquad
+  \mathcal{A}_t g(x) := 2at\,g''(x)
+   - \frac1t\int_{(0,\infty)}\Bigl[g(x) - \tfrac12\bigl(g(x-tv) + g(x+tv)\bigr)\Bigr]\,\varpi(dv),
+\end{equation}
+the integral converging absolutely for $g \in \mathcal{D}$. The generators at different scales
+are conjugate, $\mathcal{A}_t = t^{-1}\Dil{t}\,\mathcal{A}_1\,\Dil{t}^{-1}$, with
+$\mathcal{A}_1 = -B(D)$ and $D = -i\partial_x$; in log-scale $\theta = \log t$ the
+evolution reads $\partial_\theta u = \Dil{t}\mathcal{A}_1\Dil{t}^{-1}u$.
+\statusT\quad\emph{(The operator $\mathcal{A}_1 = -B(D)$ is the generator of the symmetric
+\Levy{} process with Gaussian part $2a$ and folded jump measure $\varpi$. That reading stood in the
+conjugation clause until 2026-09-19 (R174) and is here instead: it names an object this article
+never constructs, no declaration of the tag reads it, and as printed it attached the words ``the
+generator of'' to $D = -i\partial_x$, which is not one. The two forms are the two readings of
+\ref{rem:displacement-dictionary} as operators: the Gaussian coefficient is a Laplacian, and
+the catalogue is a superposition of symmetric second differences over displacement sizes, at
+rate $\varpi$ and dilated to the current scale. The factor $t^{-1}$ says that a unit of
+log-scale, not of scale, is the natural clock. The signal-side identity is a pointwise
+derivative in the scale at a fixed position, not a derivative in $\Lone$ or in any ambient
+space; the larger domain that \ref{def:signal-class} defers is a question for the paper on
+the infinitesimal theory. \texttt{\#print axioms} on each of the five declarations is Lean
+core. \emph{Both derivative clauses name their derivative}: they are stated with
+\texttt{HasDerivAt}, which asserts existence and value together, so neither reads the default
+value of a derivative that may not exist. The generator on the right of the signal-side clause
+contains a second space derivative of the scale space, and that is not a default either: the
+scale space of a signal in $\mathcal{D}$ is \emph{proved} twice differentiable, by
+differentiation under the convolution integral
+(\texttt{hasDerivAt\_mconv}, \texttt{deriv\_mconv\_signal},
+\texttt{iteratedDeriv\_two\_mconv}), and the checked proof of the signal-side clause routes
+through that chain rather than around it. This closes the review's row R6, which had priced
+the missing guard as a defect; the guard exists and is the convolution's own smoothing.)}
+\end{proposition}
+
+\begin{proof}
+\leanok
+$\hat u(t,\omega) = e^{-F(t\omega)}\hat f(\omega)$, and $F$ is $C^1$ off the origin with
+$\omega F'(\omega) = B(\omega)$ by \ref{lem:selfdecomposable-exponents} and \ref{eq:symbol};
+differentiating in $t$ gives \ref{eq:evolution-fourier}, since
+$\partial_t F(t\omega) = \omega F'(t\omega) = t^{-1}B(t\omega)$.
+
+For \ref{eq:evolution-signal}: $B(t\omega) = 2at^2\omega^2 + \int(1 - \cos t\omega
+v)\,\varpi(dv)$, where $\omega^2$ is the symbol of $-\partial_x^2$ and $1 - \cos(\omega\,tv)$
+is the symbol of $g \mapsto g - \tfrac12(\Tr{tv} + \Tr{-tv})g$. So the Fourier multiplier
+$B(tD)$ acts on $g \in \mathcal{D}$ as
+$-2at^2g'' + \int[g - \tfrac12(g(\cdot - tv) + g(\cdot + tv))]\,\varpi(dv)$, the integrand
+being bounded by $\min(2\|g\|_\infty, \tfrac12t^2v^2\|g''\|_\infty)$ and hence
+$\varpi$-integrable, since $\int (1 \wedge v^2)\,\varpi < \infty$. Thus
+$\mathcal{A}_t = -t^{-1}B(tD)$ on $\mathcal{D}$, which is \ref{eq:evolution-signal} read as a
+Fourier multiplier.
+
+That $\partial_t u$ equals $\mathcal{A}_tu$ pointwise is the inverse transform of
+\ref{eq:evolution-fourier}, and the inversion is used twice. Write
+$\langle\kappa_\varphi, h\rangle = \int_\RR h(z)\cos(\omega z - \varphi)\,dz$ for the pairing of
+$h$ with the character of frequency $\omega$ and phase $\varphi$. For a symmetric probability
+measure $\nu$ and an $h$ that is continuous and integrable with integrable transform,
+\[
+  (\nu * h)(x) \;=\; \frac{1}{2\pi}\int_\RR \hat\nu(\omega)\,
+    \langle\kappa_{\omega x}, h\rangle\,d\omega ,
+\]
+by Fourier inversion for $h$ together with one exchange of integrals against the finite $\nu$;
+the symmetry of $\nu$ is what turns the $\nu$-average of $\cos(\omega(x-y))$ into
+$\hat\nu(\omega)\cos(\omega x)$, and no other step of the proof uses it.
+
+Read at $h = f$ and $\nu = \mu_{0,s}$, this represents the scale space as
+$u(s,x) = (2\pi)^{-1}\int e^{-F(s\omega)}\langle\kappa_{\omega x},f\rangle\,d\omega$.
+Differentiating under that integral at $s = t$ is licensed on $s \in (t/2, 3t/2)$ by the
+dominating function $s^{-1}B(s\omega)\,|\langle\kappa_{\omega x},f\rangle|$, which is integrable
+because $B(s\omega) \le C(1 + s^2\omega^2)$ by \ref{lem:quadratic-growth} while
+$|\langle\kappa_\varphi, f\rangle| \le (\|f\|_1 + \|f''\|_1)/(1 + \omega^2)$ uniformly in the
+phase --- the two crude bounds $|\langle\kappa_\varphi,f\rangle| \le \|f\|_1$ and
+$\omega^2|\langle\kappa_\varphi,f\rangle| = |\langle\kappa_\varphi,f''\rangle| \le \|f''\|_1$,
+combined --- and iterating that estimate on $f''$ improves the decay to
+$(1 + \omega^2)^{-2}$, which is one power more than the symbol's growth consumes. So
+$\partial_tu(t,x)
+ = -(2\pi)^{-1}\int t^{-1}B(t\omega)e^{-F(t\omega)}\langle\kappa_{\omega x},f\rangle\,d\omega$.
+
+Read at $h = \mathcal{A}_tf$ and $\nu = \mu_{0,t}$, it represents the right-hand side --- but
+only after the generator has been moved off $u(t,\cdot)$, which is \emph{not} in $\mathcal{D}$:
+the scale space inherits the kernel's tails, and the Student-t and stable kernels have
+polynomial ones, so the multiplier identity above does not
+apply to it. Translation invariance supplies the step: $\mathcal{A}_t$ commutes with convolution
+by a finite measure, $\mathcal{A}_t(\nu * f) = \nu * (\mathcal{A}_tf)$, the exchange of the
+$\varpi$-integral with the $\nu$-integral being licensed by the same bound
+$\min(2\|f\|_\infty, \tfrac12t^2v^2\|f''\|_\infty)$ that makes the generator's own integral
+converge. Hence $\mathcal{A}_tu(t,\cdot) = \mu_{0,t} * (\mathcal{A}_tf)$, whose argument is
+continuous and integrable, and
+$\langle\kappa_{\omega x},\mathcal{A}_tf\rangle = -t^{-1}B(t\omega)\langle\kappa_{\omega x},f\rangle$
+by the multiplier identity at the scale $t$. The two frequency integrands agree, which is
+\ref{eq:evolution-signal}.
+
+Conjugation: $\Dil{t}$ has symbol map $\omega \mapsto t\omega$, so
+$\Dil{t}B(D)\Dil{t}^{-1} = B(tD)$; and $\partial_\theta = t\partial_t$.
+\end{proof}
+
+% draft: Proposition 11.2
+% twin: hcs has no single node for the corner generators; the causal article gives its
+% generator once, in def:phillips-generator, and reads the corners off it in prose.
+% SKELETON NOTE (phase B, 2026-09-09): clause (2) is NOT typed as the operator identity
+% A_t = -alpha t^{alpha-1}(-d_x^2)^{alpha/2}: Mathlib has no fractional Laplacian. What
+% Skeleton.corner_generator_stable states is the pair that clause is about and that the node's
+% own proof computes -- the symbol B(omega) = alpha |omega|^alpha and the jump measure
+% varpi(dv) = C_alpha^{-1} alpha v^{-alpha-1} dv -- which together determine the operator.
+% SKELETON.md question Q12.
+% CHANGED (review 2026-09-09, Q12): the annotation now says that clause (2) is formalised at the
+% symbol and the jump measure, and why that is a faithful reading of the clause rather than a
+% gap -- the multiplier identity of prop:scale-evolution turns the pair into the operator, and
+% both are typed. No Lean change and no statement change.
+% CHANGED (proof 2026-09-10): the class of g in the FORMALISATION of clause (4) is narrowed to
+% the class of prop:scale-evolution's convergence clause -- g twice continuously differentiable
+% with g and g'' bounded -- in place of the review's "measurable and bounded" (R18). Reason: the
+% two sides are Bochner integrals and for a general Thorin member varpi is infinite near the
+% origin, so for a merely bounded measurable g the varpi-integral of the second difference need
+% not converge and the two sides junk independently; the Matern clause is safe as it stands
+% because there varpi is finite. The narrowing is to the class the clause is about, and it is
+% what the proof consumes: that convergence clause IS the integrability the Fubini needs. The
+% blueprint statement, which is an operator identity and quantifies over no g, is unchanged.
+% CHANGED (proof of record 2026-09-10): the derivation of the Choquet measure in the proof of
+% (3) and (4) is rewritten to the checked route -- the measure is identified from its tails, not
+% obtained by differentiating the profile -- and the exchange of the two integrals is named.
+% CHANGED (2026-09-11, the author's decision on the post-sync recommendation, R116): draft
+% Proposition 11.2(2) glossed its equation, inside the statement, as "the alpha-scale-space
+% equation of [Duits et al. 2004] (their alpha being half of this one)", which this node did not
+% carry. The connection is kept and moved out of the statement: it is now a sentence of the status
+% note, at the pinned citekey duits2004axioms with the anchor read by the librarian from the held
+% copy (p. 288, section 6.1 and eq. (66), generator -(-Delta)^alpha with 0 < alpha <= 1; p. 293,
+% Fourier multiplier exp(-s |omega|^{2 alpha})). No clause and no Lean changed.
+% CHANGED (2026-09-19, article mirror of module B, R174): two register repairs, from the module B
+% register pass's items 7 and 13.
+% (a) CLAUSE (4) NAMES ITS CLASS. The clause was an operator identity quantifying over no g, while
+% its annotation and the paper both read it on the C^2 class with g and g'' bounded -- and both
+% described that class as "the class of prop:scale-evolution's convergence clause", which is stated
+% for Schwartz g. The clause now carries the class, which is a NARROWING (an identity at every g of
+% a named class, where the print left the domain open), and the annotation says what the class is
+% and that it is not the one it was attributed to. The Lean is unaffected: the narrowing of the
+% FORMALISATION to this class was made on 2026-09-10 (the wave 6 marker above), so the statement now
+% matches its declarations.
+% (b) Clause (3)'s em-dash aside becomes a second sentence, with the same content: the operator is
+% bounded, and it is the generator of a compound Poisson process with the same jump law and rate.
+% CHANGED 2026-09-19 (R182, second external review round, referee C findings 8 and 9): TWO
+% REPAIRS, both in the safe direction. (a) Clause (4)'s Student-t sentence was unconditional and
+% mis-referenced: that the Student-t family is a Thorin member at all is conditional on ledger A18
+% (rem:student-ggc), as prop:student-t(3) and lem:student-subordinated have said since R160, and the
+% Bessel Thorin measure is exhibited in that remark and not in prop:thorin-subclass, whose clause
+% (3) is the bridge. The sentence now carries the hypothesis and points at eq:student-ggc for the
+% measure, with prop:thorin-subclass(3) for the image. (b) The annotation's reason for the class of
+% test functions was false as stated -- "for a Thorin member other than the Matern one the Choquet
+% measure is infinite near the origin" -- since varpi((0,infty)) = U((0,infty)) = k(0+) is finite
+% for every Thorin member with finite U, which the proof below says in as many words ("as it does
+% whenever U is finite"). It is now stated at k(0+) = infinity. No clause of the statement and no
+% declaration is affected.
+\begin{proposition}[the generators of the corners]\label{prop:corner-generators}
+\uses{prop:scale-evolution,prop:matern-exponent,prop:student-t,prop:stable-family,prop:thorin-subclass,lem:cin-rays}
+\lean{SpatialLine.corner_generator_gaussian, SpatialLine.corner_generator_stable,
+SpatialLine.corner_generator_matern, SpatialLine.corner_generator_thorin,
+SpatialLine.corner_generator_cin}\leanok
+In the canonical gauge, and with $\Lap_\theta$ denoting convolution by the Laplace kernel
+$\tfrac{1}{2\theta}e^{-|x|/\theta}$ of range $\theta$:
+\begin{enumerate}
+\item \emph{Gaussian:} $\mathcal{A}_t = 2at\,\partial_x^2$, the heat equation
+$\partial_v u = \partial_x^2u$ in the variance gauge $v = at^2$.
+\item \emph{Symmetric stable,} $F = |\omega|^\alpha$ with $0 < \alpha < 2$:
+$\mathcal{A}_t = -\alpha\,t^{\alpha-1}(-\partial_x^2)^{\alpha/2}$, the fractional Laplacian;
+in $v = t^\alpha$ the equation is $\partial_v u = -(-\partial_x^2)^{\alpha/2}u$, and the jump
+measure is $\varpi(dv) = C_\alpha^{-1}\alpha\,v^{-\alpha-1}dv$.
+\item \emph{\Matern{},} $F = \gamma\log(1+\omega^2)$:
+$\mathcal{A}_t = \tfrac{2\gamma}{t}\,(\Lap_t - I)$, a \emph{bounded} operator of norm at most
+$4\gamma/t$. It is the generator of a compound Poisson process, whose jumps are
+Laplace-distributed of range $t$ and arrive at the rate $2\gamma/t$.
+\item \emph{Thorin members,} with Thorin measure $U$ as in \ref{eq:thorin} and $a = 0$:
+\[
+  \mathcal{A}_t = \frac1t\int_{(0,\infty)}\bigl(\Lap_{t/\theta} - I\bigr)\,U(d\theta),
+\]
+the Thorin mixture of \Matern{} generators, as an identity at every $g$ that is twice continuously
+differentiable with $g$ and $g''$ bounded. Under the hypothesis of \ref{rem:student-ggc} the
+Student-t family is the case of the Bessel Thorin measure: $U$ is twice the image of the causal
+$U_{\mathrm I}$ of \ref{eq:student-ggc} under $\theta \mapsto \sqrt{2\theta}$, by
+\ref{prop:thorin-subclass}(3).
+\item \emph{$\Cin$ ray of step $\tau$:} $\mathcal{A}_t = \tfrac1t\,\delta^2_{t\tau}$, a single
+symmetric second difference, where
+$\delta^2_h g := \tfrac12\bigl(g(\cdot - h) + g(\cdot + h)\bigr) - g$.
+\end{enumerate}
+\statusT\quad\emph{(Four kinds of generator: a differential operator, a fractional differential
+operator, a bounded integral operator, and a mixture of bounded integral operators, with the
+extreme rays carrying finite-difference generators. Clause (2)'s equation in $v = t^\alpha$ is the
+$\alpha$-scale-space equation of \sscite{duits2004axioms} (p.~288, (66)), whose generator
+$-(-\Delta)^{\alpha'}$, $0 < \alpha' \le 1$, is this one at $\alpha' = \alpha/2$: their exponent
+is half of the stable index used here. Of the four, the first is the one whose generator is a
+local operator, and which member of the cone that singles out is left for further work
+(2026-09-19, R195: the reference into the locality chapter is replaced by this sentence, module C
+being unpublished);
+% TODO(module C): cite thm:scale-locality here once module C is released.
+the boundedness of the third is the infinitesimal
+face of \ref{thm:matern}. Clause (2) is formalised at the symbol and the jump measure rather
+than at the operator: Mathlib has no fractional Laplacian, and the pair
+$\bigl(B(\omega) = \alpha|\omega|^\alpha,\ \varpi\bigr)$ is what the clause's own proof computes
+and what \emph{defines} the operator here, through the multiplier identity of
+\ref{prop:scale-evolution}. The operator form is the reading of that pair, not a further
+claim. Clauses (3) and (4) are formalised as pointwise identities in $x$, at a fixed scale, with
+$\Lap_\theta$ written as convolution by the Laplace law of range $\theta$. The class named in
+clause (4) --- $g$ twice continuously differentiable with $g$ and $g''$ bounded --- is the class on
+which the bound in the proof of \ref{prop:scale-evolution} makes the generator's integral converge;
+it is larger than $\mathcal{D}$, which is the class that proposition's convergence clause is stated
+on, and the two were conflated here and in the proof below until 2026-09-19 (R174). The class is
+needed because for a Thorin member with $U\bigl((0,\infty)\bigr) = k(0{+}) = \infty$ --- the
+symmetric stable members among them ---
+the Choquet measure is infinite near the origin and boundedness alone does not make
+the generator's integral converge. For a member with $U$ finite, the \Matern{} one among them,
+boundedness of $g$ suffices, as the proof records; the sentence here said ``other than the
+\Matern{} one'', which is false for every Thorin member with finite $U$ --- two atoms, or any
+finite quadrature of \ref{prop:thorin-machine} --- and is corrected on 2026-09-19 (R182).)}
+\end{proposition}
+
+\begin{proof}
+\leanok
+(1) is \ref{prop:scale-evolution} with $\varpi = 0$.
+
+(2) $B(\omega) = \omega F'(\omega) = \alpha|\omega|^\alpha$, so
+$-t^{-1}B(t\omega) = -\alpha t^{\alpha-1}|\omega|^\alpha$, and $|\omega|^\alpha$ is the symbol
+of $(-\partial_x^2)^{\alpha/2}$; the change of variable $v = t^\alpha$ gives
+$\partial_v = (\alpha t^{\alpha-1})^{-1}\partial_t$. The jump measure is $-dk$ for
+$k(x) = C_\alpha^{-1}x^{-\alpha}$ (\ref{prop:stable-family}).
+
+(3) and (4) are one computation. For $\theta > 0$,
+$\int_0^\infty \bigl[g - \tfrac12(g(\cdot - v) + g(\cdot + v))\bigr]\,\theta e^{-\theta v}\,dv
+= g - \Lap_{1/\theta}g$, because $\int_0^\infty \theta e^{-\theta v}dv = 1$ and
+$\int_0^\infty \tfrac12(g(x-v)+g(x+v))\,\theta e^{-\theta v}\,dv
+= \int_\RR g(x-y)\,\tfrac12\theta e^{-\theta|y|}\,dy = (\Lap_{1/\theta}g)(x)$.
+
+A Thorin member with $a = 0$ has $k(x) = \int e^{-\theta x}U(d\theta)$
+(\ref{prop:thorin-subclass}), and its Choquet measure is the $U$-mixture of exponential laws,
+$\varpi = \int \theta e^{-\theta v}\,U(d\theta)\,dv$ --- equivalently, the image of the product
+of $U$ with the standard exponential law under $(\theta,u) \mapsto u/\theta$. This is an
+identification of
+measures and not a differentiation of the profile: $\varpi$ is only given by its tails, and
+almost everywhere at that, so what is checked is that the mixture has the right ones,
+$\int_y^\infty\!\int \theta e^{-\theta v}U(d\theta)\,dv = \int e^{-\theta y}U(d\theta) = k(y)$
+by Tonelli, after which two folded measures with the same tails on $(0,\infty)$ agree. Writing
+the mixture as an image measure rather than as a density is what makes the exchange below the
+ordinary Fubini on a product.
+
+Substituting into \ref{eq:evolution-signal} and exchanging the $U$-integral with the
+$\varpi$-integral --- licensed by the absolute convergence of \ref{prop:scale-evolution} for $g$
+bounded with bounded second derivative --- and dilating $v \mapsto tv$, which sends
+$\Lap_{1/\theta}$ to $\Lap_{t/\theta}$, gives
+$\mathcal{A}_tg = \tfrac1t\int (\Lap_{t/\theta} - I)g\,U(d\theta)$, which is (4). For (3) the
+\Matern{} member has $U = 2\gamma\delta_1$ by \ref{prop:matern-exponent}(1) and
+\ref{prop:thorin-subclass}, so $\mathcal{A}_t = \tfrac{2\gamma}{t}(\Lap_t - I)$; the norm bound
+is $\|\Lap_t\| \le 1$ on $\Lone$ and on $L^\infty$. There $\varpi = 2\gamma e^{-v}dv$ is finite
+and boundedness of $g$ alone suffices, as it does whenever $U$ is finite, since
+$\varpi((0,\infty)) = U((0,\infty)) = k(0{+})$; a Thorin member with $k(0{+}) = \infty$ has
+$\varpi$ infinite near the origin, which is why clause (4) names the class it does.
+
+(5) is \ref{prop:scale-evolution} with $a = 0$ and $\varpi = \delta_\tau$, the profile being
+$\mathbf 1_{(0,\tau)}$ (\ref{lem:cin-rays}(1)).
+\end{proof}

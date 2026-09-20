@@ -1,0 +1,12 @@
+cff-version: 1.2.0
+message: "If you use this work, please cite it as below."
+title: "Spatial scale space from hemigroup axioms: the admissible cone, its corners and their implementation"
+version: "0.1"
+date-released: 2026-09-20
+authors:
+  - family-names: Fagerström
+    given-names: Daniel
+    orcid: "https://orcid.org/0009-0001-0165-1978"
+doi: "10.5281/zenodo.22864170"
+repository-code: "https://github.com/danielfagerstrom/spatial-hemigroup-scale-space-cone"
+license: CC-BY-4.0

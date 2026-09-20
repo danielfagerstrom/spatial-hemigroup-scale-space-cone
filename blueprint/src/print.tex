@@ -1,0 +1,37 @@
+% Pdf build of the blueprint content (plain pdflatex, no leanblueprint CLI needed).
+%   cd blueprint/src && pdflatex print.tex     % or: latexmk  (see latexmkrc)
+% The leanblueprint macros (\lean, \uses, \leanok, \notready) are no-ops here, stubbed
+% in linkage-macros.tex; the web build (web.tex) gives them their real meaning. The theorem
+% environments are shared with that build via theorems.tex, so numbering cannot drift.
+\documentclass[11pt]{report}
+
+\usepackage[a4paper,margin=1in]{geometry}
+\usepackage{amssymb, amsthm, amsmath}
+% mathrsfs supplies \mathscr, which macros.tex uses for the Schwartz class (2026-09-19, the
+% author's decision D7): \mathcal{S} is the subordinated slice of chapter 9. The package is
+% loaded here rather than in macros.tex so that the plasTeX web build, which reads macros.tex,
+% never sees a \usepackage it would have to resolve; MathJax renders \mathscr on its own.
+\usepackage{mathrsfs}
+\usepackage{hyperref}
+
+\input{macros}
+\input{theorems}
+
+\title{Spatial scale space from hemigroup axioms: characterization of the kernels on the line --- blueprint}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+\noindent\textbf{Legend.}\quad
+\textbf{[T]} \textsf{proved-target}: the Lean formalisation must prove this from primitives together with
+the [A] interfaces.\quad
+\textbf{[A]} \textsf{analytic interface}: stated in Lean as an axiom / carried hypothesis; the underlying
+analysis is cited, not reproven.
+
+\tableofcontents
+
+\input{content}
+
+\end{document}

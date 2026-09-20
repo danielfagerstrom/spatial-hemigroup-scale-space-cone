@@ -1,0 +1,107 @@
+% Author contribution and AI-use disclosure for module B. Placement: after the last section,
+% before the bibliography. On the line paper's final form (paper/ai-statement.tex, the author's
+% decision of 2026-09-14, response-plan D5): a short contributor section in the first person --
+% roles, verification and review status, the record, responsibility -- with the chronology, the
+% figures and their caveats in the repository's process note, here notes/PROCESS-module-b.md
+% (exported as notes/PROCESS.md). The hub standard's four rules (writing-style-and-ai-use.md
+% section 6) apply: never claim less involvement than there was; numbers from chronicler with
+% their date and caveats (in the note, not here); do not repeat the trust boundary, which
+% section 1.1 owns; anonymity outranks completeness (not in play).
+%
+% Written 2026-09-18 from the archivist's report of the same day (archive synced through
+% 2026-09-18 20:00 UTC). TO UPDATE BEFORE THE RELEASE: (1) the paragraph on verification and
+% review says that no system of another vendor and no human but the author has read the
+% article, which is true until the external review rounds have run; rewrite it from their
+% record then. (2) The responsibility paragraph does not carry the line paper's clause "and
+% have checked every citation": that is a declaration only the author can make, and it is
+% left for the author to add if it is true of this article. (3) Re-derive the two figures of
+% "The record" when the archive holds the rest of the work; update the note, then this.
+
+\section*{Author contribution and use of AI}
+
+This article was written in close collaboration with generative AI, and the collaboration
+went beyond editing assistance at every stage. I write this section in the first person
+because it is my own declaration; the article itself is written in the neutral third person.
+
+\paragraph{Roles.} The research programme and the question are mine, as for the line paper
+\sscite{fagerstrom2026spatial}. This article is the second of three modules cut from one
+working draft, and its mathematics and its formal development were produced in the same
+campaign as the line paper's, so that paper's statement and process note cover how they came
+about. The decisions of scope, method and policy for this module are mine: the cut between
+this module and the next along the dependency graph of the statements; the admission of the
+three interface names for the behaviour of a kernel at the origin; that the two constructions
+behind the dimension filtration be stated and proved and not only remarked; and the form of
+the article, which I set in a review of every section. The article restates what it uses of
+the line paper, so that it can be read alone. Its technical sections open with a map. A term
+is introduced where it is first used, with its literature. The account of the machine checking
+is in \S\ref{sec:machine-checked}, and the body says of a step that it is machine-checked only
+inside a few proofs. The numerical run of
+\S\ref{sec:numerical-run} was my request.
+
+The prose, the code, the figures and the numerical experiments were written by AI agents
+throughout, in dialogue with me; I worked from the conversation and from the built article
+rather than from the editor. The Lean~4 development is theirs essentially in full, and none of
+the proof terms are mine. So is mathematical content. The admissible cone with its extreme
+rays, the bridge from the causal theory and the \Matern{} family as the corner with exact
+recursive stages were all named in an agent's reply to my question on the day I asked it,
+before any plan existed. The boundedness threshold at the origin and the dimension filtration were proposed by
+an agent reading the released line paper in the role of a postdoctoral colleague. The design of
+the numerical run is an agent's. During the writing the agents also found and repaired errors
+in the statements of record: two while transcribing the statements into the article, and two
+in a blind review, a hypothesis that a restating clause had dropped and a uniqueness claim in
+the \Matern{} corollary made against too wide a class of realizations. The numerical run then
+showed that the text claimed an approximation property for the families with rational stages
+which the proposition behind it does not state and which fails. Corrections that make the
+article claim less are delegated to the agents by a standing rule of the project, each one
+recorded and reported to me, and I keep the veto. The technical decisions of the formalization
+were again the agents' recommendations, which I read with their consequences and followed.
+
+\paragraph{Verification and review.} What is machine-checked, and the axioms on which the
+verified development rests, are set out in \S\ref{sec:machine-checked}. Review by agents that
+had no part in the writing was a working method, as for the line paper: every section was read
+blind against the writing standard, one reviewer to a section, and each reviewer restated the
+claims from the statements and compared them with the prose, which is how the two errors above
+were found. The manuscript was then read by an AI system of another vendor, OpenAI's GPT-6
+Astra, in a referee-style review that returned a verdict of major revision and in a
+presentation review. Every finding was verified against the text, the sources and the formal development
+before it was acted on, and the substantive ones held. The review found what the writing and
+the internal reviews had missed: a cited fact on the density at the origin that had been
+admitted in a false form, because the record of the source had paraphrased its formula; a
+hypothesis missing from the printed statement of the \Matern{} theorem; the realization
+corollary stated without its restriction to integer index; a converse the text expected and
+that is false; and errors of the numerical example reported under the wrong description. It
+also proved a statement the paper had listed as open, which is now clause (4) of
+Proposition~\ref{prop:dimension-filtration}; the argument is that system's. A second round
+followed the revision. No other vendor's system could be used for it, so it was run as five
+referees that were fresh instances of the models that had worked on the article (Claude
+Opus~5 and Claude Fable~5.1). Each was given the PDF alone and was forbidden the repository
+and the first review, three read the proofs section by section, with the cited theorems read
+in the sources, one reproduced the numerical example from its printed description with code
+of its own, and one compared the headline claims with the statements and searched the
+literature. This round is less independent than the first, since its readers share the blind
+spots of the writers, and the false cited fact of the first round was found by the other
+vendor's system. It found no false numbered statement. It found an imprecise domain in one
+statement, summaries that again claimed more than their statements, a dozen steps that were
+true and not on the page, two wrong descriptions in the numerical example and a comparison
+made in mixed scales, and prior work that was not cited, the P\'olya frequency functions and
+Lindeberg's time-causal limit kernel among it. Several statements were added or widened in
+response, all proved in prose. The reviews of both rounds are archived verbatim in the
+repository beside the plans that record the disposition of each finding. The statements that
+are not machine-checked, which \S\ref{sec:machine-checked} lists and which include the whole
+of \S\ref{sec:implementation}, were written by the agents and have been read by me and by
+these reviewers, and by no other mathematician. No human reader beyond me has yet reviewed the
+article.
+
+\paragraph{The record.} The sessions were archived as the work went on, so the division of
+labour can be stated rather than estimated. It is stated, with its dates and its caveats, in
+the repository's process note (\texttt{notes/PROCESS.md}), together with the chronology and
+the places where the record qualifies a simple account of who did what. The short form: the
+work specific to this article took six days on top of the line paper's campaign, and in it
+the agents' words outnumber mine by about twenty-four to one. Those figures are lower bounds.
+I would not, unaided and as a spare-time activity, have written this article.
+
+\paragraph{Responsibility.} I directed the work throughout and have satisfied myself of the
+mathematical content. The cited results were read at their page anchors from held copies by an
+agent acting as librarian. Responsibility for this article, including for its errors, is mine
+alone; the validity of the machine-checked results depends on the Lean kernel and not on how,
+or by whom, the proof terms were produced.

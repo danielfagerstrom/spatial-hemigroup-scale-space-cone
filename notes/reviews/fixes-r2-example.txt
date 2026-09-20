@@ -1,0 +1,175 @@
+Review response R2, the numerical example (section 7.6): both rounded-node variants reported and labelled, the search as an upper bound, the lattice and continuum qualifications, the scope of the two filter exclusions, and what a reader needs to reproduce the run. Applied with scripts/apply-anchors.py.
+
+@@@ FILE paper-b/07-implementation.tex
+@@@ OLD
+the continuum family therefore hold for the sampled cascade without error: it telescopes as in
+Proposition~\ref{prop:knot-exactness}, its kernels have the variance $2\gamma t^2$ of
+Proposition~\ref{prop:matern-exponent}(3), and it solves the generator equation of
+Proposition~\ref{prop:corner-generators}(3) with the sampled Laplace kernel. The sampling is a
+choice made for the run and the paper states nothing about it. It differs from the continuum
+family by the difference between $\Omega$ and $\omega$, which is reported in the first check.
+@@@ NEW
+the continuum family therefore hold for the sampled cascade on the infinite lattice without
+error: it telescopes as in Proposition~\ref{prop:knot-exactness}, its kernels have the variance
+$2\gamma t^2$ of Proposition~\ref{prop:matern-exponent}(3), and it solves the generator
+equation of Proposition~\ref{prop:corner-generators}(3) with the sampled Laplace kernel. On the
+periodic signal of the run the kernels are wrapped around the $4096$ samples, which changes
+their variance by less than $10^{-8}$ of its value at the scales used. The sampling is a choice made for
+the run and the paper states nothing about it. It is a different spatial operator from the
+continuum one, by the difference between $\Omega$ and $\omega$, and the first check reports
+how far the two are apart.
+@@@ END
+
+@@@ FILE paper-b/07-implementation.tex
+@@@ OLD
+the Poisson scale space, on one gray scale that saturates at $\pm 0.055$. Bottom left and
+middle: the kernels at $s = 16$ on linear and on logarithmic axes. Bottom right: the $L^1$
+distance from the Poisson kernel of its quadratures with $N$ nodes, with real weights (black)
+and with weight $2$ at every node (red), and the distance of the latter from the member with
+transform $1/\cosh\omega$ (teal, dashed). The dotted line is the smallest distance from the
+Poisson kernel found among members with nodes of weight $2$ and a Gaussian part.}
+\label{fig:experiment-b}
+@@@ NEW
+the Poisson scale space, on the one gray scale of the key at the right, which saturates at
+$\pm 0.055$. The members are matched in bandwidth: at the display scale $s$ the transfer
+function of each continuum member equals $1/e$ at $\omega = 1/s$. Bottom: the kernels at
+$s = 16$ on linear and on logarithmic axes.}
+\label{fig:experiment-b}
+\end{figure}
+
+\begin{figure}[tbp]
+\centering
+\includegraphics[width=0.62\textwidth]{fig-quadrature.png}
+\caption{The Poisson member and its quadratures with $N$ nodes
+(Example~\ref{ex:numerical-run}, check 5): $L^1$ distances between kernels at canonical scale
+$1$. Black: real weights, which converge to the Poisson kernel. Red: weight $2$ at the nodes
+$\pi(i - \tfrac12)$, which stay at distance $0.507$ from it. Teal: the distance of the same
+members from the member with transform $1/\cosh\omega$, for the members realized by lag
+sections alone (dashed) and with the part of the measure above the last node carried as a
+Gaussian coefficient (dotted). The red dotted line is the smallest distance from the Poisson
+kernel found by the search described in the text, which is an upper bound for the best
+distance and not a separation.}
+\label{fig:quadrature}
+@@@ END
+
+@@@ FILE paper-b/07-implementation.tex
+@@@ OLD
+$\sigma = 1$ (Example~\ref{ex:numerical-run}). Top left: the transfer functions, that of
+Deriche's design in modulus, with its three sign changes. Top right: the folded profile of
+the cascade of four identical sections and that of the design of Young and van Vliet, which
+is negative from $x = 1.46\,\sigma$. Bottom left: the continuous part of the stage from
+$\sigma$ to $2\sigma$ for the same two, with the negative lobe of the second in the inset.
+Bottom right: the largest error of the kernel against the Gaussian, relative to the peak, for
+the cascade of $\gamma$ identical sections at matched variance and for the two designs.}
+@@@ NEW
+$\sigma = 1$ (Example~\ref{ex:numerical-run}); all three are the continuous prototypes, with
+the published coefficients. (a) The transfer functions, that of Deriche's design in modulus;
+the inset shows it with its sign, magnified, and the dotted lines mark its three zeros. (b)
+The folded profile of the cascade of four identical sections and that of the design of Young
+and van Vliet, which is negative from $x = 1.46\,\sigma$. (c) The continuous part of the
+stage from $\sigma$ to $2\sigma$ for the same two, with the negative lobe of the second in
+the inset. (d) The largest error of the kernel against the Gaussian, relative to the peak,
+for the cascade of $\gamma$ identical sections at matched variance and for the two designs.}
+@@@ END
+
+@@@ FILE paper-b/07-implementation.tex
+@@@ OLD
+$t = cs$ with $F(c) = 1$, so that every transfer function equals $1/e$ at $\omega = 1/s$. The
+@@@ NEW
+$t = cs$ with $F(c) = 1$, so that the transfer function of every continuum member equals
+$1/e$ at $\omega = 1/s$; the sampled members are run at the same $t$, and at $s = 1$ the
+sampled \Matern{} member $\gamma = 1$ has the value $0.388$ there against $1/e = 0.368$. The
+@@@ END
+
+@@@ FILE paper-b/07-implementation.tex
+@@@ OLD
+kernel is $\tfrac12\operatorname{sech}(\pi x/2)$. The run confirms it: the distance to that
+kernel falls from $4.7 \times 10^{-4}$ at $N = 4$ to $1.9 \times 10^{-9}$ at $N = 256$, while
+the distance to the Poisson kernel stays at $0.507$. Moving the nodes does not help much. A
+search over members with up to three nodes of weight $2$ and a free Gaussian coefficient
+found no member closer to the Poisson kernel than $0.200$, and the member it found is a single
+\Matern{} stage convolved with a Gaussian. The same search for the Student-t member
+$a = \tfrac32$ stops at $0.027$.
+@@@ NEW
+kernel is $\tfrac12\operatorname{sech}(\pi x/2)$. The run confirms it, for two variants that
+must be kept apart (Figure~\ref{fig:quadrature}). The member realized by $N$ lag sections
+alone, the finite product, is at $L^1$ distance $4.2 \times 10^{-2}$ from that kernel at
+$N = 4$ and $6.2 \times 10^{-4}$ at $N = 256$, a convergence of first order in $1/N$. If the
+part of the measure above the last node is carried as the Gaussian coefficient
+$1/(\pi^2N)$, the distances are $4.7 \times 10^{-4}$ and $1.9 \times 10^{-9}$; that member
+is admissible, but its Gaussian factor is not realized by lag sections. For both variants
+the distance to the Poisson kernel tends to $0.507$, the distance between the two limits.
+Moving the nodes helps only in part. A simplex search from the midpoint nodes, over members
+with up to three nodes of weight $2$ and a free Gaussian coefficient, reached the distance
+$0.200$ from the Poisson kernel, at a single \Matern{} stage convolved with a Gaussian, and
+the same search for the Student-t member $a = \tfrac32$ reached $0.027$. These two numbers
+are upper bounds for the best distance, and a finite search cannot show that they are
+attained or optimal. That the best distance is positive is
+Proposition~\ref{prop:rational-closure}: the class of limits is closed under weak convergence,
+convergence in $L^1$ implies it, and the Poisson member is not in the class. All distances
+are $L^1$ norms of differences of densities at canonical scale $1$, computed by inverting
+the transforms on $2^{20}$ points over $[-400, 400]$.
+@@@ END
+
+@@@ FILE paper-b/07-implementation.tex
+@@@ OLD
+transfer function is therefore the transform of no infinitely divisible law, and the design
+is the case of a dominant complex pair in the remark. The consequence for a cascade is
+@@@ NEW
+transfer function is therefore the transform of no infinitely divisible law: the signed
+density is the only candidate, the \Levy{} pair of a law being unique, and it is not a
+positive measure. This is an analytic statement and not a reading of the plot, since at the
+points where the cosine equals $-1$ the second term is eventually the larger. The design is
+the case of a dominant complex pair in the remark. The consequence for a cascade is
+@@@ END
+
+@@@ FILE paper-b/07-implementation.tex
+@@@ OLD
+function has the one-sided slope $+0.018$ at the origin, so its transform behaves like
+$-0.035/\omega^2$ at high frequency and is negative there, while it is positive at the
+origin. The transfer function therefore vanishes on the real axis: at
+$\omega\sigma = 4.21$, $5.08$ and $9.82$, and in every one of $2000$ draws in which the
+printed coefficients were perturbed within half a unit of their last digit. The transform of
+an infinitely divisible law has no zero (Lemma~\linenum{lem:nonvanishing} of the line paper),
+so this design is not one either, and no stable filter takes its output at $\sigma$ to its
+output at $2\sigma$, the ratio of the two transfer functions having poles on the real axis.
+@@@ NEW
+function, before its normalization to unit mass, has the one-sided slope $+0.018$ at the
+origin, so its transform behaves like $-0.035/\omega^2$ at high frequency and is negative
+there, while it is positive at the origin. The transfer function therefore vanishes on the
+real axis, at $\omega\sigma = 4.21$, $5.08$ and $9.82$ for the printed coefficients. The
+argument does not depend on their last digits: over the whole box of coefficient vectors
+that round to the printed ones, the slope lies between $+0.0068$ and $+0.0286$, so at least
+one real zero persists throughout the box. In $2000$ random draws from the box all three
+zeros persisted, which is an observation about sensitivity and proves nothing more. The
+transform of an infinitely divisible law has no zero (Lemma~\linenum{lem:nonvanishing} of the
+line paper), so this design is not one either. No stable filter takes its output at $\sigma$
+to its output at $2\sigma$: the ratio of the two transfer functions has poles on the real
+axis at the three zeros, none of which is cancelled, the zeros of the numerator being at half
+those frequencies.
+
+Both exclusions are statements about the continuous prototypes with the published
+coefficients. The recursions that are run in practice are sampled versions of them, with
+transfer functions in $z$, and sampling changes both the zeros and the profile; nothing is
+claimed here about a particular sampled implementation, or about other designs published
+under the same names.
+@@@ END
+
+@@@ FILE paper-b/07-implementation.tex
+@@@ OLD
+and all the numbers are produced by the scripts \texttt{make-fig-experiment-b.py} and
+@@@ NEW
+and all the numbers are produced, from a fixed seed, by the scripts \texttt{make-fig-experiment-b.py} and
+@@@ END
+
+@@@ FILE paper-b/07-implementation.tex
+@@@ OLD
+\texttt{make-fig-recursive-gaussians.py} that accompany the paper.
+@@@ NEW
+\texttt{make-fig-recursive-gaussians.py} that accompany the paper. The scripts fix what a
+reproduction needs and the text does not repeat: the signal and the seed of its noise, the
+ladder with its first stage from scale $0$, the periodic solution of each recursion, the
+transforms used for the Gaussian and the Poisson members, the cells and the Gaussian remainder
+of the quadratures, the windows of the tail fits, the domain and the mesh of the $L^1$
+distances, and the optimizer with its start and its stopping rule.
+@@@ END

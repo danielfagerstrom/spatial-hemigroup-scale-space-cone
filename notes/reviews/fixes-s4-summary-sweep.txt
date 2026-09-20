@@ -1,0 +1,282 @@
+Batch S4 of notes/PLAN-review-response-module-b-round2.md, after the decisions batch: every
+summary sentence of the introduction, section 1.1, the conclusions and the abstract set against
+the statement it announces. Applied with scripts/apply-anchors.py.
+
+@@@ FILE paper-b/01-introduction.tex
+@@@ OLD
+Gaussian part is bounded at the origin exactly when its profile starts above $1$
+(Corollary~\ref{cor:origin-boundedness}). For the
+@@@ NEW
+Gaussian part is bounded at the origin exactly when its profile starts above $1$
+(Corollaries~\ref{cor:origin-boundedness} and~\ref{cor:origin-smooth}, the second for a
+profile that is unbounded at the origin). For the
+@@@ END
+@@@ OLD
+than the causal theory carried across. The image lies inside a chain of classes indexed by
+dimension, the exponents whose radial extension to $\RR^d$ is again self-decomposable
+(Proposition~\ref{prop:dimension-filtration}, proved in prose on a cited theorem). One explicit
+family shows that the chain is strict at its bottom (Lemma~\ref{lem:filtration-strictness},
+proved here and not machine-checked).
+@@@ NEW
+than the causal theory carried across. The image is the intersection of a decreasing chain of
+classes indexed by dimension, the exponents whose radial extension to $\RR^d$ is again
+self-decomposable: a member has a causal ancestor exactly when it belongs to every class of
+the chain (Proposition~\ref{prop:dimension-filtration}, proved in prose on cited facts about
+laws in dimension $d$, which are listed before it). One explicit family shows that the first
+two inclusions of the chain are strict (Lemma~\ref{lem:filtration-strictness}, proved here and
+not machine-checked).
+@@@ END
+@@@ OLD
+single atom with no Gaussian part, the transform $(1+t^2\omega^2)^{-\gamma}$ up to the choice of a range, and, for
+integer $\gamma$, stages that are rational filters with a single pole pair
+(Theorem~\ref{thm:matern}). Its members of integer index are exactly the admissible families
+whose stages, over every finite ladder of scales, are cascades of identical first-order
+recursive sections, and they have every moment finite and exponential tails
+(Corollary~\ref{cor:matern-realization}). The Student-t laws are the image of
+@@@ NEW
+single atom with no Gaussian part, the transform $(1+t^2\omega^2)^{-\gamma}$ up to the choice of a range, and, for
+integer $\gamma$, stages whose transfer function is the $\gamma$-th power of one ratio of
+first-order factors (Theorem~\ref{thm:matern}; the family is read in its canonical gauge). Its
+members of integer index are exactly the admissible families whose stages, over every finite
+ladder of scales, are cascades of identical first-order recursive sections, run forward and
+backward. One kernel from the origin of that form already forces the family, and the word
+that matters is identical: there are admissible families whose stages are cascades of
+first-order sections of different ranges. The \Matern{} members have every moment finite and
+exponential tails (Corollary~\ref{cor:matern-realization}). The Student-t laws are the image of
+@@@ END
+@@@ OLD
+(Remark~\ref{rem:recursive-gaussians}). The members whose profile is a mixture of exponentials,
+the Student-t and stable families among them, are limits of members with finitely many
+ranges, and a member with finitely many ranges and integer weights has such stages
+(Proposition~\ref{prop:thorin-machine}). The families realized by such sections reach, in the limit,
+exactly the members whose Thorin measure consists of atoms of even integer mass, with a
+Gaussian part, so the stable members are not among their limits
+(Proposition~\ref{prop:rational-closure}). A numerical run closes the section
+@@@ NEW
+(Proposition~\ref{prop:rational-criterion}, read at the two designs in
+Remark~\ref{rem:recursive-gaussians}). The members whose profile is a mixture of exponentials,
+the stable family among them and the Student-t family under the hypothesis named above, are
+limits of members with finitely many ranges, and a member with finitely many ranges and
+integer weights has such stages (Proposition~\ref{prop:thorin-machine}). The families realized
+by such sections reach, in the limit, exactly the members whose Thorin measure consists of
+atoms of even integer mass, finitely many in every bounded set, possibly with a Gaussian part.
+Every such limit has an exponential moment, so the stable and the Student-t members, which
+lack moments, are not among the limits, and this needs no hypothesis
+(Proposition~\ref{prop:rational-closure}). The kernels from the origin of the limits are the
+symmetric P\'olya frequency functions of Schoenberg's theorem
+(Remark~\ref{rem:polya-limits}). A numerical run closes the section
+@@@ END
+@@@ OLD
+Most of the results are machine-checked in the Lean~4 proof assistant, and
+\S\ref{sec:machine-checked} says which, and what they rest on.
+@@@ NEW
+Most of the results of \S\S\ref{sec:cone}--\ref{sec:generator} are machine-checked in the
+Lean~4 proof assistant, and the results of \S\ref{sec:implementation} are proved in prose.
+\S\ref{sec:machine-checked} says which, and what they rest on.
+@@@ END
+@@@ OLD
+\item of \S\ref{sec:cone}, everything: the $\Cin$ rays and the superposition, the Choquet
+structure in all its parts, the delay equation in both forms, the folding translation, and
+the behaviour at the origin with the boundedness threshold;
+\item of \S\ref{sec:bridge}, everything but the dimension filtration and its lemma: the bridge
+on exponents in both clauses, the bridge on families with its four corner identifications, the
+strictness proposition in all four clauses, and the memberships of the Gaussian ray and the
+@@@ NEW
+\item of \S\ref{sec:cone}, every proposition, lemma and corollary but the last: the $\Cin$
+rays and the superposition, the Choquet structure in all its parts, the delay equation in both
+forms, the folding translation, and the behaviour at the origin with the boundedness threshold
+for a profile that is finite there;
+\item of \S\ref{sec:bridge}, everything but the dimension filtration and its lemma: the bridge
+on exponents in both clauses, the bridge on families in its five clauses, that of the Student-t
+family being the mixture identity, with the self-decomposability of its delay law as a
+hypothesis, the
+strictness proposition in all four clauses, and the memberships of the Gaussian ray and the
+@@@ END
+@@@ OLD
+Two further cited facts are each used by one proposition that is proved in prose and not
+machine-checked. Proposition~\ref{prop:dimension-filtration} uses Schoenberg's radial theorem
+(\sscite{schilling2012bernstein}, Thm.~13.14, p.~212). Proposition~\ref{prop:rational-closure}
+uses Bondesson's closure theorem for the generalized gamma convolutions
+(\sscite{bondesson1992generalized}, Thm.~3.1.5, pp.~34--35), with the continuity theorem for
+Laplace transforms (\sscite{feller2009introduction}, Vol.~2, \S XIII.1, Thm.~2, p.~431).
+Table~\ref{tab:trust-base} lists every cited fact with the results that use it directly.
+@@@ NEW
+Further cited facts are used by statements that are proved in prose and not machine-checked.
+Proposition~\ref{prop:dimension-filtration} uses Schoenberg's radial theorem
+(\sscite{schilling2012bernstein}, Thm.~13.14, p.~212), in two of its clauses, with the
+\Levy--Khintchine representation and the polar criterion of self-decomposability in dimension
+$d$ and the cited facts listed before it, and the third clause of
+Lemma~\ref{lem:filtration-strictness} uses the same two facts in dimension $d$.
+Proposition~\ref{prop:rational-closure} uses Bondesson's closure theorem for the generalized
+gamma convolutions (\sscite{bondesson1992generalized}, Thm.~3.1.5, pp.~34--35), with the
+continuity theorem for Laplace transforms (\sscite{feller2009introduction}, Vol.~2, \S XIII.1,
+Thm.~2, p.~431), and the moment criterion a second time.
+Corollary~\ref{cor:origin-smooth} uses a further clause of the theorem on the density at the
+origin (\sscite{sato1999levy}, Thm.~28.4(ii), p.~191), which the development admits nowhere.
+Table~\ref{tab:trust-base} lists every cited fact with the statements that use it directly.
+@@@ END
+@@@ OLD
+that carries each. A result not listed uses no cited fact directly, apart from the regularity
+of a self-decomposable density, which enters through
+Proposition~\ref{prop:kernel-regularity}. Cited for orientation and
+used by no proof: the closed form of the \Matern{} kernel and the Bessel asymptotics behind its
+tail (ledger entries A15 and A16, Proposition~\ref{prop:matern-density}); Thorin's definition of
+the extended generalized gamma convolutions (A17, Lemma~\ref{lem:thorin-ggc}); Halgreen's
+theorem on the inverse-gamma law (A18, Remark~\ref{rem:student-ggc}). Each of the last two
+rows is used by a proposition that is proved in prose and not machine-checked, the first of
+them with the polar criterion of self-decomposability in dimension $d$ (A7) and the
+\Levy--Khintchine representation in dimension $d$ (A3) beside it.}
+@@@ NEW
+that carries each. A numbered proposition, lemma, theorem or corollary that is not listed uses
+no cited fact directly, apart from the regularity of a self-decomposable density, which enters
+through Proposition~\ref{prop:kernel-regularity}. Cited and used by no machine-checked proof:
+the closed form of the \Matern{} kernel and the Bessel asymptotics behind its tail (ledger
+entries A15 and A16, Proposition~\ref{prop:matern-density}, from which
+Corollary~\ref{cor:matern-realization} reads its exponential tails); Thorin's definition of
+the extended generalized gamma convolutions (A17, Lemma~\ref{lem:thorin-ggc}); Halgreen's
+theorem on the inverse-gamma law (A18, Remark~\ref{rem:student-ggc}). Cited in remarks, for
+orientation or attribution: the identification of the constant of Lemma~\ref{lem:cin-rays}
+(\sscite{dlmf2026}, Remark~\ref{rem:cin-constant}), the background driving process
+(\sscite{sato1999levy}, Thm.~17.5), and Schoenberg's theorem on P\'olya frequency functions
+(A21, Remark~\ref{rem:polya-limits}). The rows below the rule are used only by statements
+proved in prose.}
+@@@ END
+@@@ OLD
+the density at the origin & A10 & three regimes, at the letter & Prop.~\ref{prop:cin-origin-singularity}; Cor.~\ref{cor:origin-boundedness} \\
+the radial theorem & A23 & Bernstein from every dimension & Prop.~\ref{prop:dimension-filtration}(3), not machine-checked \\
+closure of the gamma convolutions & A24 & closure, vague convergence & Prop.~\ref{prop:rational-closure}(1), not machine-checked \\
+@@@ NEW
+the density at the origin & A10 & three regimes, at the letter & Prop.~\ref{prop:cin-origin-singularity}; Cor.~\ref{cor:origin-boundedness} \\
+\midrule
+the density at the origin & A10 & the clause at $k(0{+}) = \infty$ & Cor.~\ref{cor:origin-smooth} \\
+the moment criterion & A13 & exponential weight & Prop.~\ref{prop:rational-closure}(5) \\
+\Levy--Khintchine in dimension $d$ & A3 & converse, uniqueness & Prop.~\ref{prop:dimension-filtration}; Lem.~\ref{lem:filtration-strictness}(3) \\
+the polar criterion in dimension $d$ & A7 & both directions & Prop.~\ref{prop:dimension-filtration}; Lem.~\ref{lem:filtration-strictness}(3) \\
+the radial theorem & A23 & Bernstein from every dimension & Prop.~\ref{prop:dimension-filtration}(3), (4) \\
+closure of the gamma convolutions, & A24 & closure, vague convergence & Prop.~\ref{prop:rational-closure}(1), (4) \\
+with continuity of Laplace transforms & & & \\
+@@@ END
+@@@ OLD
+The three names of the fact on the density at the origin carry the same step beyond their
+pages. The hypothesis is this paper's cosine-transform specification of a symmetric law and
+@@@ NEW
+The three names of the fact on the density at the origin carry the same steps beyond their
+pages. The profile is any monotone two-sided profile and not the source's version of it that
+is continuous from one side, which differs from it on a countable set and gives the same law.
+The hypothesis is this paper's cosine-transform specification of a symmetric law and
+@@@ END
+@@@ OLD
+function with its slowly varying factor, which is less than the source's asymptotic with its
+constant. The passage between
+@@@ NEW
+function with its slowly varying factor. That is less than the source's asymptotic with its
+constant because the constant is not zero, which holds for a symmetric law. The passage between
+@@@ END
+@@@ OLD
+the admitted fact false; an external review found it, and the fact is now stated as the source
+states it (\sscite{sato1999levy}, (53.25) and (53.28), p.~411).
+@@@ NEW
+the admitted fact false; an external review found it, and the fact is now stated as the source
+states it (\sscite{sato1999levy}, (53.25) and (53.28), p.~411). In print the repair added the
+slowly varying factor and the comparison function of the threshold regime to the statement of
+Proposition~\ref{prop:cin-origin-singularity}. The threshold of
+Corollary~\ref{cor:origin-boundedness} and every later result were unchanged.
+@@@ END
+@@@ OLD
+\paragraph{What is not formalized.} Seven things in the scope of this paper, and the text
+names each where it occurs.
+\begin{itemize}
+@@@ NEW
+\paragraph{What is not formalized.} The following, in the scope of this paper, and the text
+names each where it occurs.
+\begin{itemize}
+\item The smoothness of the kernel when the profile is unbounded at the origin, proved in
+prose on a clause of a cited theorem (Corollary~\ref{cor:origin-smooth}).
+@@@ END
+@@@ OLD
+\item Its lemma, which is stated in the development and not proved there
+(Lemma~\ref{lem:filtration-strictness}).
+\item The implementation section, where no machine-checked proof is scheduled, as for the
+causal article's, and the corollary of the \Matern{} theorem that rests on it
+(Corollary~\ref{cor:matern-realization}). One proposition of that section is proved on cited
+facts and not from the paper's own statements alone
+(Proposition~\ref{prop:rational-closure}).
+\end{itemize}
+Every other numbered statement is machine-checked. Two remarks carry the two cited facts that
+ground hypotheses and not statements (Remarks~\ref{rem:bridge-subordination}
+and~\ref{rem:student-ggc}).
+@@@ NEW
+\item Its lemma, of which two clauses are stated in the development and not proved there, and
+the third is proved in prose (Lemma~\ref{lem:filtration-strictness}).
+\item The whole of the implementation section, \S\ref{sec:implementation}, where no
+machine-checked proof is scheduled, as for the causal article's, and the corollary of the
+\Matern{} theorem that rests on it (Corollary~\ref{cor:matern-realization}). Its statements are
+proved in prose from the statements of this paper, except
+Proposition~\ref{prop:rational-closure}, which is proved on cited facts.
+\end{itemize}
+Every other numbered proposition, lemma, theorem and corollary is machine-checked. Who has read
+the statements of this list is said in the statement on the use of AI at the end of the paper.
+The remarks are commentary. One of them describes a computation that is not
+carried out (Remark~\ref{rem:cin-propagation}), and two carry the cited facts that ground
+hypotheses and not statements (Remarks~\ref{rem:bridge-subordination}
+and~\ref{rem:student-ggc}).
+@@@ END
+
+@@@ FILE paper-b/08-conclusions.tex
+@@@ OLD
+$\Cin$ rays sit at that threshold, and so does the \Matern{} member at $\gamma = \tfrac12$
+(Corollary~\ref{cor:origin-boundedness}).
+@@@ NEW
+$\Cin$ rays sit at that threshold, and so does the \Matern{} member at $\gamma = \tfrac12$
+(Corollaries~\ref{cor:origin-boundedness} and~\ref{cor:origin-smooth}).
+@@@ END
+@@@ OLD
+radial extension is self-decomposable in dimension $d$, and the chain is strict at its bottom
+(Proposition~\ref{prop:dimension-filtration}, proved in prose on a cited theorem, and
+Lemma~\ref{lem:filtration-strictness}, not machine-checked).
+@@@ NEW
+radial extension is self-decomposable in dimension $d$, and the first two inclusions of the
+chain are strict (Proposition~\ref{prop:dimension-filtration}, proved in prose on cited facts
+about laws in dimension $d$, and Lemma~\ref{lem:filtration-strictness}, not machine-checked).
+@@@ END
+@@@ OLD
+\emph{The algorithm.} The cascade is the algorithm. Over any finite ladder of scales the
+cascade is exact at every knot. At integer index
+@@@ NEW
+\emph{The algorithm.} The cascade is the algorithm. Over any finite ladder of scales the
+cascade is exact at every knot, for a signal on the line, the sampling of the signal being a
+separate approximation. At integer index
+@@@ END
+@@@ OLD
+the families with such stages are the members whose Thorin measure consists of atoms of even
+integer mass, with a Gaussian part (Proposition~\ref{prop:rational-closure}), and the
+numerical run
+@@@ NEW
+the families with such stages are the members whose Thorin measure consists of atoms of even
+integer mass, finitely many in every bounded set, possibly with a Gaussian part. Every such
+limit has an exponential moment, so the stable and the Student-t members are not among them
+(Proposition~\ref{prop:rational-closure}). The numerical run
+@@@ END
+@@@ OLD
+\item Which admissible families have rational stages. The families realized by first-order
+sections are among them, and so is a family with a complex pole pair
+(Remark~\ref{rem:rational-converse}), so the Thorin subclass does not contain them all. A
+description of the admissible rational transforms, and of realizations of the others with
+positivity at every stage, is not attempted.
+@@@ NEW
+\item Which admissible families have rational stages. The families realized by first-order
+sections are among them, and so are a family with a complex pole pair and a family with real
+poles and zeros only (Remark~\ref{rem:rational-converse}), so the Thorin subclass does not
+contain them all. Proposition~\ref{prop:rational-criterion} says which rational functions are
+kernels from the origin. Which are stages between two positive scales, and how the others are
+realized with positivity at every stage, is not attempted.
+@@@ END
+
+@@@ FILE paper-b/main.tex
+@@@ OLD
+non-creation of local extrema are outside the paper. Most of the results are machine-checked
+in Lean~4.
+@@@ NEW
+non-creation of local extrema are outside the paper. Most of the results of the first two
+steps are machine-checked in Lean~4, and those of the third are proved in prose.
+@@@ END

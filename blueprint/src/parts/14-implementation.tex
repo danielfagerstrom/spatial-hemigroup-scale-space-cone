@@ -1,0 +1,962 @@
+% !TEX root = ../print.tex
+% Draft \S14 --- Implementation: the hemigroup is the algorithm
+%
+% Source: draft/spatial-hemigroup-scale-space.md, \S14 (lines 823-876).
+%
+% SCOPE. As the causal article does for the same two chapters, the nodes here and in
+% Chapter 15 are blueprint statements and not formalisation targets: none carries a \lean
+% tag and none is scheduled in a Lean phase. The blueprint is nevertheless complete with
+% respect to the article's mathematics.
+%
+% CHANGED (prop:rational-increments clause 2): the draft writes the interpolated profile as
+% sum_{m >= 0} k_R(q^m x). It is sum_{m >= 1}: with F = sum_{m >= 1} psi(q^{-m} .) the
+% dilate psi(c .) has profile k_R(u/c), so c = q^{-m} contributes k_R(q^m u) for m >= 1, and
+% the m = 0 term would make the q-step increment psi(q .) rather than psi. The node states
+% the corrected form; the draft should follow.
+%
+% NARROWED (prop:rational-increments): the draft's clause (3), that an admissible family all
+% of whose increments are rational of bounded order has the form of clause (1), is a sketch
+% with three unresolved steps of its own (in what sense the difference quotients converge,
+% whether bounded order is removable, and the exclusion of oscillating terms). It is not
+% stated as a node; it is recorded as an open statement in rem:rational-converse.
+%
+% CHANGED (prop:thorin-machine): the draft's parallel generator is written
+% "2a d_x^2 + sum_i w_i (L_{t/theta_i} - I) . (2/t)". Both constants are wrong against
+% prop:corner-generators: the Gaussian term is 2at d_x^2 and the sum carries 1/t, not 2/t.
+% The node states the corrected form.
+%
+% (Checked at the draft sync, 2026-09-11: the draft already carried both corrected forms above --
+% the profile sum from m >= 1 and the generator with 2at and 1/t -- so those two CHANGED notes
+% record a past state of the draft. The same sync narrowed prop:thorin-machine's rounding to even
+% weights, R82, where the draft had been right and the node wrong.)
+%
+% The draft's dependence on the pyramid module ([VI, ...]) is removed: the q-difference
+% rigidity used in clause (2) is proved inline in three lines, so nothing here waits on an
+% unreleased module.
+
+\chapter{Implementation: the hemigroup is the algorithm}
+\label{ch:implementation}
+
+The structural fact that organizes everything: the scale direction never needs to be
+discretized approximately. What is new on the line against the causal theory is that the
+causal first-order section becomes a forward--backward pair --- the recursive filter the
+image-processing literature has used for the Gaussian for decades --- and that the theory says
+which of those filters are scale spaces and which are not.
+
+% draft: Proposition 14.1
+% twin: hcs prop:knot-exactness --- verbatim.
+\begin{proposition}[exactness at the knots]\label{prop:knot-exactness}
+\uses{lem:convolution-representation,def:cascade-family,lem:additivity}
+\notes{exact-cascade-implementation}
+Let $0 = t_0 < t_1 < \dots < t_M$ be any finite set of scale knots and define the discrete
+cascade $u_0 := f$, $u_{k+1} := \mu_{t_k,t_{k+1}} * u_k$. Then $u_k = \Phi_{0,t_k}f$ exactly for
+every $k$, and refining the knot set changes nothing at the old knots. On the transform side the
+increment transforms telescope,
+$\prod_{k<M} e^{-F(t_{k+1}\omega) + F(t_k\omega)} = e^{-F(t_M\omega)}$.
+\statusT\quad\emph{(One line of hemigroup algebra; the content is that the cascade is not an
+approximation scheme for the family but the family itself, sampled. Since the family exists at
+every scale, a ladder of knots can be shifted at will, an arbitrary dilation being handled by
+instantiating the family at the shifted knots.)}
+\end{proposition}
+
+\begin{proof}
+Induction on (A6): $\mu_{0,t_{k+1}} = \mu_{t_k,t_{k+1}} * \mu_{0,t_k}$, by
+\ref{lem:additivity}, and $u_0 = \Phi_{0,t_0}f = f$.
+\end{proof}
+
+% draft: Proposition 14.2
+% twin: hcs prop:gamma-cascade --- the causal section is one-sided; here it is a
+% forward--backward pair, and the increment kernel is the four-term mixture (14.2).
+% CHANGED (2026-09-19, article mirror of module B, R174): four register repairs in the statement,
+% from the register pass's items 4, 5 and 9. None changes what is claimed except the last, which
+% narrows.
+% (a) The term LAG SECTION is introduced here, at the first place the sections are constructed;
+% chapter 14 and prop:rational-closure used it with no gloss, and the paper introduces it in its
+% own prose ("called a lag section below").
+% (b) "free of input differentiation" is replaced by what it says: the zero of the transfer
+% function costs no differentiation of the input, the output being a convex combination of the
+% input and the state. The same sentence is added to the proof, where the convex combination is
+% computed.
+% (c) Expo_+- IS DEFINED, and \Lap takes the subscript it takes in chapters 11, 13 and 15
+% (\Lap(t) here was the article's only argument form). eq:four-term reads \Lap_{t_{k+1}}.
+% (d) THE COST IS NARROWED to a sampled realization: the section is an ODE in x, so "multiply-adds
+% per sample" presupposes a grid, which the statement did not state. The sentence now says so and
+% says that the sampling of the signal is not treated here, as the paper's opening paragraph does.
+% CHANGED 2026-09-19 (R183, second external review round, referee C finding 11): TWO CLARIFICATIONS
+% in the statement, neither of them a new claim. (a) WHICH SOLUTION of the state equation is the
+% realization: its solutions differ by a multiple of e^{-x/t_{k+1}}, and the transfer identity of
+% the proof holds for the L^1 one (w(-infty) = 0 forward, w(+infty) = 0 backward). On a finite or
+% periodic record this is the initialization problem, which the article treats only inside the
+% numerical example. (b) "IN TWO PASSES" IS PER KNOT: each record u_{k+1} needs its own forward and
+% backward pass, so a ladder of M knots is 2M passes, which the O(gamma M) count already reflects.
+% The per-sample multiply-add constant of rem:costs is corrected with it (2 gamma -> 4 gamma).
+\begin{proposition}[the \Matern{} cascade: forward--backward first-order sections]
+\label{prop:matern-cascade}
+\uses{prop:knot-exactness,prop:matern-exponent,lem:nonvanishing}
+\notes{exact-cascade-implementation}
+For the \Matern{} family with integer $\gamma$, so that $e^{-F(t\omega)} =
+(1+t^2\omega^2)^{-\gamma}$, the increment between adjacent knots has transform
+\begin{equation}\label{eq:matern-increment}
+  \hat\mu_{t_k,t_{k+1}}(\omega)
+  = \Bigl(\frac{1 + t_k^2\omega^2}{1 + t_{k+1}^2\omega^2}\Bigr)^{\gamma}
+  = \Bigl(\frac{1 + it_k\omega}{1 + it_{k+1}\omega}\cdot
+          \frac{1 - it_k\omega}{1 - it_{k+1}\omega}\Bigr)^{\gamma},
+\end{equation}
+a cascade of $\gamma$ identical causal first-order pole--zero sections in $x$, called \emph{lag
+sections} below, and $\gamma$ identical anticausal ones, each with the one-state realization
+\[
+  w' = \frac{y - w}{t_{k+1}} \quad(\text{forward}),
+  \qquad
+  v = \frac{t_k}{t_{k+1}}\,y + \Bigl(1 - \frac{t_k}{t_{k+1}}\Bigr) w,
+\]
+and its mirror image run backward. Which solution of the state equation is meant is part of the
+realization: its solutions differ by a multiple of $e^{-x/t_{k+1}}$, and the one intended is the
+solution in $\Lone$, equivalently the one with $w(-\infty) = 0$ for the forward pass and
+$w(+\infty) = 0$ for the backward one. The zero of
+the transfer function costs no differentiation of
+the input: the output is a convex combination of the input and the state. The section's kernel is
+the mixture
+$\tfrac{t_k}{t_{k+1}}\delta_0 + (1 - \tfrac{t_k}{t_{k+1}})\,\Expo_{+}(t_{k+1})$ of no
+displacement and a one-sided exponential displacement, $\Expo_{\pm}(t)$ denoting the one-sided
+exponential kernels $t^{-1}e^{-|x|/t}$ carried by $\pm(0,\infty)$; so the two-sided increment for
+$\gamma = 1$ is the four-term mixture
+\begin{equation}\label{eq:four-term}
+  r^2\,\delta_0 + r(1-r)\bigl(\Expo_+ + \Expo_-\bigr) + (1-r)^2\,\Lap_{t_{k+1}},
+  \qquad r := \frac{t_k}{t_{k+1}} \in (0,1),
+\end{equation}
+where $\Expo_\pm$ are taken at the range $t_{k+1}$ and $\Lap_t$ is the Laplace kernel of range
+$t$; positivity and unit mass are manifest at the
+realization level. Sampled on a grid, a full scale space over $M$ knots costs $2\gamma M$
+first-order states and $O(\gamma M)$ multiply--adds per sample, in a forward and a backward pass
+\emph{at each knot}. Sampling the signal
+is a separate approximation and is not treated here.
+\statusT
+\end{proposition}
+
+\begin{proof}
+The increment transform is the ratio of the endpoint transforms, the denominators being
+nonvanishing (\ref{lem:nonvanishing}), which is \ref{prop:matern-exponent}(2); the
+factorization is $1 + t^2\omega^2 = (1+it\omega)(1-it\omega)$. The transfer identity of the
+section is
+\[
+  \frac{t_k}{t_{k+1}} + \Bigl(1 - \frac{t_k}{t_{k+1}}\Bigr)\frac{1}{1+it_{k+1}\omega}
+  = \frac{1 + it_k\omega}{1 + it_{k+1}\omega},
+\]
+and the convex-combination clause is $0 < t_k/t_{k+1} < 1$. In particular the output is a convex
+combination of the input and the state, so the section differentiates nothing. For
+\ref{eq:four-term}, convolve the
+causal and anticausal mixtures and use $\Expo_+(t) * \Expo_-(t) = \Lap_t$, whose transform identity
+is $(1+it\omega)^{-1}(1-it\omega)^{-1} = (1+t^2\omega^2)^{-1}$.
+\end{proof}
+
+% CHANGED (2026-09-19, article mirror of module B, R174): THE CHAPTER'S CHECK IS DISCHARGED (the
+% register pass's item 17). The two standard recursive Gaussians are named, with the pole structure
+% the librarian read from held copies on 2026-09-18: Deriche, INRIA RR-1893, section 5.1, eq. (38),
+% two complex-conjugate pole pairs; Young and van Vliet 1995, p. 141, Table 1 with (6a)-(6b), one
+% real pole and one conjugate pair. Both therefore fall in the second half of the remark, which is
+% about complex poles, and the paper's example applies the test to both. Two further repairs in the
+% same pass: the infinite-divisibility criterion for a rational transfer, which was asserted with no
+% pointer, is now attributed to the uniqueness of the \Levy{} pair, which is what makes the signed
+% density the only candidate; and the sentence about a dominant real pole carrying a complex pair,
+% which read as if real-pole members were the only admissible rational filters, points at
+% rem:rational-converse, where such a family is exhibited (R170, the same day).
+% NEW NODE 2026-09-19 (R198; the author's decision D4, a widening authorized at the second
+% external review round of module B). The criterion deciding which rational transfer functions
+% are admissible kernels was a remark -- rem:recursive-gaussians, which stays below as a short
+% remark pointing here, so that existing references survive -- and three things were wrong with
+% it as a remark (referee C findings 4 and 5, referee E section 2.7). Its opening sentence was
+% circular ("R is the kernel of an admissible family exactly when R = e^{-F} for an admissible
+% F"). Its frame, R = |P/Q|^2, does not cover a design that ADDS a causal and an anticausal half,
+% which is Deriche's; the right frame is an even rational R with R(0) = 1. And the uniqueness step
+% it invoked is stated for POSITIVE \Levy{} pairs, while what is compared here is a signed density
+% -- the recombination of lem:cin-delay-equation's proof is what closes the gap, and it is written
+% out below. The identity of prop:matern-exponent(1) at a complex rate, asserted in
+% rem:rational-converse and used there and here, is proved here, at its first use.
+% [T], prose-only: no Lean is scheduled for this chapter and none is affected.
+\begin{proposition}[which rational transfer functions are admissible kernels]
+\label{prop:rational-criterion}
+\uses{thm:main-characterization,lem:selfdecomposable-exponents,lem:profile-integrability,prop:fourier-toolbox,prop:matern-exponent,lem:nonvanishing}
+\notes{exact-cascade-implementation}
+Let $R$ be an even rational function with $R(0) = 1$, written in lowest terms. Write
+$\pm i\theta_1,\dots,\pm i\theta_M$ for its poles and $\pm i\zeta_1,\dots,\pm i\zeta_L$ for its
+zeros, listed with multiplicity and normalised by $\Rea\theta_m > 0$ and $\Rea\zeta_l > 0$; both
+lists are closed under conjugation, so the \emph{signed profile}
+\begin{equation}\label{eq:rational-profile}
+  k(x) \ :=\ 2\sum_{m \le M} e^{-\theta_m x} \ -\ 2\sum_{l \le L} e^{-\zeta_l x},
+  \qquad x > 0,
+\end{equation}
+is real-valued. Then $R$ is the transform of the kernel at canonical scale $1$ of an admissible
+family --- equivalently, $-\log R$ is an admissible exponent --- if and only if
+\begin{enumerate}
+\item $R$ has neither a pole nor a zero on the real axis, so that $R > 0$ there;
+\item $k \ge 0$ on $(0,\infty)$; and
+\item $k$ is nonincreasing on $(0,\infty)$.
+\end{enumerate}
+The family is then the one with Gaussian coefficient $0$ and folded profile $k$. Condition (i)
+alone excludes every $R$ with a real zero, since the transform of an infinitely divisible law has
+no zero at all (\ref{lem:nonvanishing}).
+\statusT\quad\emph{(The test a practitioner applies to a recursive filter, and the reason this
+chapter can say which published designs are scale spaces and which are not. The three conditions
+are read off the pole--zero diagram: (i) is a glance at the real axis, and (ii) and (iii) are two
+inequalities for one explicit exponential sum. A Gaussian factor is not covered and needs none: a
+rational $R$ forces the Gaussian coefficient to vanish, which is the growth argument in the proof,
+and a design with a Gaussian factor is that factor times a rational one. \textbf{Not claimed}: any
+statement about a \emph{sampled} filter --- the criterion is for the transfer function on the
+line, and the discrete classification is a different theory --- and no bound on how far a failing
+filter is from the class, which is a numerical question. The formula \ref{eq:rational-profile} is
+the folded profile, so its factor $2$ is this article's convention; at a real rate $\theta$ it is
+the profile $2e^{-\theta x}$ of \ref{prop:matern-exponent}(1), whose exponent is
+$\log(1 + \omega^2/\theta^2)$.)}
+\end{proposition}
+
+\begin{proof}
+\emph{The factorisation.} $R$ is even and rational, so $R(\omega) = N(\omega^2)/D(\omega^2)$ for
+polynomials $N$ and $D$ with no common factor, real because $R$ is real on the real axis. Its
+poles and zeros are therefore closed under $\omega \mapsto -\omega$ and under conjugation, and
+under (i) none of them is real; choosing from each pair $\pm\omega_0$ the one in the upper
+half-plane and writing it as $i\theta$ with $\Rea\theta > 0$ gives the two lists of the statement,
+each closed under conjugation. Then $D(\omega^2) = c_D\prod_m(\omega^2 + \theta_m^2)$ and
+$N(\omega^2) = c_N\prod_l(\omega^2 + \zeta_l^2)$, and $R(0) = 1$ fixes the constant:
+\begin{equation}\label{eq:rational-factored}
+  R(\omega) \ =\ \frac{\prod_{l \le L}\bigl(1 + \omega^2/\zeta_l^2\bigr)}
+                      {\prod_{m \le M}\bigl(1 + \omega^2/\theta_m^2\bigr)} .
+\end{equation}
+
+\emph{The exponential-profile identity at a complex rate.} For $\Rea\theta > 0$ and $\omega$ real,
+\begin{equation}\label{eq:complex-frullani}
+  \int_0^\infty \bigl(1 - \cos\omega x\bigr)\,e^{-\theta x}\,\frac{dx}{x}
+   \ =\ \tfrac12\bigl[\Log(\theta - i\omega) + \Log(\theta + i\omega)\bigr] - \Log\theta ,
+\end{equation}
+with $\Log$ the principal logarithm, which is what \ref{prop:matern-exponent}(1) says at a real
+rate. Indeed $1 - \cos\omega x = 1 - \tfrac12(e^{i\omega x} + e^{-i\omega x})$, so the integral is
+half the sum of $\int_0^\infty(e^{-\theta x} - e^{-(\theta \mp i\omega)x})\,dx/x$, and for two
+points $\alpha,\beta$ of the open right half-plane
+\[
+  \int_0^\infty \bigl(e^{-\alpha x} - e^{-\beta x}\bigr)\frac{dx}{x}
+   = \int_0^\infty\!\!\int_{[\alpha,\beta]} e^{-sx}\,ds\,dx
+   = \int_{[\alpha,\beta]}\frac{ds}{s} = \Log\beta - \Log\alpha ,
+\]
+the segment $[\alpha,\beta]$ lying in that half-plane by convexity: the exchange is Fubini, the
+modulus of the inner integrand being at most $e^{-cx}$ with $c > 0$ the least real part on the
+segment, which is integrable against $dx$ on $[1,\infty)$ while on $(0,1)$ the inner integral is
+bounded by $|\beta - \alpha|$; and $1/s$ is analytic on a neighbourhood of the segment, where
+$\Log$ is a primitive.
+
+\emph{The exponent of the signed profile.} $k$ of \ref{eq:rational-profile} is continuous on
+$(0,\infty)$, bounded there by $2(M+L)$, and $|k(x)| \le 2(M+L)e^{-cx}$ with
+$c := \min_m\Rea\theta_m \wedge \min_l\Rea\zeta_l > 0$; so $\int_0^\infty(1 - \cos\omega x)
+|k(x)|\,dx/x$ is finite, the integrand being $O(x)$ at the origin and exponentially small at
+infinity. Summing \ref{eq:complex-frullani} over the two lists,
+\[
+  \Psi(\omega) \ :=\ \int_0^\infty \bigl(1 - \cos\omega x\bigr)\,k(x)\,\frac{dx}{x}
+   \ =\ \sum_{m}\Log\Bigl(1 + \frac{\omega^2}{\theta_m^2}\Bigr)
+        - \sum_{l}\Log\Bigl(1 + \frac{\omega^2}{\zeta_l^2}\Bigr) ,
+\]
+where each summand is $\Log(\theta-i\omega) + \Log(\theta+i\omega) - 2\Log\theta$ and no branch is
+chosen for a product: the value is real, since conjugate rates contribute conjugate summands and a
+real rate a real one. Exponentiating kills the branches, $e^{\Log z} = z$ for every $z \ne 0$, and
+\ref{eq:rational-factored} gives $e^{-\Psi(\omega)} = R(\omega)$. So $\Psi = -\log R$ with the
+real logarithm of a positive number, at every real $\omega$.
+
+\emph{Sufficiency.} Assume (i), (ii) and (iii). Then $k$ is nonnegative, nonincreasing, bounded on
+$(0,1]$ and exponentially small at infinity, so $\int_0^1 x\,k(x)\,dx$ and
+$\int_1^\infty k(x)\,x^{-1}dx$ are finite: by \ref{lem:profile-integrability} the pair $(0,k)$ is
+of the form \ref{eq:sd-profile}, and by \ref{thm:main-characterization} with clause (3) of
+\ref{lem:selfdecomposable-exponents} it is the pair of an admissible family, whose exponent is
+$\Psi = -\log R$. The transform of its kernel at canonical scale $1$ is $e^{-\Psi} = R$.
+
+\emph{Necessity.} Assume $R = e^{-F}$ with $F$ admissible, of data $(a,k_F)$. Then $R > 0$ and
+$R \le 1$ on the real axis, so $R$ has there neither a zero nor a pole, which is (i). Next
+$a = 0$: by \ref{eq:rational-factored} $|R(\omega)|$ is bounded above and below by multiples of
+$|\omega|^{2(L-M)}$ for large $|\omega|$, so $F = -\log R$ grows at most like a multiple of
+$\log|\omega|$, while $F(\omega) \ge a\omega^2$ for every $\omega$. So $F = \Psi$ by the previous
+paragraph, that is
+\[
+  \int_0^\infty (1 - \cos\omega x)\,k_F(x)\,\frac{dx}{x}
+   = \int_0^\infty (1 - \cos\omega x)\,k(x)\,\frac{dx}{x}, \qquad \omega \in \RR ,
+\]
+an identity between an exponent with a positive \Levy{} measure and one with a signed density.
+Uniqueness of the \Levy{} pair (\ref{prop:fourier-toolbox}(3)) is stated for positive measures, so
+it is applied after a recombination, as in the proof of \ref{lem:cin-delay-equation}: writing
+$k = k^{+} - k^{-}$ for the positive and negative parts, both $(k_F + k^{-})(x)\,dx/x$ and
+$k^{+}(x)\,dx/x$ are positive measures on $(0,\infty)$ satisfying the \Levy{} condition --- each
+of $k^{\pm}$ is dominated by $|k|$, which does --- and the displayed identity says that the two
+pairs $(0, (k_F+k^{-})\,dx/x)$ and $(0, k^{+}\,dx/x)$ have the same exponent. Hence they are
+equal, and $k_F = k$ almost everywhere on $(0,\infty)$. Since $k$ is continuous and $k_F$ is
+nonnegative and nonincreasing, the identity holds everywhere and $k$ inherits both properties:
+the agreement set is conull, hence meets every interval, and approaching a given $x$ from each
+side through it gives $k(x) \ge k(y)$ for $x < y$ and $k \ge 0$. That is (ii) and (iii).
+
+\emph{The last sentence.} If $R$ vanishes at a real $\omega_0$ then $R$ is the transform of no
+infinitely divisible law, the transform of such a law having no zero (\ref{lem:nonvanishing}); in
+particular it is the transform of no admissible kernel.
+\end{proof}
+
+% CHANGED 2026-09-19 (R198, the author's decision D4): the remark KEEPS ITS LABEL and becomes
+% short, its criterion being prop:rational-criterion above. What stays here is what is a remark:
+% the reading of the criterion at the real-pole designs, the two published recursive Gaussians
+% with the pole structure the librarian read from the held copies on 2026-09-18, and the
+% recommendation. The circular opening sentence and the |P/Q|^2 frame are gone with it, and the
+% two designs are now decided by the numbered conditions, Deriche's by (i) and Young and
+% van Vliet's by (ii).
+\begin{remark}[which recursive Gaussians are scale spaces]
+\label{rem:recursive-gaussians}
+\uses{prop:rational-criterion}
+Read at the designs of the image-processing literature, \ref{prop:rational-criterion} says the
+following. If the transfer has only real poles and no zeros, then
+$R = \prod_i(1+t_i^2\omega^2)^{-1}$, whose signed profile $2\sum_i e^{-x/t_i}$ is positive and
+decreasing, so the three conditions hold and the filter is the kernel of the symmetric Thorin
+member with atoms at $1/t_i$ (\ref{prop:thorin-subclass}), the multi-range \Matern{}; its dilates
+form a scale space whose increments are again forward--backward lag sections. The classical
+all-pole approximations of the Gaussian with real poles --- in particular the cascade of $\gamma$
+identical first-order sections at $t = \sigma/\sqrt{2\gamma}$, whose transfer is
+$(1 + \sigma^2\omega^2/2\gamma)^{-\gamma} \to e^{-\sigma^2\omega^2/2}$ --- are therefore not
+approximations of a scale space but scale spaces, \Matern{} members converging to the Gaussian
+along $\gamma$ at matched variance, the variance being $2\gamma t^2$ by
+\ref{prop:matern-exponent}(3). Neither complex poles nor real zeros are excluded in advance, and
+neither is harmless. A complex pair contributes a term $e^{-cx}\cos(dx)$ to the signed profile,
+which changes sign by itself, so condition (ii) has to be checked against the other terms; a real
+pole of sufficient weight can carry such a pair, and \ref{rem:rational-converse} exhibits an
+admissible family that does, of exponent $3\log(1+\omega^2) + \log(1+\omega^4/4)$. A real zero
+\emph{of the transfer} fails (i) outright, while a zero off the real axis is a term subtracted in
+\ref{eq:rational-profile} and may leave (ii) and (iii) standing or not: the second example of
+\ref{rem:rational-converse}, of exponent $2\log(1+\omega^2) - \log(1+\omega^2/4)$, has all its
+poles and zeros on the imaginary axis, is admissible, and is neither a Thorin member nor realized
+by lag sections. The two standard recursive Gaussians of the image-processing literature are
+optimized for accuracy and are decided by different conditions. The design of
+\sscite{deriche1993recursively} \emph{adds} a causal and an anticausal half (\S5.1, (38), two
+complex-conjugate pole pairs), so its transfer is not a modulus squared at all, and at the
+published coefficients that sum has zeros on the real axis: it fails (i). The design of
+\sscite{young1995recursive} is a forward--backward cascade with one real pole and one conjugate
+pair (p.~141, Table~1 with (6a)--(6b)); it passes (i), and at the published coefficients its
+signed profile \ref{eq:rational-profile} goes negative, so it fails (ii). Each verdict is a
+computation on the printed coefficients of one design and not a theorem about a class of designs.
+Whatever their accuracy as Gaussian approximations, a filter whose $R$ fails the test is
+the kernel of no exact cascade. The theory's recommendation is therefore the opposite of the
+literature's optimization: approximate the Gaussian \emph{from inside the class}, by real-pole
+cascades with no zeros, and accept the \Matern{}'s exponential tails and its kink at the origin
+for $\gamma = 1$ as the price of exactness in scale.
+\end{remark}
+
+% draft: Proposition 14.4, clauses (1) and (2). Clause (3) is NOT stated as a node; see
+% rem:rational-converse and the header note.
+% CHANGED 2026-09-19 (R185, second external review round, referee C finding 12): FOUR STEPS OF THE
+% PROOF OF (2) ARE WRITTEN OUT, none of them new and none of them changing the statement. That
+% psi = -log R has no Gaussian coefficient (rational growth against quadratic), so that the pair is
+% (0, k_R(x)dx/x) and the substitution u = cx is available; that the exchange of the sum over m with
+% the integral is Tonelli on nonnegative summands; that the sum k is the profile of a pair of the
+% form eq:sd-profile at all, which is the finiteness of F(1); and that the "exactly when" reads the
+% uniqueness of the \Levy{} pair in the direction that forces monotonicity, up to a null set. The
+% clause says "with folded \Levy{} profile k_R", so the existence of that profile is a hypothesis
+% and is not derived here; the proof now says so.
+\begin{proposition}[rational increments and the pyramid they interpolate]
+\label{prop:rational-increments}
+\uses{prop:thorin-subclass,prop:matern-cascade,thm:main-characterization,lem:selfdecomposable-exponents,lem:quadratic-growth,prop:knot-exactness}
+\notes{matern-pyramid}
+\begin{enumerate}
+\item If
+\[
+  F(\omega) = \sum_{i=1}^N w_i\log\Bigl(1 + \frac{\omega^2}{\theta_i^2}\Bigr)
+\]
+with positive integer weights $w_i$ and no Gaussian part, then every increment is rational,
+\[
+  \hat\mu_{s,t} = \prod_i\Bigl(\frac{1 + s^2\omega^2/\theta_i^2}{1 + t^2\omega^2/\theta_i^2}\Bigr)^{w_i},
+\]
+of order $2\sum_i w_i$, realized by $\sum_i w_i$ forward and $\sum_i w_i$ backward lag sections,
+each pole--zero pair at the common ratio $s/t$.
+\item Let $R$ be a symmetric rational function that is the transform of an infinitely divisible
+law, with folded \Levy{} profile $k_R$. Then for each $q > 1$ there is exactly one function $F$
+that is continuous with $F(0) = 0$ and satisfies $F(q\omega) - F(\omega) = -\log R(\omega)$,
+namely
+\[
+  e^{-F(\omega)} = \prod_{m \ge 1} R\bigl(q^{-m}\omega\bigr),
+  \qquad \text{with folded profile} \quad
+  k(x) = \sum_{m \ge 1} k_R\bigl(q^m x\bigr);
+\]
+it is admissible exactly when this $k$ is nonincreasing, in particular whenever $k_R$ is. The
+\Matern{} pyramid is the case $R(\omega) = (1+\omega^2)^{-1}$.
+\end{enumerate}
+\statusT\quad\emph{(The distinction between (1) and (2) is the distinction between the \Matern{}
+\emph{family} and the \Matern{} \emph{pyramid}: the family's increments are rational between every
+pair of scales, the pyramid's only between scales at ratio $q^n$. So every rational infinitely
+divisible transfer generates exactly one pyramid and exactly one candidate fully covariant
+family, the interpolation of the pyramid, admissible under a monotonicity condition on its
+profile. The index in the profile sum runs from $m = 1$; see the header note.)}
+\end{proposition}
+
+\begin{proof}
+(1) The increment transform telescopes by \ref{prop:knot-exactness}, and each factor
+$\bigl((1+s^2\omega^2/\theta^2)/(1+t^2\omega^2/\theta^2)\bigr)$ is realized as in
+\ref{prop:matern-cascade} after the gauge change $t \mapsto t/\theta$; admissibility is
+\ref{prop:thorin-subclass} with $U = \sum_i 2w_i\delta_{\theta_i}$.
+
+(2) \emph{Uniqueness.} If $F$ and $\tilde F$ both solve the equation and are continuous with
+value $0$ at the origin, then $D := F - \tilde F$ satisfies $D(q\omega) = D(\omega)$, so
+$D(\omega) = D(q^{-m}\omega) \to D(0) = 0$ as $m \to \infty$; hence $D \equiv 0$.
+\emph{Existence.} Write $\psi := -\log R$, which is a symmetric \Levy{} exponent. Near the origin
+$\psi(\omega) = O(\omega^2)$: $R$ is rational and even with $R(0) = 1$, so it is an analytic
+function of $\omega^2$ near the origin with value $1$ there, and so is its logarithm, with
+value $0$. Then
+$\sum_{m \ge 1}\psi(q^{-m}\omega)$ converges, the terms being $O(q^{-2m}\omega^2)$, and its
+value $F$ satisfies $F(q\omega) - F(\omega) = \psi(\omega)$ by telescoping. \emph{The pair of
+$\psi$.} It has no Gaussian coefficient: $R$ is rational, so $\psi = -\log R$ grows like a
+multiple of $\log|\omega|$, while a positive Gaussian coefficient forces quadratic growth. Its
+\Levy{} measure is $k_R(x)\,dx/x$ with $k_R$ the folded profile named in the hypothesis, which is
+what the substitution below reads; the hypothesis asks for that profile, and
+\ref{prop:rational-criterion} exhibits it for every rational $R$ meeting its condition (i) --- it
+is the signed profile \ref{eq:rational-profile}, a finite combination of exponentials, and
+conditions (ii) and (iii) there are what make it a profile. \emph{The profile.}
+Substituting $u = cx$ in the representation shows that $\psi(c\,\cdot)$ has folded profile
+$k_R(u/c)$; taking $c = q^{-m}$ and summing over $m \ge 1$ gives
+$k(x) = \sum_{m\ge1}k_R(q^mx)$, the exchange of the sum with the integral being Tonelli, the
+summands being nonnegative. That $F$ is of the form \ref{eq:sd-profile} at the pair $(0,k)$ ---
+that is, that $k$ satisfies the two integrability conditions of \ref{lem:profile-integrability}
+--- follows from the finiteness of $F(1)$, which the convergence of the series gives.
+\emph{Admissibility} is \ref{thm:main-characterization} through clause (3) of
+\ref{lem:selfdecomposable-exponents}, the representation \ref{eq:sd-profile} --- and not that
+lemma's differentiability clause, which is a different statement: $F$ is of that form with $k$
+nonincreasing exactly when the family is admissible, and $k$ inherits monotonicity from $k_R$
+when $k_R$ is nonincreasing, each summand being
+so. In the other direction, that admissibility \emph{forces} $k$ to be nonincreasing is the
+uniqueness of the \Levy{} pair (\ref{prop:fourier-toolbox}(3)), and it fixes $k$ only up to a null
+set, so the monotonicity is monotonicity of a representative.
+\end{proof}
+
+% CHANGED (2026-09-19, external review of module B, R170): the remark recorded the converse of
+% prop:rational-increments(1) as an expectation ("monotonicity of k should exclude the
+% oscillating terms"). The referee's example below refutes it. The remark now states the
+% counterexample; the label is kept. Safe direction: an expectation is withdrawn.
+% CHANGED 2026-09-19 (R184, second external review round, referee C finding 3): A SECOND EXAMPLE,
+% k = 4e^{-x} - 2e^{-2x}, and the case split of rem:recursive-gaussians restated. The first example
+% here shows that a complex pole pair survives monotonicity; the referee's shows that the real-pole
+% case is not the safe one either -- all poles and zeros real, admissible, outside the Thorin
+% subclass (k''(0+) = -4 < 0) and outside the families realized by lag sections, because the stage's
+% pole at range s/2 has no smaller zero to pair with. Every printed detail was recomputed here:
+% positivity and monotonicity, the exponent by prop:matern-exponent(1) at the rates 1 and 2 with
+% weights gamma = 2, theta = 1 and gamma = 1, theta = 1/2, the second derivative, and the pole and
+% zero ranges of the stage. So "real poles" implies neither Thorin nor lag sections, and
+% rem:recursive-gaussians' first case is restated as real poles AND NO ZEROS. Safe direction: a
+% remark's case split is narrowed and a counterexample added.
+\begin{remark}[the converse fails: a rational family with a complex pole pair]
+\label{rem:rational-converse}
+The converse of \ref{prop:rational-increments}(1) is false: an admissible family all of whose
+increments are rational, of bounded order, need not have an exponent of the form stated there,
+and need not lie in the Thorin subclass. Take $a = 0$ and
+\[
+  k(x) = 2e^{-x}\,(3 + 2\cos x), \qquad x > 0 .
+\]
+It is positive, and $k'(x) = -2e^{-x}\,(3 + 2\cos x + 2\sin x) < 0$ because
+$2\cos x + 2\sin x \ge -2\sqrt2 > -3$, so $k$ is nonincreasing; both integrability conditions
+are immediate. The identity of \ref{prop:matern-exponent}(1) holds for a complex rate of positive
+real part --- \ref{eq:complex-frullani}, proved at \ref{prop:rational-criterion}, where it is
+first needed --- and the two rates
+$1 \pm i$ of the oscillating term combine to a real exponent:
+\[
+  F(\omega) = 3\log(1 + \omega^2) + \log\Bigl(1 + \frac{\omega^4}{4}\Bigr),
+  \qquad
+  e^{-F(\omega)} = \frac{1}{(1+\omega^2)^3\,(1 + \omega^4/4)} .
+\]
+So every increment is rational, of order at most ten. But
+$k^{(4)}(x) = 2e^{-x}\,(3 - 8\cos x)$ is negative near the origin, so $k$ is not completely
+monotone and the family is not a Thorin member (\ref{prop:thorin-subclass}). Monotonicity of the
+profile therefore does not exclude oscillating terms, a real pole of sufficient weight being
+enough to carry a complex pair. Such a family has rational stages and no realization by the
+lag sections of \ref{prop:matern-cascade}, each of which is positive by itself: the factor
+of the complex pair, $1/(1 + \omega^4/4)$, is the transform of a kernel proportional to
+$e^{-|x|}(\cos x + \sin|x|)$, which changes sign, so the positivity of the member comes from
+the product only.
+
+Complex poles are not what fails, and a second example shows it. Take $a = 0$ and
+\[
+  k(x) = 4e^{-x} - 2e^{-2x}, \qquad x > 0 .
+\]
+It is positive, since $e^{-x} \le 1 < 2$; it is nonincreasing, since
+$k'(x) = -4e^{-x}(1 - e^{-x}) \le 0$; and both integrability conditions are immediate, $k$ being
+bounded and exponentially decaying. The identity of \ref{prop:matern-exponent}(1) at the two rates
+gives
+\[
+  F(\omega) = 2\log(1 + \omega^2) - \log\Bigl(1 + \frac{\omega^2}{4}\Bigr),
+  \qquad
+  e^{-F(\omega)} = \frac{1 + \omega^2/4}{(1+\omega^2)^2},
+\]
+so every increment is rational, of order at most six, and every pole and every zero of the
+kernel's transform is on the imaginary $\omega$-axis: the transfer has no oscillating factor at
+all. Yet $k''(x) = 4e^{-x} - 8e^{-2x}$ is negative at the origin, so $k$ is not completely monotone
+and the family is not a Thorin member, hence not in the class of \ref{prop:rational-closure}.
+Nor is it realized by lag sections: the stage from $s$ to $t$ has pole ranges $t, t, s/2$ and zero
+ranges $t/2, s, s$, and the pole at range $s/2$ has no zero of smaller range to pair with, so any
+factorization into first-order sections has a section with a negative coefficient. So ``real
+poles'' implies neither membership in the Thorin subclass nor a realization by lag sections, and
+the real-pole case of \ref{rem:recursive-gaussians} is the case of real poles \emph{and no zeros}.
+\end{remark}
+
+% draft: Proposition 14.5
+% twin: hcs prop:thorin-subclass (its implementation clause)
+% CHANGED (2026-09-11, draft sync, R82): the rounding clause said "rounding the weights to
+% positive integers ... makes every increment rational, realized by sum_i w_i ... sections".
+% The weights are those of U, and eq:thorin carries the factor 1/2: U_N = sum_i w_i delta_{theta_i}
+% gives F_N = sum_i (w_i/2) log(1 + omega^2/theta_i^2), so an odd w_i leaves a half-integer
+% power in the increment, which is not rational. Narrowed to even weights w_i = 2 n_i, realized
+% by sum_i n_i sections -- the draft's own form. The proof carried the other normalization
+% ("summand w_i log(1+omega^2/theta_i^2) with profile 2 w_i e^{-theta_i x}") and is corrected to
+% the one the statement and the parallel generator use; the generator, (1/t) sum_i w_i (Lap - I),
+% is prop:corner-generators(4) at U_N and was right. rem:costs is recounted the same way. Found by
+% the draft-sync editor of group D (diff row D-4).
+% CHANGED (2026-09-19, article mirror of module B, R174): the title and one sentence, from the
+% register pass's item 8. The title was "the Thorin subclass as a machine", which the paper replaced
+% on 2026-09-15 by "finite Thorin approximations and their realization", the two things the node
+% states; the blueprint follows, so that the shared statement and its copy carry one name. The
+% closing sentence's circuit metaphor ("The kernels compose in series and the generators add in
+% parallel ... the parallel sum ... of a Laplacian and bounded first-order blocks") is replaced by
+% what it means: the Thorin sum lives in the exponent, so the kernels compose as a product of
+% factors and the generators add, and the summands are a Laplacian and finitely many bounded
+% operators. No clause changes. The pass's other findings at this node are moot: "quadrature" is
+% defined in the statement itself; the convergence clause is stated at the exponents and needs no
+% hypothesis on U_N beyond that; and the convergence the rounding clause does NOT claim is now
+% prop:rational-closure (R169, 2026-09-19).
+\begin{proposition}[finite Thorin approximations and their realization]\label{prop:thorin-machine}
+\uses{prop:thorin-subclass,prop:rational-increments,prop:choquet-cone,prop:levy-continuity,prop:corner-generators,lem:admissible-cone,prop:scale-evolution}
+\notes{exact-cascade-implementation}
+Let $F$ be admissible with completely monotone profile and Thorin measure $U$ as in
+\ref{eq:thorin}. Every measure $U_N = \sum_{i \le N} w_i\delta_{\theta_i}$ with positive weights gives,
+with the same Gaussian coefficient, an admissible $F_N$. A sequence of such measures is a
+\emph{quadrature} of $U$ when $F_N(\omega) \to F(\omega)$ for every $\omega$, and the kernels of
+a quadrature converge weakly to those of $F$ at every scale. \emph{Every such $U$ has a
+quadrature}, and it has one in the variant that carries the mass above the last node as a Gaussian
+coefficient: there are cutoffs $\Theta_N \uparrow \infty$ and finite measures
+$U_N = \sum_i w_i\delta_{\theta_i}$ with positive weights, carried by $(0,\Theta_N]$, such that
+both the exponents $F_N$ at Gaussian coefficient $a$ and the exponents $\tilde F_N$ at Gaussian
+coefficient
+\[
+  a_N \ :=\ a + \tfrac12\int_{(\Theta_N,\infty)}\theta^{-2}\,U(d\theta) \ <\ \infty
+\]
+converge to $F(\omega)$ at every $\omega$; $\tilde F_N$ is admissible as well. Rounding the weights to even
+integers $w_i = 2n_i$ keeps $F_N$ admissible and makes the increments of its jump part rational,
+realized by $\sum_i n_i$ forward--backward lag sections per knot, in series; a Gaussian part is
+a separate factor $e^{-a(t^2-s^2)\omega^2}$ of every increment, and is not rational. The Thorin sum
+lives in the exponent, so the stages compose as a product of factors and the generators add: the
+generator of \ref{prop:scale-evolution} is the sum
+\[
+  \mathcal{A}_t = 2at\,\partial_x^2
+   + \frac1t\sum_i w_i\bigl(\Lap_{t/\theta_i} - I\bigr)
+\]
+of a Laplacian and finitely many bounded operators, one per atom.
+\statusT\quad\emph{(The constants in the parallel generator are those of
+\ref{prop:corner-generators}(4): the Gaussian term carries the factor $t$ and the sum the factor
+$1/t$. The draft carried different constants until the draft sync of 2026-09-11; see the header
+note. The weights are those of $U_N$, so with the factor $\tfrac12$ of \ref{eq:thorin} the
+exponent weights are $w_i/2$, which is why the rounding is to even integers.
+\textbf{Existence} (2026-09-19, R199, the author's decision D3). Until today the node
+\emph{defined} a quadrature by its convergence and showed that one converges weakly, and never
+said that any exists; five sentences of the article, and the numerical run, read it as if it did
+(referee C finding 6). The existence clause and its three-line proof are now here. The variant
+beside it --- the mass above the last node carried as a Gaussian coefficient rather than as an
+atom --- is what the article's numerical run actually computes, and the node did not cover it,
+"with the same Gaussian coefficient" being part of the first sentence. \textbf{Not claimed}: any
+rate, any optimality of the node placement, and nothing about the \emph{rounded} sequence, which
+does not converge in general (\ref{prop:rational-closure}).)}
+\end{proposition}
+
+\begin{proof}
+Admissibility of $F_N$ is closure of the cone under positive sums
+(\ref{lem:admissible-cone}, \ref{prop:choquet-cone}), each summand
+$\tfrac12 w_i\log(1+\omega^2/\theta_i^2)$ being admissible with profile $w_ie^{-\theta_ix}$; the
+same closure, with the Gaussian ray, gives admissibility of $\tilde F_N$. Weak
+convergence of a quadrature is the convergence of the exponents that defines it, together with
+\ref{prop:levy-continuity}. Even weights $w_i = 2n_i$ make the exponent
+$\sum_i n_i\log(1+\omega^2/\theta_i^2)$, so every increment is rational and has the
+realization by \ref{prop:rational-increments}(1). The generator is
+\ref{prop:corner-generators}(4) with $U = \sum_i w_i\delta_{\theta_i}$, plus the Gaussian term
+of \ref{prop:corner-generators}(1).
+
+\emph{A quadrature exists.} Three facts about \ref{eq:thorin}'s condition are used, and all three
+read the comparison $\log(1 + \lambda x) \le \lambda\log(1 + x)$, valid for $\lambda \ge 1$ and
+$x \ge 0$ because the two sides agree at $x = 0$ and the derivative of the left is
+$\lambda/(1+\lambda x) \le \lambda/(1+x)$: that $U$ is finite on $(0,\Theta]$ for every $\Theta$,
+since $\log(1+\theta^{-2}) \ge \log(1+\Theta^{-2}) > 0$ there; that
+$\int_{(\Theta,\infty)}\theta^{-2}U(d\theta) < \infty$, since
+$\log(1+\theta^{-2}) \ge \tfrac12\theta^{-2}$ for $\theta \ge 1$; and that
+$\theta \mapsto \log(1+\omega^2/\theta^2)$ is $U$-integrable at each fixed $\omega$, being at most
+$\max(1,\omega^2)\log(1+\theta^{-2})$.
+
+Take $\Theta_N := N$. Partition $[1/N, N]$ into finitely many cells of width $\delta_N$, and let
+$U_N$ put the mass $U(\text{cell})$ at a point of each nonempty cell; the weights are positive and
+finitely many. On $[1/N,N]$,
+\[
+  \Bigl|\frac{\partial}{\partial\theta}\log\Bigl(1 + \frac{\omega^2}{\theta^2}\Bigr)\Bigr|
+   = \frac{2\omega^2}{\theta(\theta^2+\omega^2)} \ \le\ \frac 2\theta \ \le\ 2N ,
+\]
+a bound free of $\omega$, so moving each cell's mass to a point of that cell changes the Thorin
+integral by at most $2N\delta_N\,U([1/N,N])$, and $\delta_N$ may be chosen to make that at most
+$1/N$. What is left is the mass of $U$ off $[1/N,N]$, whose contribution
+$\tfrac12\int_{(0,1/N)\cup(N,\infty)}\log(1+\omega^2/\theta^2)\,U(d\theta)$ tends to $0$ at each
+fixed $\omega$ by dominated convergence, the integrand being dominated by the $U$-integrable
+$\max(1,\omega^2)\log(1+\theta^{-2})$ and the domain shrinking to the empty set. So
+$F_N(\omega) \to F(\omega)$ for every $\omega$, which is a quadrature. For the variant, the
+difference $\tilde F_N - F_N$ is
+$\bigl(\tfrac12\int_{(N,\infty)}\theta^{-2}U(d\theta)\bigr)\omega^2$, and the integral is the tail
+of a finite one, so it tends to $0$; hence $\tilde F_N(\omega) \to F(\omega)$ as well.
+\end{proof}
+
+The spectra of the working families are those of the causal theory under the bijection
+$\theta \mapsto \sqrt{2\theta}$ of \ref{prop:thorin-subclass}(3): the \Matern{} one atom, the
+symmetric stable a power law, and, under the hypothesis of \ref{rem:student-ggc}, the Student-t
+the Bessel spectral density. For a power law,
+logarithmically spaced nodes are the natural quadrature, and the Thorin structure guarantees
+that a positive fit exists, positivity of the weights being membership in the axiom class.
+
+% NEW NODE (2026-09-19, the author's decision at the review of module B; fidelity row R169).
+% The numerical run of the article (paper-b, ex:numerical-run, 2026-09-18) found that the
+% families with rational stages do not approximate the Poisson member: nodes of weight 2 at the
+% midpoints of the cells of its Thorin measure (2/pi) d theta converge to the member with
+% transform 1/cosh(omega), at L1 distance 0.507, and no placement of such nodes came closer than
+% 0.200. prop:thorin-machine never claimed otherwise -- its convergence clause is for the
+% quadrature, its rounding clause asserts admissibility and rationality only -- but the prose
+% around it, here (rem:cannot-march, rem:costs) and in the article, read as if the rounded
+% families converged. This node states what the rounding can reach. It is [A] on the new ledger
+% entry A24 (Bondesson's closure theorem for generalized gamma convolutions, with Feller's
+% continuity theorem for Laplace transforms), proved in prose; no Lean is scheduled, as for the
+% rest of the chapter.
+% CHANGED 2026-09-19 (R186, second external review round, referee C finding 2): THE PREAMBLE'S
+% IDENTIFICATION IS PROVED IN BOTH DIRECTIONS. It read "These are the families realized by lag
+% sections", of which only the inclusion R -> realized was justified (by
+% prop:rational-increments(1)), while the proposition's title, rem:costs and rem:cannot-march all
+% use the converse. The sense of "lag section" is now fixed at prop:matern-cascade's -- pole and
+% zero at the two scales of the stage -- and the converse is the one line the referee asked for: at
+% s = 0 the zero is gone, so the kernel from the origin has transform prod (1 + t^2 omega^2 /
+% theta_j^2)^{-n_j} and the exponent is in R, which is dilation-invariant. No clause changes; a
+% claim already made is now proved on the page.
+\begin{proposition}[the closure of the families realized by lag sections]\label{prop:rational-closure}
+\uses{prop:thorin-machine,prop:thorin-subclass,prop:rational-increments,prop:levy-continuity,prop:stable-family,prop:matern-exponent,prop:laplace-uniqueness-locally-finite,prop:moments-tails,prop:student-t}
+\notes{exact-cascade-implementation}
+Let $\mathcal{R}$ be the set of exponents
+$F(\omega) = \sum_{i \le N} n_i\log(1 + \omega^2/\theta_i^2)$ with $N \ge 0$, positive integers
+$n_i$ and $\theta_i > 0$. These are exactly the families realized by lag sections in the sense of
+\ref{prop:matern-cascade}, that is by cascades of first-order sections whose pole and zero sit at
+the two scales of the stage: each member of $\mathcal{R}$ is admissible
+with no Gaussian part and has every increment a cascade of such sections, by
+\ref{prop:rational-increments}(1); and conversely, an admissible family one of whose kernels from
+the origin is such a cascade has its exponent in $\mathcal{R}$.
+\begin{enumerate}
+\item \emph{(Limits.)} Let $F_n \in \mathcal{R}$, let $F$ be admissible, and suppose that the
+kernels of $F_n$ at canonical scale $1$ converge weakly to that of $F$. Then $F$ has a symmetric
+Thorin representation \ref{eq:thorin} whose Thorin measure is a sum of atoms of even integer
+mass, $U = \sum_i 2n_i\delta_{\theta_i}$ with positive integers $n_i$ and with finitely many
+$\theta_i$ in every compact subset of $(0,\infty)$. Its Gaussian coefficient may be positive.
+\item \emph{(Every such member is a limit.)} Conversely, every admissible $F$ with a symmetric
+Thorin representation of that form, with any Gaussian coefficient $a \ge 0$, is the limit in
+that sense of a sequence in $\mathcal{R}$.
+\item \emph{(What is not a limit.)} Consequently an admissible $F$ is not such a limit if its
+profile is not completely monotone, or if its Thorin measure has a part without atoms or an
+atom whose mass is not an even integer. In particular no symmetric stable member with
+$0 < \alpha < 2$ is such a limit, and no \Matern{} member of non-integer index.
+\item \emph{(The class of limits is closed.)} If every $F_n$ is such a limit, $F$ is admissible,
+and the kernels of $F_n$ at canonical scale $1$ converge weakly to that of $F$, then $F$ is such
+a limit as well.
+\item \emph{(Every limit has light tails.)} If $F$ is such a limit then its displacement $X_t$
+has finite moments of every order, and an exponential moment: for every $t > 0$ there is
+$\beta > 0$ with $\mathbb{E}e^{\beta|X_t|} < \infty$. Consequently an admissible family with a
+divergent absolute moment of some order is not such a limit. No symmetric stable member with
+$0 < \alpha < 2$ is one, and no Student-t member is one either --- the second exclusion with no
+hypothesis on that family's Thorin measure.
+\end{enumerate}
+\statusA\quad\ledger{A24}\quad\ledger{A13}\quad\emph{(\textbf{Assignment.} \ledger{A24} carries
+two cited facts,
+both spent by clause (1) and again by clause (4): the continuity theorem for Laplace transforms,
+that pointwise
+convergence of the transforms of probability laws on $[0,\infty)$ to a limit that tends to $1$
+at the origin is weak convergence to a probability law with that transform; and Bondesson's
+closure theorem, that a weak limit of generalized gamma convolutions is one, with the Thorin
+measures converging vaguely on $(0,\infty)$. \ledger{A13} carries the moment criterion, spent by
+clause (5) twice: at the weight $(|x| \vee 1)^n$ through \ref{prop:moments-tails}(1) for the
+moments, and at the submultiplicative weight $e^{\beta|x|}$ for the exponential moment, which is
+the entry's own form and which no other node of this article reads. Clauses (2) and (3) spend no
+cited fact. What is
+NOT carried, and not claimed: a rate, or a distance between a member and the closure, which the
+article measures in a numerical example for the Poisson and one Student-t member; the value of
+$\beta$ in clause (5), which the proof exhibits as anything below $\theta_{\min}/t$ but which the
+statement leaves existential; and any converse to clause (5) --- light tails do not make a member
+a limit, the \Matern{} member of non-integer index having every moment and an exponential moment
+and being excluded by clause (3).
+\textbf{Clauses (4) and (5) were added on 2026-09-19} (R200, the author's decision D3). Clause (4)
+was used in the article's numerical run and was a clause of nothing (referee C finding 13). Clause
+(5) is the external review's observation (referee C finding 7), and what it buys is that the
+Student-t exclusion no longer passes through \ref{rem:student-ggc}: until today every statement
+that the Student-t family is outside this closure went through that remark's hypothesis, since it
+was read off the family's Thorin measure. It is now read off its moments instead, which
+\ref{prop:student-t}(4) gives from the explicit density.)}
+\end{proposition}
+
+\begin{proof}
+\emph{The identification of $\mathcal{R}$.} One direction is
+\ref{prop:rational-increments}(1) at $U = \sum_i 2n_i\delta_{\theta_i}$. For the other, let the
+kernel of an admissible family at some scale $t > 0$ be a cascade of lag sections in that sense.
+A section of the stage from $s$ to $t$ has transfer
+$(1 + s^2\omega^2/\theta^2)/(1 + t^2\omega^2/\theta^2)$, so at $s = 0$ its zero is gone and the
+cascade's transfer is $\prod_j(1 + t^2\omega^2/\theta_j^2)^{-n_j}$ with positive integer
+multiplicities. Taking logarithms, the exponent at that scale is
+$\sum_j n_j\log(1 + t^2\omega^2/\theta_j^2)$, which is a member of $\mathcal{R}$ read at the
+ranges $\theta_j/t$; and $\mathcal{R}$ is invariant under $\omega \mapsto \lambda\omega$, so the
+family's exponent lies in it whatever the gauge.
+
+(1) \emph{The transforms.} Weak convergence of the kernels gives convergence of their cosine
+transforms, $e^{-F_n(\omega)} \to e^{-F(\omega)}$ for every $\omega$, and the limit is positive,
+so $F_n(\omega) \to F(\omega)$.
+
+\emph{The causal side.} Write $F_n = \sum_i n_i^{(n)}\log(1 + \omega^2/\theta_{i,n}^2)$ and put
+$G_n(\sigma) := F_n(\sqrt{2\sigma})$ for $\sigma \ge 0$. Then
+$G_n(\sigma) = \int_{(0,\infty)}\log(1 + \sigma/t)\,V_n(dt)$ with
+$V_n := \sum_i n_i^{(n)}\delta_{\theta_{i,n}^2/2}$, and $e^{-G_n}$ is the Laplace transform of the
+law $T_n$ of a finite sum of independent gamma variables, of shapes $n_i^{(n)}$ and rates
+$\theta_{i,n}^2/2$, since a gamma variable of shape $n$ and rate $t$ has the Laplace transform
+$(1 + \sigma/t)^{-n}$. In the parametrization of the cited definition $T_n$ is the generalized
+gamma convolution with left extremity $0$ and measure $V_n$, which is finite with compact support
+in $(0,\infty)$ and so satisfies the integrability conditions asked there. Put
+$G(\sigma) := F(\sqrt{2\sigma})$. Then $G_n \to G$ pointwise on $[0,\infty)$, and $G$ is
+continuous with $G(0) = 0$, so $e^{-G(\sigma)} \to 1$ as $\sigma \downarrow 0$. By the
+continuity theorem for Laplace transforms the laws $T_n$ converge weakly to a probability law
+$T$ on $[0,\infty)$ with Laplace transform $e^{-G}$. By the closure theorem $T$ is a generalized
+gamma convolution, say with left extremity $b \ge 0$ and measure $V$, so that
+$G(\sigma) = b\sigma + \int_{(0,\infty)}\log(1 + \sigma/t)\,V(dt)$, and $V_n \to V$ vaguely on
+$(0,\infty)$.
+
+\emph{A vague limit of integer-valued point measures is one.} Each $V_n$ is a finite sum of atoms
+of positive integer mass. Let $I$ be an open interval with compact closure in $(0,\infty)$ and
+$V(\partial I) = 0$. Squeezing the indicator of $I$ between continuous functions of compact
+support whose integrals against $V$ differ by as little as desired shows $V_n(I) \to V(I)$, so
+$V(I)$ is a limit of nonnegative integers and is one. The atoms of $V$ are countably many, so
+for every $x \in (0,\infty)$ the intervals $(x - \varepsilon, x + \varepsilon)$ with
+$V(\{x \pm \varepsilon\}) = 0$ have $\varepsilon$ arbitrarily small, and along them the integers
+$V((x-\varepsilon,x+\varepsilon))$ decrease to $V(\{x\})$ and are therefore eventually equal to
+it. So every $x$ has a neighbourhood in which $V$ is an atom of integer mass at $x$, or zero,
+and nothing else: $V = \sum_i n_i\delta_{t_i}$ with positive integers $n_i$ and with finitely
+many $t_i$ in every compact subset of $(0,\infty)$.
+
+\emph{Back to the line.} Reading $G$ at $\sigma = \omega^2/2$,
+\[
+  F(\omega) = \tfrac12 b\,\omega^2 + \int_{(0,\infty)}\log\Bigl(1 + \frac{\omega^2}{2t}\Bigr)V(dt)
+   = a\,\omega^2 + \tfrac12\int_{(0,\infty)}\log\Bigl(1 + \frac{\omega^2}{\theta^2}\Bigr)U(d\theta),
+\]
+with $a = \tfrac12 b$ and $U$ twice the image of $V$ under $t \mapsto \sqrt{2t}$, which is the
+correspondence of \ref{prop:thorin-subclass}(3). The integrability condition of \ref{eq:thorin} is
+the finiteness of the Thorin integral at $\omega = 1$, that is $2\bigl(G(\tfrac12) -
+\tfrac12b\bigr)$, and $G$ is finite on $[0,\infty)$. So $F$ has the representation (2) of
+\ref{prop:thorin-subclass}, and $U = \sum_i 2n_i\delta_{\sqrt{2t_i}}$.
+
+(2) Let $F(\omega) = a\omega^2 + \sum_i n_i\log(1 + \omega^2/\theta_i^2)$ be of that form, the sum
+countable and convergent for every $\omega$ by the integrability conditions of \ref{eq:thorin}.
+Put $F_N(\omega) := N\log(1 + a\omega^2/N) + \sum_{i \le N} n_i\log(1 + \omega^2/\theta_i^2)$,
+omitting the first term when $a = 0$. Then $F_N \in \mathcal{R}$, its first term being the
+\Matern{} exponent of index $N$ and range $\sqrt{a/N}$. Since $N\log(1 + x/N) \to x$ for
+$x \ge 0$, $F_N(\omega) \to F(\omega)$ for every $\omega$, so the transforms of the kernels
+converge pointwise and the kernels converge weakly by \ref{prop:levy-continuity}.
+
+(3) If $F$ is such a limit, clause (1) gives it a representation \ref{eq:thorin} with a Thorin
+measure made of atoms of even integer mass. By \ref{prop:thorin-subclass} its profile is then
+completely monotone, and the Thorin measure of an admissible $F$ is unique, by the uniqueness
+of the data $(a,k)$ with \ref{prop:laplace-uniqueness-locally-finite}. So an $F$ whose profile
+is not completely monotone, or whose Thorin measure is of another kind, is not such a limit.
+The symmetric stable member with $0 < \alpha < 2$ has a Thorin measure with a density
+(\ref{prop:stable-family}), and the \Matern{} member of index $\gamma$ has the Thorin measure
+$2\gamma\,\delta_1$, the exponent $\gamma\log(1+\omega^2)$ being \ref{eq:thorin} at that measure
+(\ref{prop:matern-exponent}(1)), whose atom is an even integer only for integer $\gamma$.
+
+(4) By clauses (1) and (2) the limits are exactly the admissible $F$ with a symmetric Thorin
+representation $U = \sum_i 2n_i\delta_{\theta_i}$ of the stated kind, at any Gaussian coefficient,
+so what has to be shown is that this class is closed under the convergence in question. The
+argument of clause (1) shows it, read at a sequence from the class rather than from $\mathcal{R}$:
+what it uses of the approximating sequence is that $G_n(\sigma) := F_n(\sqrt{2\sigma})$ is
+$b_n\sigma + \int_{(0,\infty)}\log(1+\sigma/t)\,V_n(dt)$ with $b_n \ge 0$ and $V_n$ a measure whose
+atoms have positive integer mass, satisfying the integrability conditions of the cited definition,
+so that $e^{-G_n}$ is the Laplace transform of a generalized gamma convolution. A member of the
+class supplies that too: $b_n = 2a_n$ and $V_n$ is half the image of $U_n$ under
+$\theta \mapsto \theta^2/2$, whose atoms have mass $n_i$, and the two integrability conditions
+follow from the finiteness of $G_n(1)$ by the three regimes in the proof of
+\ref{prop:thorin-subclass}, (1) implies (2). Everything after that --- the continuity theorem, the
+closure theorem, the integer-valued vague limit and the return to the line --- reads nothing else.
+
+(5) Let $F$ be such a limit, with Gaussian coefficient $a \ge 0$ and Thorin measure
+$U = \sum_i 2n_i\delta_{\theta_i}$ as in clause (1), and let $k$ be its profile. If $U = 0$ the
+kernels are Gaussian and every moment and every exponential moment is finite. Otherwise the atoms
+have a smallest range. Indeed \ref{eq:thorin}'s condition gives
+$\log 2 \cdot U((0,1]) \le \int_{(0,1]}\log(1+\theta^{-2})\,U(d\theta) < \infty$, so $U((0,1])$ is
+finite, while every atom has mass at least $2$; there are therefore finitely many atoms in
+$(0,1]$, and finitely many in every compact subset of $(0,\infty)$ by clause (1), so
+$\theta_{\min} := \min_i\theta_i$ exists and is positive. By \ref{prop:thorin-subclass}, (1) if
+and only if (2), the profile is $k(x) = \sum_i 2n_ie^{-\theta_ix}$, finite at $x = 1$; hence for
+$x \ge 1$
+\[
+  k(x) = \sum_i 2n_ie^{-\theta_i}e^{-\theta_i(x-1)}
+   \ \le\ e^{-\theta_{\min}(x-1)}\sum_i 2n_ie^{-\theta_i}
+   \ =\ k(1)\,e^{\theta_{\min}}\,e^{-\theta_{\min}x} .
+\]
+Every moment is then finite by \ref{prop:moments-tails}(1), since
+$\int_1^\infty x^{n-1}k(x)\,dx$ is dominated by a multiple of
+$\int_1^\infty x^{n-1}e^{-\theta_{\min}x}dx$. For the exponential moment, fix $t > 0$ and
+$\beta < \theta_{\min}/t$. The \Levy{} measure of $X_t$ is the $t$-dilate of the folded
+$k(x)x^{-1}dx$, so, as in the proof of \ref{prop:moments-tails},
+$\int_{|x|>1}e^{\beta|x|}\,\nu_2(dx) = \int_{1/t}^\infty e^{\beta t x}\,k(x)\,x^{-1}dx$, which the
+bound above makes finite: near infinity the integrand is dominated by a multiple of
+$e^{(\beta t - \theta_{\min})x}$, and on the compact stretch $[1/t, 1]$ it is bounded, $k$ being
+finite and nonincreasing there. The weight $x \mapsto e^{\beta|x|}$ is submultiplicative, so the
+moment criterion applies to it and gives $\mathbb{E}e^{\beta|X_t|} < \infty$.
+
+The consequence is the contrapositive. A symmetric stable member with $0 < \alpha < 2$ has
+$\mathbb{E}|X_t|^n = \infty$ for $n \ge \alpha$ (\ref{prop:stable-family}), and the Student-t
+member of shape $a$ has $\mathbb{E}|X_t|^n = \infty$ for $n \ge 2a$ (\ref{prop:student-t}(4)); so
+neither is a limit of families realized by lag sections. The second exclusion reads the moments of
+the explicit density of \ref{prop:student-t}(1) and no property of that family's Thorin measure,
+so it is free of the hypothesis of \ref{rem:student-ggc}.
+\end{proof}
+
+% NEW 2026-09-19 (R201; the author's decision D4, its second half): the attribution of the limit
+% class. The external review found that the class of prop:rational-closure is the symmetric Polya
+% frequency functions of order infinity, and that Bondesson states the half-line form of the same
+% identification on his p. 36, two pages after the closure theorem ledger A24 cites. Both pages
+% were read from the page images by the librarian on 2026-09-19
+% (notes/reviews/cone/SOURCES-round2-2026-09-19.md, Parts 1.2 and 1.3), and ledger A21 already
+% holds Karlin's Thm. 3.2(a), p. 345, with the class E2* of p. 336. The remark is an attribution
+% with the two-line computation that makes it one, and it is SCOPED: the identification is of the
+% kernels from the origin and not of the families, a stage between two positive scales not being
+% of Schoenberg's form at all; and non-creation of extrema is named as untreated here.
+\begin{remark}[the limit class is the symmetric P\'olya frequency functions]
+\label{rem:polya-limits}
+\uses{prop:rational-closure,prop:thorin-subclass}
+The class of limits identified in \ref{prop:rational-closure} is classical under another name. A
+probability density $f$ on the line is a \emph{P\'olya frequency function of order $\infty$} when
+for every $n$ and all $x_1 < \dots < x_n$, $y_1 < \dots < y_n$ the matrix $(f(x_i - y_j))_{i,j}$
+has nonnegative determinant. Schoenberg's representation theorem, as printed in
+\sscite{karlin1968total}, Thm.~3.2(a), p.~345, with the class $\mathcal{E}_2^{*}$ of p.~336, says
+that $f$ is one exactly when the reciprocal of its two-sided Laplace transform $\varphi$ is the
+entire function
+\begin{equation}\label{eq:schoenberg-e2}
+  \frac{1}{\varphi(s)} = e^{-\gamma s^2 + \delta s}\prod_i (1 + a_is)\,e^{-a_is},
+  \qquad \gamma \ge 0, \quad \delta,\ a_i \ \text{real}, \quad \sum_i a_i^2 < \infty,
+\end{equation}
+with the nondegeneracy $\gamma + \sum_i a_i^2 > 0$; those are the pages ledger A21 anchors, and
+Karlin attributes the theorem to Schoenberg (1951) in the notes to his chapter, p.~391. The primary source is \sscite{schoenberg1951polya}, Theorem~I, pp.~333--334, read at the page: it
+states the representation for the class of his (3), p.~331, without the normalization to a
+density that Karlin's statement makes explicit, and the same paper proves the
+variation-diminishing property of these functions.
+
+Read at a member of the class, the two agree. Let $F(\omega) = a\omega^2 +
+\sum_i n_i\log(1 + \omega^2/\theta_i^2)$ be as in \ref{prop:rational-closure}(1). By clause (5)
+its kernel from the origin at canonical scale $1$ has an exponential moment, so its two-sided
+Laplace transform converges on a strip about the imaginary axis and is there the analytic
+continuation of the cosine transform: $\varphi(s) = e^{-F(-is)} = e^{as^2}\prod_i
+(1 - s^2/\theta_i^2)^{-n_i}$, whence
+\[
+  \frac{1}{\varphi(s)}
+   = e^{-as^2}\prod_i\Bigl[\Bigl(1 + \frac{s}{\theta_i}\Bigr)
+       \Bigl(1 - \frac{s}{\theta_i}\Bigr)\Bigr]^{n_i} .
+\]
+That is \ref{eq:schoenberg-e2} with $\gamma = a$, $\delta = 0$ and the numbers $\pm1/\theta_i$ for
+the $a_i$, each with multiplicity $n_i$: the factors $e^{-a_is}$ cancel in pairs, and
+$\sum_i a_i^2 = \sum_i 2n_i\theta_i^{-2}$, which \ref{eq:thorin}'s condition makes finite and
+which is what makes the product entire. Conversely, if $f$ is a symmetric probability density
+whose reciprocal transform is \ref{eq:schoenberg-e2}, then evenness makes the zero set of
+$1/\varphi$ symmetric, so $\delta = 0$ and the $a_i$ pair as $\pm1/\theta_j$ with multiplicities
+$m_j$; the paired factors collapse to $\prod_j(1 - s^2/\theta_j^2)^{m_j}$, and reading at
+$s = i\omega$ gives the cosine transform $e^{-\gamma\omega^2}\prod_j
+(1+\omega^2/\theta_j^2)^{-m_j}$, an exponent of the form \ref{eq:thorin} at
+$U = \sum_j 2m_j\delta_{\theta_j}$ --- admissible by \ref{prop:thorin-subclass}, with finitely
+many $\theta_j$ below any bound because $\sum_j m_j\theta_j^{-2} < \infty$. \emph{So the kernels
+from the origin of the members of the class of \ref{prop:rational-closure} are exactly the
+symmetric P\'olya frequency functions of order $\infty$}, the nondegeneracy
+$\gamma + \sum_ia_i^2 > 0$ corresponding to $F \not\equiv 0$, which (ND) supplies. Bondesson
+states the half-line form of the same identification, for Thorin's class on $[0,\infty)$, two
+pages after the closure theorem used above (\sscite{bondesson1992generalized}, p.~36): ``Obviously
+the [$PF_\infty$]-class equals the subclass of [Thorin's class] for which the $U$-measure is
+discrete with atoms with integral mass. The closure theorem for GGC's guarantees in particular
+that also the $PF_\infty$-class is closed with respect to weak limits; note that atoms with mass
+$1$ cannot be split in the limit.''
+
+\emph{What this does not say.} The identification is of the kernels \emph{from the origin}. A
+stage between two positive scales is not of Schoenberg's form at all: the reciprocal of its
+transform is $(1+t^2\omega^2)/(1+s^2\omega^2)$ read at imaginary argument, which has poles, while
+\ref{eq:schoenberg-e2} is an entire function. Nothing is therefore claimed here about the
+\emph{families} --- neither that their stages are P\'olya frequency functions nor that they
+diminish variation. And the question the identification suggests, whether the scale space of such
+a member creates no new local extremum, is not treated in this module; it is left for further
+work.
+% TODO(module C): cite the non-creation theorem here once module C is released.
+\end{remark}
+
+% CHANGED (2026-09-19, article mirror of module B, R174): the two remarks below get the two pointers
+% the register pass's item 18 asked for, and rem:cannot-march glosses "marched" at its first use
+% (item 5). The ill-posedness was asserted with nothing behind it and is now read at the member
+% a = 1/2, where the equation is the Laplace equation and the instability is Hadamard's; the
+% accuracy O(1/gamma) of the real-pole Gaussian was established nowhere and is now the expansion of
+% rem:recursive-gaussians' own transfer, at a fixed frequency, which is all that is claimed.
+% CHANGED (2026-09-19, R169): the two remarks below read as if the lag-section quadrature of
+% prop:thorin-machine converged to the Student-t and stable members. It does not
+% (prop:rational-closure): the quadrature that converges has real weights and no lag-section
+% realization. rem:cannot-march now says which quadrature is meant, and rem:costs no longer
+% prices the stable and Student-t families by "their Thorin quadratures". Safe direction.
+% CHANGED (2026-09-19, external review of module B, R170): the remark said that the Student-t
+% scale space "cannot be computed by stepping in scale from the signal, only ... by its kernel".
+% That is false: prop:knot-exactness is a cascade for every admissible family, and the member
+% a = 1/2 steps by the Poisson semigroup. What cannot be marched is the LOCAL equation, whose
+% Cauchy problem is ill-posed. The title keeps its claim, which was always about the equation.
+% CHANGED 2026-09-19 (R187, second external review round, referee E finding 3.4): THE REMARK IS
+% SPLIT INTO WHAT IS ESTABLISHED AND WHAT IS ANNOUNCED. Module B's section 5.4 says that which
+% principle cuts the Student-t family out of the cone is the subject of the next module and that
+% nothing is stated about it here, while this remark asserted the elliptic boundary-value problem,
+% the ill-posedness of its Cauchy problem, and Hadamard's instability. Of those, the equation itself
+% is thm:joint-locality -- chapter 12, module C, and machine-checked at the family
+% (SpatialLine.student_scaleSpace_gaspt) -- but the ILL-POSEDNESS is asserted by no statement of
+% this article at any member, the a = 1/2 reading being classical and the general case a
+% description. The remark now says which half is which; nothing proved is withdrawn (the steppable
+% cascade, the absent lag-section realization and the two exclusions all stay, with their nodes).
+% Safe direction: a remark claims less.
+% CHANGED 2026-09-19 (R202, the author's decision at the second review round): the two references
+% into chapter 12 are replaced by prose, module C being unpublished and a reference across the
+% module boundary being what a repository split would break; and the Student-t exclusion no longer
+% passes through rem:student-ggc, prop:rational-closure(5) having made it unconditional (R200).
+% TODO(module C): cite thm:joint-locality and eq:gaspt here once module C is released.
+\begin{remark}[the local equation of the Student-t corner cannot be marched]\label{rem:cannot-march}
+To \emph{march} an equation in scale is to step its solution forward from the signal by a local
+update, as an explicit scheme does with the heat equation. On the line the scale-locally generated
+corner is the heat equation, marched routinely. The
+jointly local corner, the Student-t family, is of a different kind: its scale space solves an
+elliptic boundary-value problem in the half-plane of scale and position rather than a parabolic
+evolution in scale. That equation is the subject of a further module, on locality and the
+selection of the Gaussian, and no statement of this module asserts it.
+
+\emph{What this chapter establishes about it.} The family can be stepped in scale, as every
+admissible family can (\ref{prop:knot-exactness}); its stages are nonlocal operators, those of the
+Poisson semigroup for the member $a = \tfrac12$. What it lacks is a realization by lag sections:
+the Thorin quadrature of \ref{prop:thorin-machine} with the Bessel spectral density has real
+weights and therefore no such realization, and by \ref{prop:rational-closure}(5) no family
+realized by lag sections converges to it either, its moments being finite only below the order
+$2a$ while every such limit has all of them. So the stages of this corner are computed from its
+kernels and not from a recursion in $x$.
+
+\emph{What is announced and not proved here.} That the Cauchy problem of that equation in $t$ is
+ill-posed, so that the local equation cannot be marched in scale from the signal, is asserted by no
+statement of this article; at the member $a = \tfrac12$ the equation is the Laplace equation, whose
+solutions at frequency $\omega$ combine $e^{-t|\omega|}$ with $e^{+t|\omega|}$ --- a perturbation of
+the data at high frequency amplified without bound, Hadamard's classical instability --- and the
+Poisson stages select the decaying solution; for the other members it is a description and not a
+claim. Read with that reservation, the parabolic-versus-elliptic asymmetry between the two local
+corners has this as its implementation face.
+\end{remark}
+
+\begin{remark}[costs]\label{rem:costs}
+Per sample and per knot: the \Matern{} family costs $2\gamma$ first-order states and $4\gamma$
+multiply--adds --- two per section, one for the state and one for the output, and $2\gamma$
+sections, $\gamma$ forward and $\gamma$ backward --- in a forward and a backward pass at that
+knot; a Thorin approximant $U_N = \sum_i 2n_i\delta_{\theta_i}$ costs $2\sum_i n_i$ states and
+$4\sum_i n_i$ multiply--adds; the Gaussian by
+real-pole recursion costs $2\gamma$ states at an accuracy in the exponent that is $O(1/\gamma)$ at each
+fixed frequency (the expansion of $\gamma\log(1 + \sigma^2\omega^2/2\gamma)$ against
+$\sigma^2\omega^2/2$, the two transfers of \ref{rem:recursive-gaussians}), and by a direct
+finite-impulse-response filter of length $L$ costs $L$; the stable and Student-t families have
+no such realization and are not limits of families that have one
+(\ref{prop:rational-closure}(5), on their moments alone and with no hypothesis on either family's
+Thorin measure), so their stages are computed from their kernels or their
+transforms, at the cost of the method chosen. The counts above are totals over the ladder; the
+stages can be run one after another, so the live state of an implementation is that of one
+stage. This article makes no empirical
+claim about natural images.
+\end{remark}

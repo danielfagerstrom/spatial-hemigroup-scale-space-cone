@@ -1,0 +1,148 @@
+% Module B of Paper V: the admissible cone, its corners and their implementation (ADR-0006:
+% blueprint chapters 8, 9, 10, 11 and 14). Drafted on the line paper's model (paper/main.tex,
+% the article session of 2026-09-11/13): one file per section, theorem statements shared with
+% the blueprint under `% shared with blueprint <label>` markers with the paper statement's own
+% \label equal to the blueprint label (framework LINKAGE.md rule 4; linkage.toml names both
+% paper directories), the proofs of record verbatim, the ledger's page anchors printed in the
+% prose before every [A] statement (read from blueprint/AXIOMS.md, never from memory), one
+% "relation to the causal theory" remark per section (ADR-0003), the frontier named where it
+% occurs.
+%
+% Structure (2026-09-15; the blueprint's chapters in their order, so blueprint numbering is not
+% churned, sections renumbered from 1 since this is its own article):
+%   1  Introduction (written LAST; 1.1 "what is machine-checked" owns the trust base of THIS
+%      module, with the #print axioms block of its headline theorem and Table 1 on the line
+%      paper's pattern; what the line paper settled is cited as its released version)
+%   2  What the line paper settled: the notation table (the shared header, hub RELEASES.md
+%      rule 3, with the bridge rows added), the axioms, the exponent and its profile, the
+%      characterization theorem -- RESTATED verbatim from the blueprint with the line paper's
+%      statement numbers in the titles (the author's decision at the review, 2026-09-16: the
+%      paper is read on its own; the first draft cited everything and restated nothing); what
+%      is only cited prints as "n of [line paper]", v0.1's numbers, concept DOI
+%      10.5281/zenodo.22761631
+%   3  The admissible cone (ch. 8; prose rewritten at the review 2026-09-17: a map at the head,
+%      terms introduced with citations, no machine-checking talk in the body, two figures:
+%      fig-admissible-cone.tex and figures/fig-cin-rays.png)
+%   4  The subordination bridge (ch. 9; the one section where the causal article is mathematics;
+%      prose rewritten at the review 2026-09-17 with an informal causal introduction, a figure
+%      of two corners crossing, and the dimension filtration as a proposition, R166)
+%   5  The corners (ch. 10; prose rewritten at the review 2026-09-18: the payoff stated at the
+%      head with a map, each family in its literature, figures/fig-corners.png)
+%   6  The scale evolution in generator form (ch. 11; prose rewritten 2026-09-18, fig-generator)
+%   7  Implementation (ch. 14; prose rewritten 2026-09-18 in five subsections, fig-sections)
+%   8  Conclusions: what is settled, what module C takes up (locality, non-creation, the jet),
+%      stated as open and promised nowhere (hub RELEASES.md rule 1); restructured 2026-09-18
+% The writing standard is the hub's writing-style-and-ai-use.md: read it before touching prose.
+%
+% The \input lines below are uncommented as each section is drafted. Citations of the line
+% paper: \sscite{fagerstrom2026spatial} with the statement number as of v0.1, never a draft.
+% Paper I (\sscite{fagerstrom2026hemigroup}): the introduction, section 4, and at most one
+% remark per section.
+%
+% Voice and register: the hub's writing-style-and-ai-use.md (ADR-0015, neutral third person,
+% the restraint budget), measured with scripts/count-register.py paper-b/*.tex. Build:
+% tectonic paper-b/main.tex. Gates before every commit: tectonic clean, linkage check with every
+% shared statement verbatim, python scripts/check-control-chars.py. LaTeX is written with the
+% file tools, never through Bash heredocs.
+
+\documentclass[11pt]{article}
+
+\usepackage[a4paper,margin=1in]{geometry}
+\setlength{\emergencystretch}{1.5em}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usetikzlibrary{decorations.pathreplacing} % the brace in fig-sections.tex
+\usepackage{booktabs}
+\usepackage[hidelinks]{hyperref}
+\hypersetup{
+  pdftitle={Spatial Scale Space from Hemigroup Axioms: The Admissible Cone, Its Corners and Their Implementation},
+  pdfauthor={Daniel Fagerstr\"om},
+}
+
+\graphicspath{{../figures/}}
+
+\input{macros}
+\numberwithin{equation}{section}
+
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+\title{Spatial scale space from hemigroup axioms:\\
+the admissible cone, its corners and their implementation}
+\author{Daniel Fagerstr\"om}
+% The draft line stays until the release of cone-v0.1 (ADR-0007), when the date, the version
+% and the reserved DOI replace it and the PDF is rebuilt (notes/RELEASE-procedure.md, steps 2
+% and 3; hub RELEASES.md, checklist item 2). The release form, with the DOI that
+% `scripts/zenodo-release.py reserve` prints (built and read back with pdftotext, 2026-09-19):
+%   \date{September NN, 2026 (v0.1)\\[3pt]
+%     {\normalsize \href{https://doi.org/10.5281/zenodo.NNNNNNNN}{doi:10.5281/zenodo.NNNNNNNN}}}
+% Both `export-release.py` and `zenodo-release.py` refuse a build whose first page still says
+% "working draft", or does not print the version and the DOI.
+% cone-v0.1 (2026-09-20): the date frozen for the release, with the version DOI reserved
+% before the build (scripts/zenodo-release.py reserve). The draft line returns at the first
+% edit of the next development cycle:
+%   \date{Working draft --- not yet released}
+\date{September 20, 2026 (v0.1)\\[3pt]
+  {\normalsize \href{https://doi.org/10.5281/zenodo.22864170}{doi:10.5281/zenodo.22864170}}}
+
+\begin{document}
+\maketitle
+
+% Abstract for module B's scope (2026-09-15, written with section 1); rewritten 2026-09-18 at
+% the author's review for a reader who has not read the line paper: the setting in two
+% sentences, then the five results in plain terms, the scope, one sentence on the
+% formalization. No term is used that the sentence does not explain (the Thorin subclass, the
+% type G exponents and the knot ladder of the first version are gone from it).
+\begin{abstract}
+Gaussian scale space is the classical answer to the question of which smoothing kernels can
+serve a multi-scale representation. A companion paper showed that on the line the answer is
+much larger when the semigroup requirement of the axioms is weakened to a cascade, a
+two-parameter hemigroup: the admissible kernels are the symmetric self-decomposable laws,
+each given by a Gaussian coefficient and a nonincreasing profile of displacement sizes. This
+paper describes that class for a reader who computes with it, in three steps. The first is
+its shape. The admissible exponents form a convex cone in which every member is a unique
+superposition of the Gaussian and the members whose profile is a unit step. Subordination maps
+the time-causal scale spaces of the same axioms injectively into the cone, and the image
+consists of the members whose radial extension is self-decomposable in every dimension. The
+second is the familiar families in it: the \Matern{} kernels of spatial statistics, the
+Student-t laws and the symmetric stable laws are located and compared by their moments, their
+tails and their behaviour at the origin. The third is computation. For signals on the line the
+cascade composes exactly over any finite set of scales, and the \Matern{} families of integer
+index are exactly those whose stages are cascades of identical first-order recursive filters,
+run forward and backward. The families computed in this way do not reach the stable members
+even in the limit, and the sampling of the signal is a separate approximation. A numerical
+example checks the statements and finds that the continuous prototypes of two recursive
+Gaussian filters in common use are the kernels of no such cascade. Locality and the
+non-creation of local extrema are outside the paper. Most of the results of the first two
+steps are machine-checked in Lean~4, and those of the third are proved in prose.
+\end{abstract}
+
+\input{01-introduction}
+\input{02-line-paper}
+\input{03-cone}
+\input{04-bridge}
+\input{05-corners}
+\input{06-generator}
+\input{07-implementation}
+\input{08-conclusions}
+
+\appendix
+\input{appendix-strictness}
+
+\input{ai-statement}   % from the session archive, 2026-09-18; its header says what to update
+                       % before the release (the external reviews, the citation clause, the figures)
+
+\bibliographystyle{plain}
+\bibliography{references}   % starts as the line paper's subset; B's own citations are added as
+                            % they occur, from the hub's library.bib (`library bib export`)
+
+\end{document}

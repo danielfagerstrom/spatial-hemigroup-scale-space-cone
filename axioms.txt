@@ -1,0 +1,576 @@
+'SpatialLine.CascadeFamily' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.IsScaleCovariant' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.IsPositiveDefinite' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.IsSymNegDef' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.IsSelfDecomposable' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.SymLevyPair.exponent' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.SDProfile.exponent' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.fourierCos' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.reflL1' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.cin' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.HasProfileTail' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.cinSuperpositionL' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.symbol' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.IsSubordinated' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.besselK' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.IsCompletelyMonotone' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.SignalClass' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.scaleGenerator' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.IsScaleLocallyGenerated' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.IsJointlyLocalOfOrder' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.signChangesAE' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.IsVariationDiminishing' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.IsPolyaExponent' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.integrable_cos_mul' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.integrable_sin_mul' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.fourierCos_dirac_zero' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.fourierCos_eq_charFun_re' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.charFun_eq_fourierCos_of_symmetric' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.fourier_uniqueness' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.levy_continuity' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.SymLevyPair.quadratic_growth' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.SymLevyPair.quadratic_growth_isBigO' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.SymLevyPair.exponentL_ne_top' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.profile_integrability' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.lintegral_ofReal_ne_top_of_integrableOn' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.sFinite_profileMeasure' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.profile_integrability_pair' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.profile_integrability_mem' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ SpatialLine.fourier_toolbox_levy_converse]
+'SpatialLine.laplace_uniqueness_locally_finite' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.charFun_eq_one_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.lattice_zero_isClosedSubgroup' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.lattice_zero_trichotomy' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.lattice_zero_eq_univ_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.lattice_zero_mem_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.lattice_zero_exponent' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.lattice_zero_example_mem' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.lattice_zero_example_lattice' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.two_members_gaussian' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.gaussianCascadeFamily' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.eq_dirac_of_mconvL1_eq_id' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.norm_mconvL1_sub_le' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.tendsto_norm_mconvL1_sub_of_tendsto_charFun' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.integral_eq_zero_of_odd' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.integral_smul_exp_eq' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.ae_eq_zero_of_even_of_integral_cos_eq_zero' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.charFun_add_measure' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.integral_withDensity_ofReal' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.representation_existsUnique' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.representation_symmetric' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.representation_converse' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.nonvanishing' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.nonvanishing_exponent' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.dilation_invariance' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.dilation_atom' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.additivity' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.smoothed_transmittance' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.smoothed_transmittance_strictAnti' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.covariance_fourier' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.covariance_similarity' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.action_rigidity_injective' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.action_rigidity_group' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.action_rigidity_continuous' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.action_rigidity_no_fixed_point' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.monotonicity_zero_set' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.monotonicity_strict' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.no_lattice' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.canonical_gauge_orbit' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.canonical_gauge_of_levy' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.sub_one_sub_exp_neg_le' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.one_sub_sinc_ge' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.exists_limit_measure' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.increments_levy' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.canonical_gauge' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.increments_levy_infinitely_divisible' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ SpatialLine.fourier_toolbox_bochner_symm,
+ SpatialLine.fourier_toolbox_levy_converse]
+'SpatialLine.SDProfile.exponentL_ne_top' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.admissible_cone' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.sd_exponents_three_implies_one' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.sd_increment_pair' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.setLIntegral_Ioi_comp_mul' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.sd_dilate_pair' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.sd_increment_isSymLevyExponent' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.CascadeData.cascadeCore' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.CascadeData.continuousOn_mconvL1' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.ConstructionData.chi_continuousOn' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.exists_isSymmetric_of_isSymLevyExponent' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ SpatialLine.fourier_toolbox_bochner_symm,
+ SpatialLine.fourier_toolbox_levy_converse]
+'SpatialLine.main_construction' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ SpatialLine.fourier_toolbox_bochner_symm,
+ SpatialLine.fourier_toolbox_levy_converse]
+'SpatialLine.strict_positivity_monotone' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.gaussianDatum' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.gaussianDatum_exponent' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.semigroup_case_gaussian' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.lintegral_intervalIntegral_of_hasProfileTail' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.lintegral_min_one_sq_ne_top' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.lintegral_log_max_one_ne_top' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.measure_Ioi_ne_top' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.tendsto_measure_Ioi_nhdsGT' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.sd_exponents_profile_measure' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.hasDerivAt_cin' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.integrable_cin_dilate' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.exponent_eq_integral_cin' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.hasDerivAt_exponent' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.mul_deriv_exponent' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.symbolL_eq_ofReal' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.sd_exponents_symbol' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.sd_exponents_three_implies_two' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.symLevyPair_dilate' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.symLevyPair_add' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.dilate_le_of_increments' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ SpatialLine.fourier_toolbox_levy_unique]
+'SpatialLine.tonelli_window' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.setLIntegral_dyadicDensity' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.exists_antitone_density' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.SymLevyPair.measure_Ioi_ne_top' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.map_log_shift' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.map_exp_withDensity' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.dyadicDensity_ne_top' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.exists_profile_of_dilate_le' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.SDProfile.exponentL_neg' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.SDProfile.exponent_neg' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.sd_exponents_one_implies_three' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ SpatialLine.fourier_toolbox_levy_unique]
+'SpatialLine.SymLevyPair.continuous_exponent' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.SDProfile.continuous_exponent' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.main_uniqueness' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.fourierCos_eq_exp_neg_exponent' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.isSymLevyExponent_dilate_diff' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.exists_kernelFamily' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.main_analysis_of_profileForm' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.main_analysis' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ SpatialLine.fourier_toolbox_levy_unique]
+'SpatialLine.main_analysis_exists' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ SpatialLine.fourier_toolbox_levy_unique]
+'SpatialLine.main_characterization' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ SpatialLine.fourier_toolbox_bochner_symm,
+ SpatialLine.fourier_toolbox_levy_converse,
+ SpatialLine.fourier_toolbox_levy_unique]
+'SpatialLine.ae_restrict_Ioi_mul_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.SDProfile.k_eq_zero_of_dilation_ae' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.strict_positivity_strict' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.strict_positivity_consequences' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.isSelfDecomposable_kernel' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.kernel_ne_dirac_zero' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.kernel_regularity' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ SpatialLine.kernel_regularity_law]
+'SpatialLine.integrableOn_stableIntegrand' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.stableConst_pos' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.stableDatum' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.stableDatum_exponent' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.semigroup_case_profile' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.eq_mul_of_addOn_of_continuousOn' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.exists_eq_rpow_of_mul' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.semigroup_case' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.cin_elementary' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.cin_expansion_zero' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.cin_expansion_top' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.cin_ray' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.cin_superposition' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.cin_superposition_exists' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.cin_origin_singularity_cin_ray' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.choquet_cone_forward' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.choquet_cone_surjective' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.choquet_cone_domain' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.choquet_cone_linear' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.choquet_cone_injective' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ SpatialLine.fourier_toolbox_levy_unique]
+'SpatialLine.choquet_cone_extreme_gaussian' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ SpatialLine.fourier_toolbox_levy_unique]
+'SpatialLine.choquet_cone_extreme_cin' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ SpatialLine.fourier_toolbox_levy_unique]
+'SpatialLine.choquet_cone_extreme_only' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ SpatialLine.fourier_toolbox_levy_unique]
+'SpatialLine.tail_eq_of_ae_tail_eq' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.measure_eq_of_tail_eq' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.cinSDProfile' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.choquetSDProfile' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.exists_tailMeasure' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.SDProfile.tendsto_k_atTop' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.sdProfile_unique' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ SpatialLine.fourier_toolbox_levy_unique]
+'SpatialLine.integrable_abs_of_exponent_le' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.cin_law_integrable_abs' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.integral_eq_integral_density' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.integrable_density' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.cin_delay_deriv_of_measure_form' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.measurable_windowMass' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.conv_delayWindow_eq_withDensity' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.charFun_delayWindow' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.hasDerivAt_fourierCos' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.integral_mul_sin_cin' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.integral_mul_cos_eq_zero_of_symmetric' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.charFun_jordan_sub' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.cin_delay_jordan' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.cin_delay_pairing' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.integral_delayWindow_deriv' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.cin_delay_measure_form' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.integrable_windowMassReal' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.cin_delay_pairing_density' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.cin_delay_equation' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.cin_delay_equation_deriv' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.integral_sin_mul_exp_neg_Ioi' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.integral_frullani' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.maternDatum' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.maternDatum_exponent' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.matern_exponent' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.matern_transforms' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.matern_gauge' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.matern_gauge_profile' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.matern_rational' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.matern_rational_polynomial' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.stable_family_bridge' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.eqOn_of_ae_eq_of_antitoneOn' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.eqOn_of_profileMeasure_eq' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.thorinExponent_dirac' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.eqOn_maternProfile_of_exponent' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ SpatialLine.fourier_toolbox_levy_unique]
+'SpatialLine.matern_thorin_atom' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ SpatialLine.fourier_toolbox_levy_unique]
+'SpatialLine.matern_kernels' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ SpatialLine.fourier_toolbox_levy_unique]
+'SpatialLine.matern_theorem' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ SpatialLine.fourier_toolbox_levy_unique]
+'SpatialLine.besselK_half' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.matern_density_special' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.student_density' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.matern_density_gaussian_limit' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.iteratedDeriv_scale_two' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.scale_evolution_conjugation' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.corner_generator_gaussian' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.corner_generator_cin' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.one_sub_inv_le_log' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.sigmaFinite_of_lintegral_ne_top' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.thorin_measure_facts' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.thorin_frullani' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.laplaceL_ne_top_of_facts' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.continuousOn_laplaceReal' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.lintegral_gaussian_one_sub_cos' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.lintegral_min_ne_top_of_profileJump_eq' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.laplaceL_eq_of_thorin' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ SpatialLine.fourier_toolbox_levy_unique]
+'SpatialLine.thorin_subclass_representation' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ SpatialLine.bernstein_completely_monotone,
+ SpatialLine.fourier_toolbox_levy_unique]
+'SpatialLine.sigmaFinite_of_laplaceL_ne_top' depends on axioms: [propext, Classical.choice, Quot.sound]
+'ScaleSpace.CausalAdmissible.ofReal_mul_mixDensityL_laplace' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.isFolded_map_sqrt' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.integrable_expNegSq' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.continuous_erfc' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.erfc_pos' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.integral_Ioi_exp_neg_mul_const' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.erfc_le_two_mul_exp' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.hasDerivAt_inv_sq' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.antitoneOn_inv_sq' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.image_inv_sq' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.lintegral_Ioo_comp_inv_sq' depends on axioms: [propext, Classical.choice, Quot.sound]
+'ScaleSpace.CausalAdmissible.bridgeProfile_of_cin' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.exists_laplaceL_lower_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.thorin_bridge' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ SpatialLine.bernstein_completely_monotone,
+ SpatialLine.fourier_toolbox_levy_unique]
+'SpatialLine.lintegral_Ioi_exp_neg_mul' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.ofReal_one_sub_exp_div_eq_lintegral' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.lintegral_Ioc_inv_add' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.causal_thorin_frullani' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.min_one_le_exp_one_mul' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.measurable_halfSq' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.measurable_sqrtTwoMul' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.map_sqrtTwoMul_map_halfSq' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.map_halfSq_map_sqrtTwoMul' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.thorin_bridge_measure_linear' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.thorin_bridge_measure_injective' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.thorin_bridge_onto' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.thorin_strictness' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ SpatialLine.bernstein_completely_monotone,
+ SpatialLine.fourier_toolbox_levy_unique]
+'SpatialLine.laplaceL_gammaThorinMeasure' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.thorin_of_laplace' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.stable_family_thorin' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.lintegral_min_hasProfileTail' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.abs_secondDifference_le' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.scale_evolution_absconv' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.cin_pos' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.bridge_strictness_criterion' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.bridge_strictness_increasing' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.bridge_strictness_cin' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.bridge_strictness_stationary' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.bridge_strictness_cone' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.subordinated_members' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.measurable_brownianLaw' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.bridge_families_delay' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.bridge_families_stable' depends on axioms: [propext, Classical.choice, Quot.sound]
+'ScaleSpace.CausalAdmissible.mixDensityL_ne_top' depends on axioms: [propext, Classical.choice, Quot.sound]
+'ScaleSpace.CausalAdmissible.ofReal_mul_mixDensityL' depends on axioms: [propext, Classical.choice, Quot.sound]
+'ScaleSpace.CausalAdmissible.bridgeProfile_antitoneOn' depends on axioms: [propext, Classical.choice, Quot.sound]
+'ScaleSpace.CausalAdmissible.lintegral_min_profileMeasure_ne_top' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+'ScaleSpace.CausalAdmissible.profileJump_bridgeProfile' depends on axioms: [propext, Classical.choice, Quot.sound]
+'ScaleSpace.CausalAdmissible.bridgeDatum_exponent' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.bridge_exponents' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.isProbabilityMeasure_bind_brownianLaw' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.isSymmetric_bind_brownianLaw' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.fourierCos_bind_brownianLaw' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.bridge_exponents_mixture' depends on axioms: [propext, Classical.choice, Quot.sound]
+'ScaleSpace.CausalAdmissible.exponent_of_nonpos' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.bridgeConstruction_expo' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.bridgeConstruction_gaugeAction' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.bridgeDatum_ne_zero' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.bridge_families' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ SpatialLine.fourier_toolbox_bochner_symm,
+ SpatialLine.fourier_toolbox_levy_converse]
+'SpatialLine.integral_inverseGamma_brownian' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.lintegral_inverseGamma_brownian' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.bridge_families_bessel' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.lintegral_ofReal_ne_top_iff_integrableOn' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.stable_family_moments' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ SpatialLine.moments_tails_criterion]
+'SpatialLine.matern_moments_integrable' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ SpatialLine.moments_tails_criterion]
+'SpatialLine.mul_deriv_abs_rpow' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.corner_generator_stable_symbol' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.stableJump_tail' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.stable_jump_measure' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.corner_generator_stable' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.mconv_laplaceLaw' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.maternJump_tail' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.matern_jump_measure' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.integral_maternJump' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.corner_generator_matern' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.symbol_eq_mul_deriv' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.hasDerivAt_exponent_of_ne' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.scale_evolution_fourier' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.abs_mul_log_le' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.mul_log_le_sq' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.lintegral_exp_sq_eq_top' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.completely_monotone_support_unbounded' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ SpatialLine.bernstein_completely_monotone]
+'SpatialLine.moments_tails_completely_monotone' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ SpatialLine.bernstein_completely_monotone,
+ SpatialLine.moments_tails_divergence]
+'SpatialLine.lintegral_exp_mul_of_even' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.lintegral_Ioi_rpow_exp_besselKernel' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.lintegral_cosh_exp_eq_besselK' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.lintegral_Ioi_inverseGammaKernel' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.isProbabilityMeasure_inverseGammaLaw' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.lintegral_exp_neg_inverseGammaLaw' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.student_transform' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.lintegral_Ioi_comp_exp' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.lintegral_exp_neg_half_of_even' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.lintegral_besselK_half' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.lintegral_Ioi_firstPassage' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.integral_Ioi_firstPassage' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.bridgeProfile_of_exp' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.bridge_families_gamma' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.one_sub_cos_mul_two_div' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.exponent_eq_add_integral' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.tendsto_exponent_div' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.tendsto_one_sub_exp_div' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.lintegral_sq_le_of_tendsto' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.moments_tails_variance' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.maternTransform_zero' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.integral_id_mul_maternProfile' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.matern_mean_variance' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.two_members_matern_moments' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.lintegral_symmetrise_of_even' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.fourierCos_symmetrise' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.lintegral_pow_brownianLaw' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.lintegral_gammaMeasure_rpow_mul_exp' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.integral_exp_neg_maternDelay' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.fourierCos_maternDelay_bind' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.lintegral_pow_maternDelay_bind' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.matern_gamma_mixture' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.matern_moments' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.sub_translate_eq_intervalIntegral' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.lintegral_enorm_translate_sub_le' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.lintegral_enorm_secondDifference_le' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.lintegral_enorm_secondDifference_le_three' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.lintegral_enorm_secondDifference_le_min' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.sigmaFinite_of_hasProfileTail' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.symbol_eq_add' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.integral_kar_mul_secondDifference' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.integral_kar_mul_deriv' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.integral_kar_mul_iteratedDeriv_two' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.integrable_uncurry_kar_secondDifference' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.integral_kar_mul_scaleGenerator' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.scale_evolution_multiplier' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.expLaw_tail' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.integral_expLaw' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.isFolded_thorinJump' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.thorinJump_tail' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.thorin_jump_measure' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ SpatialLine.fourier_toolbox_levy_unique]
+'SpatialLine.integral_expLaw_secondDifference' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.integral_thorinJump' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.corner_generator_thorin' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ SpatialLine.fourier_toolbox_levy_unique]
+'SpatialLine.SignalClass.exists_bound_iteratedDeriv_two' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.integrable_prod_secondDifference' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.integral_secondDifference_mconv' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.integrable_mconv_secondDifference' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.scaleGenerator_mconv' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.conv_absolutelyContinuous' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.isSymmetric_conv' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.mconv_conv_bounded' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.signChangesAE_congr' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.measurable_mconv' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.mconv_bounded' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.exists_good_representative' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.isVariationDiminishing_conv' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.ae_eq_of_profileMeasure_eq_aemeasurable' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.abs_karPair_le' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.exists_bound_karPair' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.exists_bound_karPair_two' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.cosPair_eq' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.continuous_karPair' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.integral_sin_mul_eq_zero_of_symmetric' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.integral_cosPair_translate' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.re_exp_mul_fourier' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.im_fourier_ofReal' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.fourier_ofReal_eq' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.integrable_fourier_ofReal_of_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.inversion_cosPair' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.mconv_eq_integral_cosPair' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.exists_bound_symbol' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.continuous_symbol' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.exists_bound_secondDifference' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.continuous_scaleGenerator_signal' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.integrable_scaleGenerator_signal' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.karPair_scaleGenerator' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.exists_bound_karPair_scaleGenerator' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.hasDerivAt_integral_transfer' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.scale_evolution_signal' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.IsVariationDiminishingOrd' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.signChanges_mono' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.signChangesAE_le_of_ae' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.signChangesAE_le' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.exists_measurable_rep_signChanges_le' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.signChangesAE_eq_iInf_measurable' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.isVariationDiminishing_of_ord' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.causalThorinDatum' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.causalThorinDatum_exponent' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.laplaceL_ne_top_of_causalThorin' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.student_subordinated' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.student_thorin' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ SpatialLine.bernstein_completely_monotone,
+ SpatialLine.fourier_toolbox_levy_unique]
+'SpatialLine.thorin_pair_mul' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.neg_log_norm_thorin_factor' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.thorin_pair_compensator' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.thorin_two_sided_fold' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.two_mul_ofReal_half' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.lintegral_Ioi_min_profile_ne_top' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.lintegral_foldedHalf_one_sub_cos' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.twoSided_k_add_neg' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.twoSided_exponent' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.twoSided_tendsto_nhdsGT' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.twoSided_tendsto_nhdsLT' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.folding_translation' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.TwoSidedProfile.integrableOn_satoIntegrand' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.integrableOn_foldedSatoIntegrand' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.twoSided_satoK' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.cin_origin_singularity_unbounded_of_sato' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.cin_origin_singularity_smooth_of_sato' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.cin_origin_singularity_threshold_of_sato' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.maternProfile_tendsto_nhdsGT' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.matern_origin_constant' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.SDProfile.k_le_of_tendsto_nhdsGT' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.one_le_satoK' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.measure_Ioo_le_of_density_le' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.le_measure_Ioo_of_le_density' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.not_le_of_le_density' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.integrableOn_thresholdIntegrand' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.thresholdExponent_antitone' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.integrableOn_thresholdComparison' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.log_le_thresholdComparison' depends on axioms: [propext, Classical.choice, Quot.sound]
+'SpatialLine.cin_origin_singularity_unbounded' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ SpatialLine.sato_origin_singular]
+'SpatialLine.cin_origin_singularity_smooth' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ SpatialLine.sato_origin_smooth]
+'SpatialLine.cin_origin_singularity_threshold' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ SpatialLine.sato_origin_threshold]
+'SpatialLine.origin_boundedness' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ SpatialLine.sato_origin_singular,
+ SpatialLine.sato_origin_smooth,
+ SpatialLine.sato_origin_threshold]
+'SpatialLine.matern_origin_boundedness' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ SpatialLine.sato_origin_singular,
+ SpatialLine.sato_origin_smooth,
+ SpatialLine.sato_origin_threshold]

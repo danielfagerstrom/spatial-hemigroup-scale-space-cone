@@ -1,0 +1,107 @@
+Decision D5 of notes/PLAN-review-response-module-b-round2.md (the author, 2026-09-19): the
+bibliography extended, every new citation written from a held copy read at the page
+(notes/reviews/cone/SOURCES-round2-2026-09-19.md and SOURCES-round2-acquisitions-2026-09-19.md).
+Paper-side prose only, outside statements, proofs and copied remarks. Applied with
+scripts/apply-anchors.py. The type G attribution and the novelty sentence wait for the reading
+of the papers the author acquired on 2026-09-20.
+
+@@@ FILE paper-b/05-corners.tex
+@@@ OLD
+(\sscite{whittle1954stationary}). It became the standard covariance family of spatial
+statistics after Mat\'ern's monograph (\sscite{guttorp2006studies};
+\sscite{porcu2024matern}). And its members are the Green's functions of the operator
+$(1 - \theta^2\Delta)^\gamma$, which is the link to Gaussian Markov random fields
+(\sscite{lindgren2011explicit}). In probability the same
+@@@ NEW
+(\sscite{whittle1954stationary}). It became the standard covariance family of spatial
+statistics after Mat\'ern's monograph, where it is the family of correlation functions
+$2(b\nu/2)^\nu K_\nu(b\nu)/\Gamma(\nu)$ in his notation (\sscite{matern1960spatial}, (2.4.7),
+p.~18; \sscite{guttorp2006studies} for the history; \sscite{porcu2024matern} for the present
+state). And its members are the Green's functions of the operator
+$(1 - \theta^2\Delta)^\gamma$, which is the link to Gaussian Markov random fields
+(\sscite{lindgren2011explicit}). On the line the members of half-integer smoothness
+$\nu = \gamma - \tfrac12$, which are those of integer index $\gamma$, have the spectral density
+$(\lambda^2 + \omega^2)^{-\gamma}$, and its factorization into
+$(\lambda + i\omega)^{-\gamma}(\lambda - i\omega)^{-\gamma}$ makes the process the output of a
+linear stochastic differential equation of order $\gamma$. That is how these covariances are
+computed in Gaussian process regression (\sscite{hartikainen2010kalman}, \S 4.1, (8)--(9);
+\sscite{sarkka2019applied}, \S 12.3, (12.33)--(12.35)). The factorization of the member of
+integer index into first-order causal and anticausal factors is therefore classical. What
+Corollary~\ref{cor:matern-realization} adds is that the same factorization holds between every
+two scales, a stage being a cascade of such factors with a zero at the earlier scale, and that
+within the admissible class this property characterizes the family. In probability the same
+@@@ END
+@@@ OLD
+stable and Student-t members. The tail entries are orders, in the senses made precise in
+Propositions~\ref{prop:moments-tails}, \ref{prop:matern-density}, \ref{prop:student-t}
+and~\ref{prop:stable-family}. Boundedness
+@@@ NEW
+stable and Student-t members. The tail entries are orders, in the senses made precise in
+Propositions~\ref{prop:moments-tails}, \ref{prop:matern-density} and~\ref{prop:student-t}; for
+the stable row Proposition~\ref{prop:stable-family} gives the count of moments, and the order
+of the density is the classical
+$p(x) \sim \pi^{-1}\Gamma(\alpha+1)\sin(\pi\alpha/2)\,|x|^{-\alpha-1}$ of
+\sscite{sato1999levy}, Remark~14.18, pp.~87--88, which no statement here uses. Boundedness
+@@@ END
+
+@@@ FILE paper-b/07-implementation.tex
+@@@ OLD
+\end{proof}
+
+% blueprint rem:rational-converse, copied
+@@@ NEW
+\end{proof}
+
+\paragraph{The time-causal counterpart.} The construction of clause (2) has a counterpart in
+the time-causal literature. Lindeberg's time-causal limit kernel is the infinite cascade of
+first-order recursive temporal filters, truncated exponential kernels, whose time constants
+form a geometric progression, with the transform
+\[
+  \hat\Psi(\omega;\tau,c) = \prod_{k \ge 1}\frac{1}{1 + i\,c^{-k}\sqrt{c^2-1}\,\sqrt\tau\,\omega},
+  \qquad c > 1
+\]
+(\sscite{lindeberg2016time}, \S 5, (38), p.~62; \sscite{lindeberg2023time}). It is built so
+that the temporal scale space is covariant under scaling by the powers of the ratio $c$, and
+the cascade of first-order temporal smoothing steps that it is the limit of goes back to
+\sscite{lindeberg1996scalespace}. Clause (2) read at the one-pole transfer function
+$R(\omega) = (1+\omega^2)^{-1}$ and the ratio $q = c$ gives
+$e^{-F(\omega)} = \prod_{m \ge 1}(1 + q^{-2m}\omega^2)^{-1}$, which is the squared modulus of
+that transform after the dilation of $\omega$ by $\sqrt{(c^2-1)\tau}$: the two-sided kernel is
+the limit kernel run forward and backward. The clause differs from that construction in three
+respects. It is symmetric in space and not causal in time. It allows any rational $R$ that is
+the transform of an infinitely divisible law, and says when the result is admissible. And it
+proves that the pyramid determines the family, which the axioms of this paper then interpolate
+between the levels.
+
+% blueprint rem:rational-converse, copied
+@@@ END
+@@@ OLD
+Both designs are more accurate than the real-pole cascade at the same order, and the last
+panel gives the price of staying inside the class. A largest error
+@@@ NEW
+Later designs change one or the other ingredient of the design of Young and van Vliet:
+\sscite{vanvliet1998recursive} give a closed-form design of the poles for every order, and
+\sscite{triggs2006boundary} correct the transition between the forward and the backward pass
+at the boundary of a finite signal. Neither is analysed here. The criterion of
+Proposition~\ref{prop:rational-criterion} applies to the poles of any such design, and the
+boundary rule does not enter it.
+
+Both designs are more accurate than the real-pole cascade at the same order, and the last
+panel gives the price of staying inside the class. A largest error
+@@@ END
+
+@@@ FILE paper-b/01-introduction.tex
+@@@ OLD
+(\sscite{heyer1977probability,siebert1982continuous,hazod2001stable}), and the random
+integral representation of
+\sscite{beckerkern2004random} is the closest in shape to the bridge, though it starts from no
+axioms on measurement.
+@@@ NEW
+(\sscite{heyer1977probability,siebert1982continuous,hazod2001stable}), and the random
+integral representation of a self-decomposable law
+(\sscite{jurek1983integral}; \sscite{beckerkern2004random} for hemigroups) is the closest in
+shape to the bridge, though it starts from no axioms on measurement. In the scale-space
+literature the nearest construction is Lindeberg's time-causal limit kernel
+(\sscite{lindeberg2016time}), an infinite cascade of first-order filters over a geometric
+ladder of time constants, of which the pyramid of \S\ref{sec:rational} is the two-sided form.
+@@@ END

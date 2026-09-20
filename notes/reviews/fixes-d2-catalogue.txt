@@ -1,0 +1,51 @@
+Decision D2, the last part: "catalogue" names the jump measure nu(dx) = k(x) dx/x only; the profile k and the tail measure varpi = -dk go by their own names, and section 2 says once how the three are related (presentation review, item 6). Applied with scripts/apply-anchors.py.
+
+@@@ FILE paper-b/01-introduction.tex
+@@@ OLD
+Gaussian part of that displacement, and the \emph{profile} $k$ is a catalogue of jumps:
+@@@ NEW
+Gaussian part of that displacement, and the \emph{profile} $k$ describes its jumps:
+@@@ END
+
+@@@ FILE paper-b/02-line-paper.tex
+@@@ OLD
+the only one Gaussian scale space uses. The measure $\nu$ is a \emph{catalogue of jump
+displacements}. Displacements of size about $x$ arrive as a Poisson stream, that is at
+@@@ NEW
+the only one Gaussian scale space uses. The measure $\nu$ is a \emph{catalogue of jump
+displacements}. Three objects describe it in this paper, and they are kept apart by name: the
+catalogue itself, the measure $\nu(dx) = k(x)\,dx/x$ on the half-line; the \emph{profile} $k$,
+its density against $dx/x$; and the \emph{tail measure} $\varpi = -dk$ of \S\ref{sec:cone},
+which says how much of each unit step the profile contains. Displacements of size about $x$
+arrive as a Poisson stream, that is at
+@@@ END
+
+@@@ FILE paper-b/04-bridge.tex
+@@@ OLD
+means a lattice \emph{profile}, a catalogue whose jump sizes lie on a lattice, and no axiom
+excludes it. The $\Cin$ rays are the case of a single jump size. What excludes it is
+subordination, because a Gaussian mixture spreads every jump size over the whole line.
+@@@ NEW
+means a lattice \emph{profile}, a step function whose jumps lie on a lattice, that is a tail
+measure $\varpi$ carried by the lattice, and no axiom excludes it. The $\Cin$ rays are the
+case of a single step. What excludes it is subordination, because a Gaussian mixture spreads
+every delay over the whole line.
+@@@ END
+
+@@@ FILE paper-b/04-bridge.tex
+@@@ OLD
+must have its catalogue mass on steps --- is not asserted, and it fails: an admissible $F$
+whose catalogue is carried by a compact subset of $(0,\infty)$ and spread continuously over it
+@@@ NEW
+must have a step profile --- is not asserted, and it fails: an admissible $F$
+whose catalogue is carried by a compact subset of $(0,\infty)$ and spread continuously over it
+@@@ END
+
+@@@ FILE paper-b/05-corners.tex
+@@@ OLD
+Remark~\ref{rem:displacement-dictionary}. The profile is a catalogue of displacements,
+$k(x)\,dx/x$ being the rate of those of size $x$; a large displacement of the kernel comes
+@@@ NEW
+Remark~\ref{rem:displacement-dictionary}. The profile describes a catalogue of displacements,
+$k(x)\,dx/x$ being the rate of those of size $x$; a large displacement of the kernel comes
+@@@ END

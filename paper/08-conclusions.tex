@@ -1,0 +1,99 @@
+% §8 Concluding remarks --- paper-only, written 2026-09-15 for module B's scope (blueprint
+% chapters 8, 9, 10, 11 and 14; ADR-0006); rewritten 2026-09-18 at the author's review, on the
+% hub's writing standard (writing-style-and-ai-use.md: claim first, one main clause and at most
+% one subordinate, lists where the content is a list, no closers). On the line paper's model:
+% the summary, the scope, one methodological remark on what the formalization changed in the
+% printed proofs (each item is a blueprint CHANGED marker in chapters 8-11), and the open
+% questions, stated as open and not as promised (hub RELEASES.md rule 1). Module C's subjects
+% are named as the next module's without a statement number. No blueprint node is shared here.
+
+\section{Concluding remarks}\label{sec:conclusions}
+
+The line paper \sscite{fagerstrom2026spatial} characterized the spatial scale spaces on the
+line under the hemigroup axioms: their kernels are the symmetric self-decomposable laws, each given by a
+Gaussian coefficient and a nonincreasing displacement profile. This paper described that
+class, and its results are of five kinds.
+
+\emph{The shape of the class.} The admissible exponents form a cone. Its extreme rays are the
+Gaussian ray and the exponents $\Cin(\tau\,\cdot)$ of the unit-step profiles, and every member
+is a unique superposition of them (Proposition~\ref{prop:choquet-cone}). The kernel of a
+member with no Gaussian part is bounded at the origin exactly when the value of its profile
+there exceeds $1$. The
+$\Cin$ rays sit at that threshold, and so does the \Matern{} member at $\gamma = \tfrac12$
+(Corollaries~\ref{cor:origin-boundedness} and~\ref{cor:origin-smooth}).
+
+\emph{The relation to the causal theory.} Bochner's subordination maps the causal theory of
+\sscite{fagerstrom2026hemigroup} into the spatial one, family to family and corner to corner
+(Lemma~\ref{lem:bridge-exponents}, Proposition~\ref{prop:bridge-families}). The map is
+injective (Proposition~\ref{prop:bridge-strictness}(1)), and on the Thorin subclasses it is a
+bijection (Proposition~\ref{prop:thorin-subclass}). It is not onto. It misses every member
+with no Gaussian part whose profile is a lattice step, the $\Cin$ rays among them
+(Proposition~\ref{prop:bridge-strictness}). Its
+image is the intersection of a chain of classes indexed by dimension, the exponents whose
+radial extension is self-decomposable in dimension $d$, and the first two inclusions of the
+chain are strict (Proposition~\ref{prop:dimension-filtration}, proved in prose on cited facts
+about laws in dimension $d$, and Lemma~\ref{lem:filtration-strictness}, not machine-checked).
+
+\emph{The named members.} The \Matern{} family is the single-atom member of the Thorin
+subclass with no Gaussian part. Its members of integer index are exactly the families
+realized at every ladder of scales by a cascade of identical first-order forward--backward
+sections, and every member has every moment finite and exponential tails
+(Theorem~\ref{thm:matern},
+Corollary~\ref{cor:matern-realization}). The Student-t family is the image of the causal Bessel
+corner, with polynomial tails of a prescribed order (Proposition~\ref{prop:student-t}). The
+symmetric stable family is the semigroup corner, and the heavy tails of its non-Gaussian
+members come from the semigroup requirement (Proposition~\ref{prop:stable-family}).
+
+\emph{The evolution.} Every member satisfies an evolution equation in scale whose generator is
+a Laplacian plus a superposition of symmetric second differences
+(Proposition~\ref{prop:scale-evolution}). The generators of the named members are a
+differential operator, a fractional one, a bounded integral operator, mixtures of such, and
+for the unit-step members a single second difference
+(Proposition~\ref{prop:corner-generators}).
+
+\emph{The algorithm.} The cascade is the algorithm. Over any finite ladder of scales the
+cascade is exact at every knot, for a signal on the line, the sampling of the signal being a
+separate approximation. At integer index the \Matern{} stages are forward--backward
+first-order recursive sections. The members of the Thorin subclass with finitely many ranges
+and integer weights have such stages, and every member of the subclass is a limit of members
+with finitely many ranges. The restriction to integer weights is a real one: the limits of
+the families with such stages are the members whose Thorin measure consists of atoms of even
+integer mass, finitely many in every bounded set, possibly with a Gaussian part. Every such
+limit has an exponential moment, so the stable and the Student-t members are not among them
+(Proposition~\ref{prop:rational-closure}). The numerical run of \S\ref{sec:numerical-run} finds them at a fixed distance from the Poisson
+scale space.
+
+\emph{Scope.} The paper delivers the geometry of the class, the bridge, the corners, the
+generator form and the implementation, on the line and in the $L^1$ signal model. It makes no
+empirical claim about natural signals. Locality of the scale evolution and of the scale space,
+the non-creation and non-enhancement of local extrema, and the scale-space jet are the subject
+of the next module. Nothing here depends on them. Dimension $d$, and families that are
+covariant only under a discrete group of dilations, remain outside, as in the line paper.
+
+\emph{Open questions.} Five are left.
+\begin{enumerate}
+\item How large the complement of the slice is. The lattice-step members with no Gaussian part
+are outside it, and so
+is every member with a compactly supported catalogue. No description of the complement is
+given.
+\item Which admissible families have rational stages. The families realized by first-order
+sections are among them, and so are a family with a complex pole pair and a family with real
+poles and zeros only (Remark~\ref{rem:rational-converse}), so the Thorin subclass does not
+contain them all. Proposition~\ref{prop:rational-criterion} says which rational functions are
+kernels from the origin. Which are stages between two positive scales, and how the others are
+realized with positivity at every stage, is not attempted.
+\item The formal status of three of the clauses that \S\ref{sec:machine-checked} lists as not
+formalized. The closed form of the \Matern{} kernel, its tail, and the moment count of the
+Student-t family are cited and not machine-checked
+(Propositions~\ref{prop:matern-density} and~\ref{prop:student-t}(4)). A machine-checked closed
+form would let the boundedness threshold be read from the kernel as well as from the profile.
+\item The boundedness threshold in dimension $d$. On the line it is the value $1$ of the
+profile at the origin, and the condition $\gamma > \tfrac12$ of the \Matern{} member is its
+instance. Whether the threshold in $\RR^d$ is the dimension is a question for the theory in
+dimension $d$, which is not begun here. If it is, an admissible aperture in the plane may be
+unbounded at its own centre.
+\item The hemigroup weakened once more. The dilatively stable processes of
+\sscite{kern2015dilatively} and the semi-selfsimilar and semistable hemigroups of
+\sscite{beckerkern2004random} describe what remains of covariance when the scaling group is
+weakened or discretized. How much of the present geometry survives there is open.
+\end{enumerate}

@@ -1,0 +1,19 @@
+Citation audit of 2026-09-19 (two librarian passes: the ledger, blueprint/AXIOMS-verbatim.md; the prose, 53 anchored citations). Two sentences of the prose corrected. Applied with scripts/apply-anchors.py.
+
+@@@ FILE paper-b/05-corners.tex
+@@@ OLD
+The symmetric stable laws are the laws with exponent $c\,|\omega|^\alpha$, $0 < \alpha \le 2$
+(\sscite{sato1999levy}, Theorem~14.14, p.~86): the laws that reproduce themselves under
+@@@ NEW
+The symmetric stable laws are the laws with exponent $c\,|\omega|^\alpha$, $0 < \alpha \le 2$
+(\sscite{sato1999levy}, Theorem~14.14, p.~86, for $\alpha < 2$, the Gaussian being the case
+$\alpha = 2$): the laws that reproduce themselves under
+@@@ END
+
+@@@ FILE paper-b/06-generator.tex
+@@@ OLD
+exponent $\psi$ of a \Levy{} process, the background driving process
+@@@ NEW
+exponent $\psi$ of a \Levy{} process, the background driving process, written with the sign of
+this paper, so that the process at time $1$ has the transform $e^{-\psi}$
+@@@ END

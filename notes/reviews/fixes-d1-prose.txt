@@ -1,0 +1,16 @@
+Decision D1 (the author's, 2026-09-19): clause (4) of the dimension filtration. The paper-side prose around the shared statement: the cited facts the new clause uses, read verbatim by the librarian the same day (Sato Prop. 15.5 p. 93; Thm. 24.11 p. 153 with Remark 21.6 p. 138), and where the clause came from. Applied with scripts/apply-anchors.py.
+
+@@@ FILE paper-b/04-bridge.tex
+@@@ OLD
+the kernel sense (\sscite{schilling2012bernstein}, Prop.~4.4, p.~36). The proposition is proved
+@@@ NEW
+the kernel sense (\sscite{schilling2012bernstein}, Prop.~4.4, p.~36). Clause (4) uses three
+more. The remainder $\rho_b$ in the definition of a self-decomposable law on $\RR^d$ is itself
+infinitely divisible (\sscite{sato1999levy}, Prop.~15.5, p.~93). The exponential of the
+negative of a Bernstein function is completely monotone, and is therefore the Laplace
+transform of a positive measure (\sscite{schilling2012bernstein}, Thm.~3.7, p.~27, and
+Thm.~1.4, p.~3). And an infinitely divisible law carried by the half-line has no Gaussian
+part, a \Levy{} measure on $(0,\infty)$ and a nonnegative drift, with the Laplace exponent
+$\gamma_0u + \int(1 - e^{-ux})\,\nu(dx)$ (\sscite{sato1999levy}, Thm.~24.11, p.~153, and
+Remark~21.6, p.~138). The proposition is proved
+@@@ END

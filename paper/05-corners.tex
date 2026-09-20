@@ -1,0 +1,1168 @@
+% §5 The corners --- blueprint chapter 10 (blueprint/src/parts/10-corners.tex), statements and
+% proofs of record verbatim. Drafted 2026-09-15, from the blueprint at the state after the step-2
+% merges (R160: prop:student-t(3) conditional on the Thorin representation, lem:thorin-ggc
+% narrowed, lem:thorin-two-sided new, rem:student-ggc new) and the two drafting-day repairs
+% (R164: the tail sentence of prop:matern-density restored to the statement; R165: a proof
+% environment for lem:thorin-two-sided).
+%
+% Prose rewritten 2026-09-18 at the author's review (statements and proofs untouched). The
+% author's findings: four lines of introduction for the section that is the payoff of the
+% theory; no map; every subsection opening with technicalities about a theorem and its proof
+% the reader has not seen, and with what is proved in Lean in place of explanation; the corner
+% families not placed in their literature; no illustrations. What was done: the section opens
+% with what the three families are, where they are used, the five results and why they matter,
+% and a figure of the three families by parameter (figures/fig-corners.png from
+% scripts/make-fig-corners.py); each subsection opens with motivation or intuition and the
+% literature of its family (Whittle, Guttorp-Gneiting, Porcu et al., Lindgren et al.,
+% Madan-Seneta, Burgeth et al. for Matern; Thorin and Bondesson for the Thorin class; Grosswald,
+% Ismail-Kelker, Halgreen, Barndorff-Nielsen-Halgreen, Felsberg-Sommer, Duits et al. for
+% Student-t; Pauwels et al., Duits et al., Pedersen et al. for stable); comments on a statement
+% or a proof come AFTER the statement, before the proof; the machine-checking talk is out of the
+% body; rem:matern-literature is moved from the end of the section to the end of 5.2 and given
+% its citekeys; rem:student-ggc's second paragraph is reduced to what a reader needs (both
+% paper-side changes to copied remarks). MIRRORED 2026-09-19 (R174): rem:matern-literature's
+% citekeys are in the blueprint; rem:student-ggc's reduction is NOT mirrored, deliberately, the
+% blueprint keeping its account of what is not machine-checked and why A18 is unadmitted (D5).
+%
+% Contents and departures from the blueprint chapter:
+%   - all eleven statement nodes transcribed under their markers: prop:moments-tails ([A] on A13
+%     and A14, notready on the bounded-support and heavy-tail clauses), prop:matern-exponent
+%     (also Appendix A.3 of the line paper, in the form that paper's body used; stated here in
+%     full with the blueprint's own remark at the end of its proof), prop:matern-density ([A] on
+%     A15 and A16, notready), thm:matern, cor:matern-realization (no Lean scheduled),
+%     prop:thorin-subclass ([A] on A11), lem:thorin-two-sided, lem:thorin-ggc ([A] on A17,
+%     unadmitted, notready), prop:student-t (notready on clause (4) alone), prop:stable-family;
+%     the [A] nodes' page anchors are printed in the prose before each statement, read from
+%     blueprint/AXIOMS.md;
+%   - rem:student-ggc and rem:matern-literature are copied (remarks carry no marker);
+%     rem:student-ggc is where the one cited fact about the Student-t corner binds;
+%   - the paragraph after prop:student-t on which locality principle cuts the Student-t family
+%     out (module C's chapters) becomes a sentence naming the next module's subject with no
+%     statement number;
+%   - the blueprint's status annotations are not transcribed; what a reader needs from them is
+%     said in prose next to each statement, in particular which clauses are machine-checked and
+%     on what, and what a statement does not claim;
+%   - this section's one relation-to-the-causal-theory remark (ADR-0003) is the paragraph after
+%     the Thorin proposition on the bijection of the corners; the causal article is named there.
+
+\section{The corners: \texorpdfstring{\Matern{}}{Matern}, Student-t, symmetric stable}
+\label{sec:corners}
+
+The two preceding sections described the admissible cone as a whole: its extreme rays, and the
+part of it that the causal theory reaches. This section is about individual members, the ones
+a user of scale space would compute with. Three families are treated, each already in use.
+The \emph{\Matern{}} kernels are the
+covariance family of spatial statistics (\sscite{whittle1954stationary};
+\sscite{guttorp2006studies} for the history; \sscite{porcu2024matern} for the present state).
+The \emph{Student-t} laws are the classical heavy-tailed relatives of the normal law, and
+their member with one degree of freedom is the Cauchy kernel of the Poisson scale space
+(\sscite{felsberg2004monogenic}). The \emph{symmetric stable} laws are the kernels the
+semigroup axiomatics of scale space arrive at (\sscite{pauwels1995extended};
+\sscite{duits2004axioms}). What the hemigroup theory adds is one description for all three and
+a way to compare them. Each family is a curve of profiles: an exponential for the \Matern{}
+kernels, the Gaussian mixture of the causal Bessel catalogue for the Student-t laws, a pure
+power for the stable laws. The profile answers the practical questions about a kernel at
+once: how many moments it has and how heavy its tail is, whether it is
+bounded at the origin (Corollary~\ref{cor:origin-boundedness}), and whether it can be computed
+exactly by recursive filters (\S\ref{sec:implementation}). Figure~\ref{fig:corners} shows the
+three families.
+
+The section has five parts. \S\ref{sec:moments-tails} gives the two dials on which the families
+are compared: the $n$-th moment is finite exactly when $\int_1^\infty x^{n-1}k(x)\,dx$ is, and
+the tail is governed by the support of the profile (Proposition~\ref{prop:moments-tails}).
+\S\ref{sec:matern} is the main result: four descriptions single out the \Matern{} family, and
+its members of integer index are exactly the families computed by a cascade of identical
+first-order recursive sections (Theorem~\ref{thm:matern},
+Corollary~\ref{cor:matern-realization}). \S\ref{sec:thorin} treats the profiles that are
+mixtures of exponentials, the subcone that contains all three families and on which the
+bridge of \S\ref{sec:bridge} is a bijection (Proposition~\ref{prop:thorin-subclass}).
+\S\ref{sec:student} and \S\ref{sec:stable} place the Student-t and the stable families in it
+(Propositions~\ref{prop:student-t} and~\ref{prop:stable-family}). Table~\ref{tab:families}
+collects what the section and the two around it establish for each family, with the unit-step
+members of \S\ref{sec:cone} for contrast.
+
+\begin{table}[!htb]
+\centering
+\caption{The named families compared, at canonical scale $t$ and with no Gaussian part
+except in the first row. ``Lag sections'' means an exact realization of every stage by the
+first-order forward--backward sections of \S\ref{sec:implementation}; ``not a limit'' means
+that no sequence of families so realized converges to the member, by
+Proposition~\ref{prop:rational-closure} --- at its clause (3) for the unit-step members and the
+\Matern{} members of non-integer index, and at its clause (5), on the moments alone, for the
+stable and Student-t members. The tail entries are orders, in the senses made precise in
+Propositions~\ref{prop:moments-tails}, \ref{prop:matern-density} and~\ref{prop:student-t}; for
+the stable row Proposition~\ref{prop:stable-family} gives the count of moments, and the order
+of the density is the classical
+$p(x) \sim \pi^{-1}\Gamma(\alpha+1)\sin(\pi\alpha/2)\,|x|^{-\alpha-1}$ of
+\sscite{sato1999levy}, Remark~14.18, pp.~87--88, which no statement here uses. Boundedness at the origin is
+Corollary~\ref{cor:origin-boundedness} for the \Matern{} and unit-step rows,
+Corollary~\ref{cor:origin-smooth} for the stable row, and the explicit density of
+Proposition~\ref{prop:student-t}(1) for the Student-t row.}
+\label{tab:families}
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}llllll@{}}
+\toprule
+family & profile $k(x)$ & finite moments & tail & bounded at $0$ & lag sections \\
+\midrule
+Gaussian & $0$, with $a > 0$ & all & $e^{-x^2/4at^2}$ & yes & a limit only \\
+\Matern{}, index $\gamma$ & $2\gamma e^{-x}$ & all & $e^{-|x|/t}$ & iff $\gamma > \tfrac12$ & iff $\gamma$ is an integer \\
+Student-t, shape $a$ & a Gaussian mixture & $n < 2a$ & $|x|^{-2a-1}$ & yes & none, not a limit \\
+stable, index $\alpha < 2$ & $C_\alpha^{-1}x^{-\alpha}$ & $n < \alpha$ & $|x|^{-1-\alpha}$ & yes & none, not a limit \\
+unit step, cutoff $\tau$ & $\mathbf 1_{(0,\tau)}$ & all & $e^{-|x|\log|x|/\tau t}$ & no & none, not a limit \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% Figure: the three corner families by parameter (2026-09-18, the author's request at the
+% review); the image is figures/fig-corners.png from scripts/make-fig-corners.py (numpy, scipy's
+% modified Bessel function, matplotlib; closed forms except the stable densities, which are
+% numerical cosine inversions checked against the Cauchy and Gaussian closed forms).
+\begin{figure}[t]
+\centering
+\includegraphics[width=\textwidth]{fig-corners.png}
+\caption{The three corner families at canonical scale $1$: the kernels (top) and the
+exponents $F = -\log\hat\phi_1$ (bottom). Left, the \Matern{} family for four values of the
+index $\gamma$: the Bessel $K_0$ at $\gamma = \tfrac12$, logarithmically singular at the
+origin, the Laplace kernel at $\gamma = 1$, and smoother kernels beyond, approaching a
+Gaussian shape; all have exponential tails, and the exponent grows like a logarithm
+(Propositions~\ref{prop:matern-exponent} and~\ref{prop:matern-density}). Middle, the Student-t
+family for four values of the degrees of freedom $2a$, in the scale of the proposition, in
+which a larger $a$ is also a narrower kernel: the Cauchy kernel at $2a = 1$; the
+tails are polynomial, of order $|x|^{-2a-1}$, and the exponent grows linearly
+(Proposition~\ref{prop:student-t}). Right, the symmetric stable family for four values of the
+index $\alpha$: the Cauchy kernel again at $\alpha = 1$, the Gaussian at $\alpha = 2$; the
+exponent is the power $|\omega|^\alpha$ and, for $\alpha < 2$, the tails are of order
+$|x|^{-1-\alpha}$ (Proposition~\ref{prop:stable-family}). The parameters vary at a fixed
+canonical scale and the bandwidths are not matched, so the panels show the shapes of the
+families and are not a comparison of smoothings; Figure~\ref{fig:experiment-b} compares members
+at equal bandwidth.}
+\label{fig:corners}
+\end{figure}
+
+\subsection{Moments and tails}\label{sec:moments-tails}
+
+Two questions one asks of any smoothing kernel are how far it spreads and how fast it falls
+off. Does it have a variance, and how many moments? Does a distant feature leak into the
+measurement at an exponential or at a polynomial rate? For an admissible kernel both answers
+are in the tail of the profile, and the reason is the displacement dictionary of
+Remark~\ref{rem:displacement-dictionary}. The profile describes a catalogue of displacements,
+$k(x)\,dx/x$ being the rate of those of size $x$; a large displacement of the kernel comes
+from a large displacement in the catalogue; and the classical theory of infinitely divisible
+laws makes this exact. A law has an $n$-th moment exactly when its \Levy{} measure, restricted
+to the large jumps, has one (\sscite{sato1999levy}, Theorem~25.3, p.~159, in the form with a
+submultiplicative weight), and when the jumps are bounded by a radius $\tau$ the tail of the
+law is of the order $e^{-|x|\log|x|/\tau}$ and no lighter (\sscite{sato1999levy},
+Theorem~26.1, p.~168, which states both directions). The proposition reads the two theorems
+in the folded profile, adds the formula for the variance, and draws the conclusion that
+matters for comparing families: a profile of bounded support gives the lightest tails the
+cone allows, and they are still heavier than a Gaussian's, so the Gaussians are the only
+members with Gaussian tails.
+
+% shared with blueprint prop:moments-tails
+\begin{proposition}[moments and tails]\label{prop:moments-tails}
+Let $F$ be admissible with data $(a,k)$, and let $X_t$ be the displacement at canonical scale
+$t$.
+\begin{enumerate}
+\item \emph{(Moments.)} For $n \ge 1$, $\mathbb{E}|X_t|^n < \infty$ if and only if
+$\int_1^\infty x^{n-1}k(x)\,dx < \infty$. When finite, the variance is
+$\mathbb{E}X_t^2 = t^2\bigl(2a + \int_0^\infty x\,k(x)\,dx\bigr)$, the two terms being the
+jitter and the second moment of the catalogue.
+\item \emph{(Tails.)} If $k \not\equiv 0$ and $\tau$ is the least radius beyond which $k$
+vanishes, then $\mathbb{E}\exp(\alpha|X_t|\log|X_t|) < \infty$ for every $\alpha < 1/(\tau t)$
+and for no $\alpha > 1/(\tau t)$: the tail is of order $e^{-|x|\log|x|/(\tau t)}$. If $k$
+vanishes beyond no $\tau$, the tail is heavier than every such rate. In particular a completely monotone $k$,
+being positive on all of $(0,\infty)$, puts the whole Thorin subclass on the heavy side, and no
+kernel other than the Gaussians themselves has a Gaussian or lighter tail.
+\end{enumerate}
+\end{proposition}
+
+The criterion of clause (1) and the two rates of clause (2) are the cited theorems read in
+this paper's convention. The translation into the folded profile, the variance formula and
+the last sentence of clause (2) are proved below; the variance formula uses no cited fact, the
+finiteness of $\mathbb{E}X_t^2$ being a conclusion of its argument and not a hypothesis.
+
+\begin{proof}[Proof of the parts that are this paper's own]
+The \Levy{} measure of $X_t$ is the $t$-dilate of $\nu = k(x)x^{-1}dx$, folded to the two-sided
+measure $\nu_2$; so
+$\int_{|x|>1}|x|^n\,\nu_2(dx) = \int_{1/t}^\infty (tx)^n\,k(x)\,x^{-1}dx$, which is finite
+exactly when $\int_1^\infty x^{n-1}k(x)\,dx$ is, the integrand being locally bounded away from
+the origin. Applying the moment criterion with the submultiplicative weight $\max(|x|,1)^n$
+gives clause (1)'s criterion: that weight agrees with $|x|^n$ on $\{|x| > 1\}$, the only region
+the criterion integrates over, and has a finite integral against the law exactly when $|x|^n$
+does, since $|x|^n \le \max(|x|,1)^n \le |x|^n + 1$; the weight $|x|^n$ itself is not
+submultiplicative.
+
+For the variance, what has to be evaluated is a second difference of the transform at the
+origin and not a second derivative. Write $C = t^2(2a + \int_0^\infty x\,k(x)\,dx)$, finite by
+hypothesis. The half-angle formula $1 - \cos u = 2\sin^2(u/2)$ gives, for every real $c$ and
+every $\omega \ne 0$,
+\[
+  \bigl(1 - \cos c\omega\bigr)\frac{2}{\omega^2}
+   = c^2\Bigl(\frac{\sin(c\omega/2)}{c\omega/2}\Bigr)^2 \le c^2 ,
+\]
+an identity rather than an estimate, so the same line supplies the pointwise limit $c^2$ as
+$\omega \to 0$, a dominating function, and the inequality $1 - \cos u \le u^2/2$. On the
+exponent side, reading it at $c = tx$ inside \ref{eq:sd-profile} and dominating by $t^2xk(x)$
+gives $2\omega^{-2}F(t\omega) \to C$; hence $F(t\omega) \to 0$, and since
+$ye^{-y} \le 1 - e^{-y} \le y$ for $y \ge 0$, the same limit holds for
+$2\omega^{-2}(1 - e^{-F(t\omega)})$. On the measure side, $\mu_t$ being a probability measure,
+$1 - \hat\mu_t(\omega) = \int(1 - \cos\omega x)\,\mu_t(dx)$; Fatou's lemma along a sequence
+$\omega_m \to 0$ turns the exponent-side limit into $\int x^2\,\mu_t(dx) \le C$, so the second
+moment is finite --- a conclusion of the argument, not a hypothesis of it --- and dominated
+convergence with the dominating function $x^2$ then gives
+$2\omega^{-2}(1 - \hat\mu_t(\omega)) \to \int x^2\,\mu_t(dx)$. The two limits are limits of the
+same function, so $\mathbb{E}X_t^2 = C$. The mean vanishes because $|x| \le 1 + x^2$ makes $x$
+integrable against $\mu_t$ and $\mu_t$ is reflection-symmetric.
+
+\emph{Remark, not machine-checked.} A second route to the variance evaluates
+$\mathbb{E}X_t^2 = -\partial_\omega^2 e^{-F(t\omega)}|_{\omega = 0} = t^2F''(0)$ and
+differentiates \ref{eq:levy-khintchine} twice under the integral sign to obtain
+$F''(0) = 2a + \int_{(0,\infty)}x^2\,\nu(dx)$. It reaches the same constant and costs a
+dominating function for each of the two differentiations, where the second difference costs one
+and delivers the finiteness of $\mathbb{E}X_t^2$ along the way.
+
+For the last
+sentence of (2), a completely monotone $k$ is a mixture of exponentials by Bernstein's theorem
+(\S\ref{sec:thorin}): $k(x) = \int e^{-\theta x}\,V(d\theta)$ for a positive measure $V$, which is
+not the zero measure because $k \not\equiv 0$. Some window $[0,\theta_0]$ then carries positive
+mass, and on it $e^{-\theta x} \ge e^{-\theta_0x}$, so
+$k(x) \ge e^{-\theta_0x}\,V([0,\theta_0]) > 0$ at every $x > 0$; hence
+$k$ vanishes beyond no $\tau$, and the heavy branch of the tail statement applies. Finally, if
+$k \equiv 0$ then $F = a\omega^2$ and the kernel is Gaussian, while if $k \not\equiv 0$ then
+$F$ has a nonzero jump catalogue and the tail floor forbids a Gaussian tail: fixing $x_0 > 0$
+with $k(x_0) \ne 0$, the catalogue reaches the radius $x_0$, so the floor holds at every
+$\alpha' > 1/(x_0t)$, and one such $\alpha'$ suffices, since
+$\alpha'|x|\log|x| \le \alpha x^2$ once $|x| \ge (2\alpha'/\alpha)^2$ --- write
+$\log|x| = 2\log\sqrt{|x|} \le 2\sqrt{|x|}$ --- while the law is a probability measure, so the
+divergence cannot come from the bounded part. No case distinction between a bounded and an
+unbounded catalogue is needed at this step, one radius the catalogue reaches being enough.
+\end{proof}
+
+The two dials are turned by one object, the tail of $k$: polynomial moment weight by its decay,
+super-exponential tail order by its support. The $\Cin$ rays and their superpositions, with
+bounded support, are the best-localized members of the cone and have every moment; the price is
+the echo structure of Lemma~\ref{lem:cin-delay-equation}. Completely monotone profiles give
+kernels with no such echoes, computed by first-order sections when the profile is a finite
+sum of exponentials with integer weights (\S\ref{sec:implementation}), at the price of tails
+no lighter than exponential.
+
+\subsection{The \texorpdfstring{\Matern{}}{Matern} family}\label{sec:matern}
+
+The \Matern{} kernels are the functions on the line with transform
+$(1 + \theta^2\omega^2)^{-\gamma}$. The name is that of the covariance functions, which are the
+members with $\gamma > \tfrac12$, and this paper uses it for the whole range $\gamma > 0$. The
+family has three histories. It entered statistics as the covariance functions of the
+stationary random fields that solve a stochastic Helmholtz equation
+(\sscite{whittle1954stationary}). It became the standard covariance family of spatial
+statistics after Mat\'ern's monograph, where it is the family of correlation functions
+$2(b\nu/2)^\nu K_\nu(b\nu)/\Gamma(\nu)$ in his notation (\sscite{matern1960spatial}, (2.4.7),
+p.~18; the name is Stein's, who defines the class by the spectral density
+$\phi(\alpha^2 + \omega^2)^{-\nu - 1/2}$ and notes that it is rational exactly at half-integer
+$\nu$, \sscite{stein1999interpolation}, (14), p.~31; \sscite{guttorp2006studies} for the history; \sscite{porcu2024matern} for the present
+state). And its members are the Green's functions of the operator
+$(1 - \theta^2\Delta)^\gamma$, which is the link to Gaussian Markov random fields
+(\sscite{lindgren2011explicit}). On the line the members of half-integer smoothness
+$\nu = \gamma - \tfrac12$, which are those of integer index $\gamma$, have the spectral density
+$(\lambda^2 + \omega^2)^{-\gamma}$, and its factorization into
+$(\lambda + i\omega)^{-\gamma}(\lambda - i\omega)^{-\gamma}$ makes the process the output of a
+linear stochastic differential equation of order $\gamma$. That is how these covariances are
+computed in Gaussian process regression (\sscite{hartikainen2010kalman}, \S 4.1, (8)--(9);
+\sscite{sarkka2019applied}, \S 12.3, (12.33)--(12.35)). The factorization of the member of
+integer index into first-order causal and anticausal factors is therefore classical. What
+Corollary~\ref{cor:matern-realization} adds is that the same factorization holds between every
+two scales, a stage being a cascade of such factors with a zero at the earlier scale, and that
+within the admissible class this property characterizes the family. In probability the same
+functions are the densities of the symmetric variance-gamma laws, Brownian motion run for a
+Gamma-distributed time, introduced as a model of asset returns (\sscite{madan1990variance};
+\sscite{fischer2025variance} for the distribution theory). In image analysis they have
+appeared as the Bessel potentials of the Bessel scale-space (\sscite{burgeth2005bessel}),
+composed there along the order $\gamma$ at a fixed range, which is a semigroup but is not
+scale invariant. What none of these sources has is the family as a scale space, composed along
+the \emph{range}: with $\gamma$ fixed and the range $\theta t$ as the scale, the kernels form
+an admissible family, an explicit member of the line paper
+(Proposition~\ref{prop:two-members}). The stage from scale $s$ to scale $t$ has the quotient
+of the two endpoint transforms as its transfer function, and it is not itself a member of the
+family.
+
+The first proposition is the computation that the rest of the subsection reads: the profile
+of the family is a single exponential,
+$k(x) = 2\gamma e^{-x/\theta}$, displacements of every size with an exponential cutoff at the
+range, and the index $\gamma$ is their overall rate.
+
+% shared with blueprint prop:matern-exponent
+\begin{proposition}[the \Matern{} family: exponent, transforms, moments]\label{prop:matern-exponent}
+For $\gamma > 0$:
+\begin{enumerate}
+\item \emph{(Exponent.)} $F(\omega) = \gamma\log(1 + \omega^2)$ is admissible, with Gaussian
+coefficient $a = 0$ and folded profile $k(x) = 2\gamma e^{-x}$; the profile at range $\theta$ is
+$k(x) = 2\gamma e^{-x/\theta}$, with exponent $\gamma\log(1 + \theta^2\omega^2)$.
+\item \emph{(Transforms.)} $e^{-F(t\omega)} = (1 + t^2\omega^2)^{-\gamma}$, and the increments
+have transfer functions $\bigl((1 + s^2\omega^2)/(1 + t^2\omega^2)\bigr)^{\gamma}$, rational in
+$\omega$ for integer $\gamma$.
+\item \emph{(Moments.)} Every moment is finite: $X_t \seq \BM_T$ with $T$ Gamma-distributed of
+shape $\gamma$ and scale $2t^2$, so
+$\mathbb{E}X_t^{2n} = (2n-1)!!\,(2t^2)^n\,\Gamma(\gamma+n)/\Gamma(\gamma)$, and in particular
+$\mathbb{E}X_t^2 = 2\gamma t^2$.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+(1) Fix $\theta > 0$ and write $p = 1/\theta$. The integrand
+$(1 - \cos\omega x)\,e^{-px}x^{-1}$ is nonnegative on $(0,\infty)$ and, since
+$1 - \cos u \le u^2/2$, is bounded there by $\tfrac12\omega^2\,x\,e^{-px}$, so it is integrable
+for every $\omega$; its derivative in $\omega$ is $\sin(\omega x)\,e^{-px}$, whose modulus is at
+most $e^{-px}$ \emph{uniformly in} $\omega$. Differentiation under the integral sign is
+therefore legitimate at every $\omega$ with one and the same dominating function, and gives
+\[
+  \frac{d}{d\omega}\int_0^\infty (1 - \cos\omega x)\,e^{-px}\,\frac{dx}{x}
+   = \int_0^\infty \sin(\omega x)\,e^{-px}\,dx = \frac{\omega}{p^2+\omega^2},
+\]
+which is also the derivative of $\tfrac12\log(1 + \omega^2/p^2)$. The two functions of $\omega$
+therefore differ by a constant, and both vanish at $\omega = 0$, so
+\[
+  \int_0^\infty (1 - \cos\omega x)\,e^{-x/\theta}\,\frac{dx}{x}
+   = \tfrac12\log\bigl(1 + \theta^2\omega^2\bigr).
+\]
+Hence $F(\omega) = \gamma\log(1+\theta^2\omega^2)$ is of the form \ref{eq:sd-profile} with
+$a = 0$ and $k(x) = 2\gamma e^{-x/\theta}$, which is nonnegative and nonincreasing on
+$(0,\infty)$. Its two integrability conditions are the two dominating functions above read on
+the two halves of the range: $\int_0^1 x\,k(x)\,dx \le 2\gamma$ and
+$\int_1^\infty k(x)\,x^{-1}dx \le 2\gamma\int_1^\infty e^{-x/\theta}dx < \infty$. Exhibiting the
+pair $(0, 2\gamma e^{-\cdot/\theta})$ is what admissibility asks for, so the argument stops
+there; the range $\theta$ is carried by the computation and needs no separate dilation step.
+
+(2) is (1) read through the similarity form of Theorem~\ref{thm:main-characterization}: the
+increment transfer function is the ratio of the endpoint transforms, the denominators being
+nonvanishing.
+
+(3) Let $\Gamma_{\gamma,2t^2}$ be the Gamma law of shape $\gamma$ and scale $2t^2$, that is the
+law on $(0,\infty)$ with density $u^{\gamma-1}e^{-u/2t^2}/(\Gamma(\gamma)(2t^2)^{\gamma})$. Its
+Laplace transform is $\int_0^\infty e^{-\sigma u}\,\Gamma_{\gamma,2t^2}(du) =
+(1 + 2t^2\sigma)^{-\gamma}$ for $\sigma \ge 0$, one Gamma integral; so the Gaussian mixture
+$\int_0^\infty g_u\,\Gamma_{\gamma,2t^2}(du)$ --- the law of $\BM_T$ with $T$ so distributed ---
+has cosine transform $(1 + 2t^2\cdot\omega^2/2)^{-\gamma} = (1 + t^2\omega^2)^{-\gamma}$, which
+by (2) is the transform of the kernel at scale $t$. Both are symmetric probability measures, so
+Proposition~\ref{prop:fourier-uniqueness} identifies them and $X_t \seq \BM_T$. Conditioning on
+$T$, $\mathbb{E}X_t^{2n} = \mathbb{E}[T^n]\,\mathbb{E}[\BM_1^{2n}] = (2n-1)!!\;\mathbb{E}T^n$
+with $\mathbb{E}[\BM_v^{2n}] = (2n-1)!!\,v^n$ and
+$\mathbb{E}T^n = (2t^2)^n\Gamma(\gamma+n)/\Gamma(\gamma)$; the two are the same Gamma integral
+read at half-integer and at integer argument. Every moment is then finite, since
+$|x|^n \le 1 + x^{2n}$, and $n = 1$ with $\Gamma(\gamma+1) = \gamma\Gamma(\gamma)$ gives
+$\mathbb{E}X_t^2 = 2\gamma t^2$.
+
+\emph{Remark.} Finiteness of every moment also follows from
+Proposition~\ref{prop:moments-tails}(1), the profile decaying exponentially, and the variance
+from the variance formula there:
+$\mathbb{E}X_t^2 = t^2\int_0^\infty x\,2\gamma e^{-x}dx = 2\gamma t^2$. That route is machine-
+checked too and is independent of this one; it does not reach the general even moment.
+\end{proof}
+
+The kernel has a closed form in the modified Bessel function $K_\nu$, and it is the form under
+which the family is known. The next proposition records it, with its two elementary members,
+the Laplace kernel and the Bessel $K_0$, its exponential tail and its Gaussian limit. The
+closed form and the tail are classical and are cited: the Fourier pair, with the
+identification of the family as the symmetric variance-gamma laws, is
+\sscite{fischer2025variance}, the density (1.1) and the characteristic function (2.12), with
+self-decomposability in \S2.3, p.~6; the asymptotics of the modified Bessel function that give
+the tail are \sscite{dlmf2026}, \S10.25(ii), (10.25.3), and
+\sscite{abramowitz1964handbook}, \S9.7, 9.7.2, p.~378.
+
+% shared with blueprint prop:matern-density
+\begin{proposition}[the \Matern{} family: the kernel and its tail]\label{prop:matern-density}
+For $\gamma > 0$ and $t > 0$ the kernel of the \Matern{} family at canonical scale $t$ has the
+density
+\[
+  \phi_t(x) = \frac{1}{\sqrt\pi\,\Gamma(\gamma)\,t}
+   \Bigl(\frac{|x|}{2t}\Bigr)^{\gamma - \frac12}
+   K_{\gamma-\frac12}\Bigl(\frac{|x|}{t}\Bigr),
+\]
+for $\gamma > \tfrac12$ the \Matern{} kernel of smoothness $\gamma - \tfrac12$ and range $t$
+normalised to unit mass; for every $\gamma > 0$ these are the symmetric variance-gamma laws. Here
+$\gamma = 1$ gives the Laplace kernel $e^{-|x|/t}/(2t)$ at every $x \ne 0$, and
+$\gamma = \tfrac12$ gives $K_0(|x|/t)/(\pi t)$ at every $x$. The origin is excluded from the first
+of those two values because the display reads there as the product of $(|x|/2t)^{1/2} = 0$ with
+$K_{1/2}(0)$ and does not return $(2t)^{-1}$. The difference is on a null set and leaves the
+kernel, a density, unchanged.
+As $|x| \to \infty$,
+$\phi_t(x) \sim c_\gamma\,t^{-\gamma}|x|^{\gamma-1}e^{-|x|/t}$: exponential tails, the
+heavy side of Proposition~\ref{prop:moments-tails}(2), as for every completely monotone profile. As
+$\gamma \to \infty$ with $2\gamma t^2 = v$ held fixed, $\phi_t$ converges weakly to the
+Gaussian of variance $v$.
+\end{proposition}
+
+The displayed function is a probability density for every
+$\gamma > 0$, but a \Matern{} \emph{covariance} function is bounded at the origin, which needs
+the smoothness $\gamma - \tfrac12$ to be positive, and Corollary~\ref{cor:origin-boundedness}
+says the same from the side of the profile. Of the proposition's content, the two special
+values, that the kernel is a density at all (Proposition~\ref{prop:kernel-regularity}) and the
+Gaussian limit, from $(1 + v\omega^2/2\gamma)^{-\gamma} \to e^{-v\omega^2/2}$ and
+Proposition~\ref{prop:levy-continuity}, are proved in this paper; the closed form and the tail
+are the two cited facts.
+
+The theorem says that four descriptions single out the same family. The first is the profile,
+a single exponential. The second is the Thorin measure of \S\ref{sec:thorin}, a single atom:
+among the mixtures of exponentials, the \Matern{} members are the pure ones. The third is the
+kernel, through its transform. The fourth is the engineering one: for integer $\gamma$, every
+stage of the family, from scale $s$ to scale $t$, is a rational filter with a single pole
+pair, which is what lets the family be computed by recursive filters with no approximation
+(\S\ref{sec:implementation}). The equivalence of the fourth with the first is the point. A
+stage that is a cascade of identical first-order sections is what one would ask for on
+practical grounds. Within the cone that property singles out one family, the one spatial
+statistics had already chosen on grounds of its own.
+
+% shared with blueprint thm:matern
+\begin{theorem}[the \Matern{} theorem]\label{thm:matern}
+For an admissible family \emph{in its canonical gauge} and $\gamma, \theta > 0$, clauses (1), (2)
+and (3) are equivalent, and
+when $\gamma$ is a positive integer they are equivalent to clause (4).
+\begin{enumerate}
+\item The profile is a single exponential, $k(x) = 2\gamma e^{-x/\theta}$, and $a = 0$.
+\item The family lies in the symmetric Thorin subclass of
+Proposition~\ref{prop:thorin-subclass} with
+Gaussian coefficient $0$ and the one-point Thorin measure $2\gamma\,\delta_{1/\theta}$.
+\item The kernels are \Matern{}: $\hat\phi_t(\omega) = (1 + \theta^2t^2\omega^2)^{-\gamma}$.
+\item The stage transfer functions are $\hat\mu_{s,t}(\omega) =
+\bigl((1 + \theta^2s^2\omega^2)/(1 + \theta^2t^2\omega^2)\bigr)^{\gamma}$ for all $s \le t$,
+rational in $\omega$, with a single pole pair when $s < t$.
+\end{enumerate}
+The parameter $\theta$ is a change of gauge and may be normalised to $1$.
+\end{theorem}
+
+The equivalences hold at a given pair $(\gamma,\theta)$, and the one cited fact the proof uses
+is the uniqueness of the \Levy{} pair (Proposition~\ref{prop:fourier-toolbox}(3)), which turns
+an equality of exponents into an equality of profiles. Clause (4) is stated for integer
+$\gamma$ only, the single-pole-pair case: at a non-integer exponent the stage transfer
+function is not a ratio of polynomials. The canonical gauge is a hypothesis because clauses (3)
+and (4) speak of the kernels and the stages at the parameter $t$: a \Matern{} family read in
+another gauge $\chi$ has the stage transfer function with $\chi(s)$ and $\chi(t)$ in place of $s$
+and $t$, and satisfies clause (1) all the same.
+Proposition~\ref{prop:rational-increments} gives a class of admissible stage transfer functions;
+which rational functions in general are admissible stages is open (\S\ref{sec:conclusions}), and
+Remark~\ref{rem:rational-converse} shows that the first clause of that proposition has no
+converse.
+
+\begin{proof}
+\emph{(1) if and only if (2).} With $k(x) = 2\gamma e^{-x/\theta}$ and $a = 0$, take
+$U = 2\gamma\,\delta_{1/\theta}$. Then \ref{eq:thorin} reads
+$\tfrac12\cdot 2\gamma\log(1 + \omega^2\theta^2) = \gamma\log(1+\theta^2\omega^2)$, which is the
+exponent computed in Proposition~\ref{prop:matern-exponent}(1); so (1) implies (2) with that
+one-point measure, the factor $2$ of the folded profile cancelling the $\tfrac12$ of
+\ref{eq:thorin}. Conversely, a one-point $U = 2\gamma\,\delta_{1/\theta}$ makes the right-hand
+side of \ref{eq:thorin} that same exponent, so $F(\omega) = \gamma\log(1+\theta^2\omega^2)$, and
+the next paragraph's uniqueness argument returns the single exponential.
+
+\emph{(1) implies (3)} is Proposition~\ref{prop:matern-exponent}(1)--(2) after the gauge change
+$t \mapsto \theta t$, which Proposition~\ref{prop:matern-exponent}(1) supplies directly at range
+$\theta$.
+
+\emph{(3) implies (1).} Reading the transform at the canonical scale $t = 1$ and taking
+logarithms turns clause (3) into $F(\omega) = \gamma\log(1+\theta^2\omega^2)$; the other scales
+say nothing further. The computation in Proposition~\ref{prop:matern-exponent}(1) shows that
+this exponent has the pair $(0, 2\gamma e^{-x/\theta}x^{-1}dx)$, and the pair of an exponent is
+unique (Proposition~\ref{prop:fourier-toolbox}(3)), so $a = 0$ and the \Levy{} measure is that
+one. Uniqueness of the pair is an identity of \emph{measures}, so it gives
+$k(x) = 2\gamma e^{-x/\theta}$ for almost every $x > 0$; the pointwise identity on $(0,\infty)$
+follows because $k$ is nonincreasing there while $2\gamma e^{-\cdot/\theta}$ is continuous.
+Indeed the set on which the two agree is co-null, hence meets every subinterval of $(0,\infty)$;
+approaching a given $x > 0$ from the left through that set gives
+$k(x) \le 2\gamma e^{-y/\theta}$ for points $y < x$ arbitrarily close to $x$, whence
+$k(x) \le 2\gamma e^{-x/\theta}$, and approaching from the right gives the reverse inequality.
+(Monotonicity of the comparison function is not used; continuity of one side and monotonicity
+of the other suffice.)
+
+\emph{(3) if and only if (4)}, for integer $\gamma$, is Proposition~\ref{prop:matern-exponent}(2)
+read in both directions. Forwards, the cascade law makes the increment transfer function the
+ratio of the two endpoint transforms, the denominators being nonvanishing; at the collapsed pair
+$s = t = 0$ the same law reads $\hat\mu_{0,1} = \hat\mu_{0,1}\hat\mu_{0,0}$ with
+$\hat\mu_{0,1} > 0$, so $\hat\mu_{0,0} = 1$, which is clause (4) there. Backwards, clause (4) at
+$s = 0$ is the endpoint transform of clause (3); no limit in $s$ is needed.
+\end{proof}
+
+The engineering reading of the theorem is the next corollary. One of its terms belongs to
+\S\ref{sec:implementation}: a first-order forward--backward section is a first-order recursive
+filter run forward along the signal, together with its mirror image run backward, and a cascade
+of $\gamma$ identical such pairs has the transfer function
+$\bigl((1+p^2\omega^2)/(1+q^2\omega^2)\bigr)^\gamma$, with $q$ the range of the pole and $p$ that
+of the zero. The realization half of the corollary is proved in that section, where the sections
+are constructed. What the corollary does \emph{not} prescribe is the pair: the pole and the zero
+are not tied in advance to the two scales of the stage, and the third clause asks for one kernel
+from the origin and nothing else. That the zero then vanishes is the content of the argument.
+
+% shared with blueprint cor:matern-realization
+\begin{corollary}[the \Matern{} families of integer index are the ones realized by identical first-order sections]
+\label{cor:matern-realization}
+Let $(\Phis{s}{t})$ be an admissible family in its canonical gauge and let $\gamma$ be a positive
+integer. Call a symmetric kernel \emph{a cascade of $\gamma$ identical forward--backward pairs of
+first-order sections} when its transform is
+$\bigl((1+p^2\omega^2)/(1+q^2\omega^2)\bigr)^{\gamma}$ for some $p, q \ge 0$, the pair being the
+first-order forward--backward section pair of Proposition~\ref{prop:matern-cascade} with pole
+range $q$ and zero range $p$. Then the following are equivalent.
+\begin{enumerate}
+\item The family is \Matern{} of index $\gamma$: its exponent is
+$F(\omega) = \gamma\log(1+\theta^2\omega^2)$ for some $\theta > 0$.
+\item Every stage is such a cascade: for all $0 \le s < t$ the increment $\mu_{s,t}$ is a cascade
+of $\gamma$ identical pairs, with $p$ and $q$ depending on the pair of scales.
+\item One kernel from the origin is such a cascade: for some $t > 0$ the kernel $\phi_t$ is.
+\end{enumerate}
+In (1) the pair of the stage from $s$ to $t$ is $(p,q) = (\theta s, \theta t)$; in (3) the zero
+necessarily vanishes, $p = 0$ and $q = \theta t$. Such a family has every moment finite and
+exponential tails.
+\end{corollary}
+
+The word \emph{identical} is what carries the corollary, and it cannot be dropped. An admissible
+family whose kernel from the origin is a cascade of first-order forward--backward pairs of
+different ranges need not be \Matern{}: the second example of
+Remark~\ref{rem:rational-converse}, of exponent $2\log(1+\omega^2) - \log(1+\omega^2/4)$, has the
+kernel transform $\bigl[(1+t^2\omega^2/4)/(1+t^2\omega^2)\bigr]\cdot(1+t^2\omega^2)^{-1}$ from the
+origin at scale $t$, a cascade of two pairs, one carrying a zero of range $t/2$ and one a pure
+pole of range $t$. The same happens with three pairs at $k(x) = 6e^{-x} - 2e^{-2x}$, which is
+positive ($6e^{-x} \ge 2e^{-x} > 2e^{-2x}$) and nonincreasing
+($k'(x) = -2e^{-x}(3-2e^{-x}) < 0$) and has
+$F(\omega) = 3\log(1+\omega^2) - \log(1+\omega^2/4)$ by
+Proposition~\ref{prop:matern-exponent}(1) at the two rates.
+
+\begin{proof}
+\emph{(1) implies (2).} A \Matern{} family of positive integer index $\gamma$ and range $\theta$
+has, by Proposition~\ref{prop:matern-cascade} read in the gauge $t \mapsto \theta t$, the stage
+transfer functions $\bigl((1+\theta^2s^2\omega^2)/(1+\theta^2t^2\omega^2)\bigr)^\gamma$ at every
+pair of scales, realized by $\gamma$ identical forward--backward pairs; so every stage is a
+cascade of the kind named, with $(p,q) = (\theta s,\theta t)$ and $p < q$.
+
+\emph{(2) implies (3)} is the stage from $s = 0$, which in the canonical gauge is the kernel
+$\phi_t = \mu_{0,t}$ from the origin, at any $t > 0$.
+
+\emph{(3) implies (1).} Suppose
+$\hat\phi_t(\omega) = \bigl((1+p^2\omega^2)/(1+q^2\omega^2)\bigr)^\gamma$ for some $t > 0$ and
+some $p,q \ge 0$. First $q > p$: the transform of a probability measure is bounded by $1$ in
+modulus, so the ratio $(1+p^2\omega^2)/(1+q^2\omega^2)$ is bounded on the line, which forces
+$q \ge p$, and $q = p$ would make $\hat\phi_t \equiv 1$, hence $\phi_t = \delta_0$ and
+$\Phis{0}{t} = \mathrm{Id}$, against (ND). Next $p = 0$: by
+Proposition~\ref{prop:kernel-regularity} the kernel from the origin is absolutely continuous, so
+its transform tends to $0$ at infinity --- the Fourier transform of an integrable function does
+--- while
+\[
+  \Bigl(\frac{1+p^2\omega^2}{1+q^2\omega^2}\Bigr)^{\gamma}
+   \ \longrightarrow\ \Bigl(\frac pq\Bigr)^{2\gamma} \qquad (|\omega| \to \infty),
+\]
+a positive number unless $p = 0$. So $p = 0$ and $q > 0$, and the canonical gauge reads
+$e^{-F(t\omega)} = (1+q^2\omega^2)^{-\gamma}$, that is
+$F(t\omega) = \gamma\log(1+q^2\omega^2)$; substituting $\omega \mapsto \omega/t$ gives clause (1)
+with $\theta = q/t$.
+
+\emph{The index is not free.} If the kernels from the origin at two scales are cascades of
+$\gamma$ and $\gamma'$ identical pairs, the paragraph just proved gives
+$\gamma\log(1+\theta^2\omega^2) = \gamma'\log(1+\theta'^2\omega^2)$; dividing by $\log|\omega|$
+and letting $|\omega| \to \infty$ gives $\gamma = \gamma'$. So the number of pairs is the index,
+at every scale.
+
+\emph{The consequences.} Every moment is finite by
+Proposition~\ref{prop:matern-exponent}(3), and the tail is exponential by
+Proposition~\ref{prop:matern-density}.
+\end{proof}
+
+% blueprint rem:matern-literature, copied; moved here from the end of the section and given its
+% citekeys paper-side (2026-09-18, the author's review: each corner placed in its literature).
+\begin{remark}[the literature of the \Matern{} corner]\label{rem:matern-literature}
+The kernels of Theorem~\ref{thm:matern} are the \Matern{} covariance functions of spatial
+statistics, defined there by the spectral density $(1+\theta^2\omega^2)^{-\gamma}$ or as the
+Green's functions of a fractional Helmholtz operator (\sscite{whittle1954stationary};
+\sscite{lindgren2011explicit}; \sscite{porcu2024matern}). In image analysis the same kernels
+appear as Bessel potentials, and the Bessel scale-space built from them
+(\sscite{burgeth2005bessel}) composes the family along the \emph{order} $\gamma$ at fixed
+range --- an additive semigroup in $\gamma$ that is explicitly not scale invariant --- with no
+composition law stated for the range family at fixed order. In natural-image statistics they
+appear as Bessel K forms, a statistical model of filter responses rather than a kernel family
+(see \sscite{pedersen2005alpha}). In none of these is the family derived from axioms on
+measurement, and the hemigroup is what makes the derivation possible: composed along the range
+the family is a two-parameter cascade whose increments are not stationary in the scale
+parameter, so no semigroup axiomatics can reach it, which is why the literature composed along
+the order instead. The probabilistic identity, the symmetric variance-gamma laws
+(\sscite{madan1990variance}), is what the classification actually sees.
+\end{remark}
+
+\subsection{The symmetric Thorin subclass}\label{sec:thorin}
+
+A function on $(0,\infty)$ is \emph{completely monotone} when it is smooth and its derivatives
+alternate in sign, $(-1)^n k^{(n)} \ge 0$ for every $n$. By Bernstein's theorem, cited below,
+these are the mixtures of exponentials, $k(x) = \int e^{-\theta x}\,U(d\theta)$ with a positive
+measure $U$. Each exponential is a
+\Matern{} profile, so these are the superpositions of \Matern{} members over their ranges, and
+the mixing measure $U$ is called the \emph{Thorin measure}. The class is classical. On the
+half-line it is Thorin's class of generalized gamma convolutions, introduced to prove the
+infinite divisibility of the Pareto and the lognormal laws (\sscite{thorin1977pareto};
+\sscite{thorin1977lognormal}) and developed into a theory by Bondesson
+(\sscite{bondesson1992generalized}); the class here is its symmetric extension to the line.
+
+Three things make it the organising object of this section. All three named families lie in
+it, the \Matern{} family as its atoms and the Student-t family under the hypothesis of
+Remark~\ref{rem:student-ggc}. It is the part of the cone on which the bridge of
+\S\ref{sec:bridge} is a bijection: a causal family with a completely monotone delay profile and
+its image determine each other, with an explicit map between their Thorin measures. And it
+contains the families realized by first-order sections, as the members whose Thorin measure is a finite
+sum of atoms of even integer mass (Proposition~\ref{prop:thorin-machine}). The
+proposition gives the representation of the exponent that goes with the mixture,
+\ref{eq:thorin}, in which every atom of $U$ contributes one \Matern{} exponent; clause (3) is
+the bijection, and clause (4) shows that the subclass is strictly smaller than the image of the
+bridge, so that the chain from the Thorin subclass through the subordinated slice to the cone
+is strict at both steps. With the \Matern{} members at its start, the chain and the members
+that make each step strict are
+\[
+\begin{array}{ccccccc}
+\text{\Matern{} members} & \subsetneq & \text{Thorin subclass} & \subsetneq & \mathcal{S}
+  & \subsetneq & \text{admissible cone} \\[2pt]
+ & & \uparrow & & \uparrow & & \uparrow \\[2pt]
+ & & \text{stable} & & k(x) = 2\,\erfc\bigl(x/\sqrt{2\tau}\bigr) & & \Cin\ \text{rays}
+\end{array}
+\]
+where each member named in the lower row lies in the class above it and not in the class to
+the left of that one. The Student-t members sit beside the stable ones under the hypothesis of
+Remark~\ref{rem:student-ggc}, and unconditionally nowhere in this chain. The first step is strict
+because the \Matern{} members are the atoms of
+the subclass, the second by clause (4), and the third by
+Proposition~\ref{prop:bridge-strictness}(3). Figure~\ref{fig:filtration} divides the last step
+further, by dimension. The one cited fact is Bernstein's theorem, that a completely monotone
+function is the Laplace transform of a positive measure (\sscite{schilling2012bernstein},
+Theorem~1.4, p.~3; \sscite{feller2009introduction}, Vol.~2, \S XIII.4, Theorems~1 and~1a,
+pp.~439--440).
+
+% shared with blueprint prop:thorin-subclass
+\begin{proposition}[the symmetric Thorin subclass]\label{prop:thorin-subclass}
+For an admissible $F$ with data $(a,k)$ the following are equivalent.
+\begin{enumerate}
+\item $k$ is completely monotone.
+\item $F$ has a symmetric Thorin representation
+\begin{equation}\label{eq:thorin}
+  F(\omega) = a\,\omega^2
+   + \tfrac12\int_{(0,\infty)} \log\Bigl(1 + \frac{\omega^2}{\theta^2}\Bigr)\,U(d\theta),
+  \qquad U \ge 0, \quad
+  \int_{(0,\infty)}\log\Bigl(1 + \frac{1}{\theta^2}\Bigr)\,U(d\theta) < \infty .
+\end{equation}
+\end{enumerate}
+A third member of the equivalence --- that the kernels are symmetric extended generalized gamma
+convolutions in Thorin's sense --- is stated apart, as Lemma~\ref{lem:thorin-ggc}, because it
+rests on the reading of Thorin's definition rather than on Bernstein's theorem.
+
+Moreover:
+\begin{enumerate}
+\item[(3)] \emph{(The bridge on Thorin subclasses.)} If $F_{\mathrm I}$ is causally admissible
+with completely monotone profile $k_{\mathrm I} = \int e^{-\theta u}\,U_{\mathrm I}(d\theta)$,
+then $F_{\mathrm I}(\cdot^2/2)$ is a symmetric Thorin member with $a = \tfrac12 b_0$ and $U$
+equal to \emph{twice} the image of $U_{\mathrm I}$ under $\theta \mapsto \sqrt{2\theta}$; the
+map $U_{\mathrm I} \mapsto U$ is linear and injective, and carries the causal Thorin measures
+onto the Thorin measures of the symmetric Thorin members, so the subordination bridge restricts
+to a linear bijection of the causal Thorin subclass onto the symmetric one.
+\item[(4)] \emph{(Strictness the other way.)} The subordinated slice $\mathcal{S}$ of
+Proposition~\ref{prop:bridge-strictness} is strictly larger than the symmetric Thorin subclass:
+the image of the causal ray with profile $k_{\mathrm I} = \mathbf 1_{(0,\tau)}$ has the explicit
+profile $k(x) = 2\,\erfc\bigl(x/\sqrt{2\tau}\bigr)$, which is not completely monotone. So the
+symmetric Thorin subclass is strictly inside $\mathcal{S}$, which is strictly inside the
+admissible cone.
+\end{enumerate}
+\end{proposition}
+
+Clause (3) is classical. Both directions, with the correspondence of the measures, are
+Bondesson's Theorem~7.3.1, p.~115: if $\varphi$ is the moment generating function of a
+generalized gamma convolution then $\psi(s) = \varphi(s^2/2)$ is that of a symmetric extended
+generalized gamma convolution, and conversely; and the proof on pp.~115--116 computes the
+spectral measure of $\psi$ as the image of that of $\varphi$ under $t \mapsto \pm\sqrt{2t}$, the
+left extremity of $\varphi$ becoming half the coefficient of $s^2$ in $\psi$. Read at imaginary
+argument --- which is Lemma~\ref{lem:thorin-ggc} --- that is the clause. What belongs to this
+paper is the folded normalisation, the linearity and injectivity of the measure map, and the
+verification that the constructed causal datum is causally admissible.
+
+What is taken from Bernstein's theorem is its existence half. The uniqueness of the Thorin
+measure is not taken from it: it is Proposition~\ref{prop:laplace-uniqueness-locally-finite}.
+The computation that turns the mixture into \ref{eq:thorin}, the correspondence between the
+two integrability conditions, and clauses (3) and (4), which are computations on the bridge
+profile \ref{eq:bridge-profile}, are proved below. An atom of $U$ at $\theta = 0$ is excluded
+because it would make $k$ bounded below and $\int_1^\infty k(x)x^{-1}dx$ infinite.
+
+\begin{proof}[Proof of the parts that are this paper's own]
+\emph{(1) implies (2).} By Bernstein's theorem, $k(x) = \int_{[0,\infty)} e^{-\theta x}\,U(d\theta)$
+for a positive measure $U$ on $[0,\infty)$; an atom at $\theta = 0$ would make $k$ bounded below
+by a positive constant, so that $\int_1^\infty k(x)x^{-1}dx = \infty$, against admissibility. So
+$U$ lives on $(0,\infty)$, and it is $\sigma$-finite, its transform being finite at $x = 1$.
+Tonelli with the computation of Proposition~\ref{prop:matern-exponent}(1) gives
+\[
+  \int_0^\infty (1-\cos\omega x)\,k(x)\,\frac{dx}{x}
+  = \int_{(0,\infty)}\Bigl(\int_0^\infty (1-\cos\omega x)\,e^{-\theta x}\,\frac{dx}{x}\Bigr) U(d\theta)
+  = \tfrac12\int_{(0,\infty)}\log\Bigl(1 + \frac{\omega^2}{\theta^2}\Bigr)U(d\theta),
+\]
+which is \ref{eq:thorin}. The integrability condition of \ref{eq:thorin} is not a further
+hypothesis but a consequence of that identity: read at $\omega = 1$ the identity says that the
+integral is $2(F(1) - a)$, and $F(1)$ is finite for every admissible $F$ by
+Lemma~\ref{lem:quadratic-growth}. Three regimes read off from it what the classical form of the
+condition states separately: $\log(1+\theta^{-2}) \ge 2\log(1/\theta)$ near $0$,
+$\ge \tfrac12\theta^{-2}$ at infinity, and $\ge \log 2$ on $(0,1]$, so that
+$\int_{(0,1]}\log(1/\theta)\,U(d\theta)$ and $\int_{(1,\infty)}\theta^{-2}\,U(d\theta)$ are finite
+and $U$ is finite on $(0,1]$, hence on every compact subset of $(0,\infty)$.
+
+\emph{(2) implies (1).} Given \ref{eq:thorin} with $U$ carried by $(0,\infty)$, set
+$k'(x) := \int_{(0,\infty)} e^{-\theta x}\,U(d\theta)$, which is finite for every $x > 0$: on
+$(0,1]$ the integrand is at most $1$ and $U$ is finite there, and on $(1,\infty)$ one has
+$e^{-\theta x} \le C_x\theta^{-2}$ against the second integral, both facts being the three regimes
+of the previous paragraph. It is the finiteness of $U$ on $(0,1]$ that is doing the work here, and
+it is why the displayed condition is the one printed: the two integrals alone leave $U$ free to
+put infinite mass just below $\theta = 1$. The displayed Tonelli, read backwards, says that $k$ and $k'$ have the same
+compensated integral $\int_0^\infty(1-\cos\omega x)\,\cdot\,dx/x$ at every frequency. That $k'$
+is the profile of a symmetric \Levy{} pair at all --- that is, that
+$\int_0^\infty (1\wedge x^2)\,k'(x)\,dx/x < \infty$ --- follows by averaging that identity over
+$\omega$ against a standard Gaussian law: Tonelli replaces the weight $1 - \cos\omega x$ by
+$1 - e^{-x^2/2}$, which lies between $\tfrac13(1 \wedge x^2)$ and $1 \wedge x^2$, so the \Levy{}
+condition transfers from $k$ to $k'$. Uniqueness of the pair
+(Proposition~\ref{prop:fourier-toolbox}(3)) then identifies the two \Levy{} measures, hence $k$
+and $k'$ almost everywhere on $(0,\infty)$, and hence everywhere there, $k$ being nonincreasing
+and $k'$ continuous. So $k$ is a Laplace transform, and Bernstein's theorem read the other way
+returns complete monotonicity.
+
+\emph{Uniqueness of $U$.} If $U'$ on $(0,\infty)$ also satisfies \ref{eq:thorin}, the previous
+paragraph applied to $U'$ gives $k(x) = \int e^{-\theta x}\,U'(d\theta)$ as well, so $U$ and $U'$
+have the same Laplace transform on $(0,\infty)$ and it is finite there; by
+Proposition~\ref{prop:laplace-uniqueness-locally-finite}, $U' = U$. This does not spend the
+uniqueness half of Bernstein's theorem: the Laplace uniqueness the argument needs is proved in
+the line paper.
+
+\emph{(3).} With $k_{\mathrm I}(u) = \int e^{-\theta u}\,U_{\mathrm I}(d\theta)$,
+\ref{eq:bridge-profile} and Tonelli give
+\[
+  k(x) = \int U_{\mathrm I}(d\theta)\;2x\int_0^\infty g_u(x)\,e^{-\theta u}\,\frac{du}{u}
+       = 2\int e^{-x\sqrt{2\theta}}\,U_{\mathrm I}(d\theta),
+\]
+by the first-passage identity used in Proposition~\ref{prop:bridge-families}(2); substituting
+$\theta' = \sqrt{2\theta}$ this is $\int e^{-\theta'x}\,U(d\theta')$ with $U$ twice the image
+of $U_{\mathrm I}$, so $k$ is completely monotone, and the Gaussian coefficient is
+$\tfrac12 b_0$ by Lemma~\ref{lem:bridge-exponents}. That $U_{\mathrm I}$ is $\sigma$-finite,
+which the Tonelli needs, is not a further hypothesis: $k_{\mathrm I}(1)$ is a real number, so
+the transform of $U_{\mathrm I}$ is finite at $u = 1$ against a weight vanishing nowhere.
+
+The identification of $k$ deserves a sentence, because the exponent determines it only up to a
+null set. What Proposition~\ref{prop:fourier-toolbox}(3) returns, applied to the subordinated
+exponent and to any admissible $F$ with that exponent, is equality of the two \Levy{} measures,
+hence of the two profiles almost everywhere on $(0,\infty)$; the conclusions of this clause ---
+complete monotonicity, which is a statement about every derivative at every point --- are
+pointwise. The passage is the one Theorem~\ref{thm:matern} makes: the two profiles are
+nonincreasing and the Laplace transform $\int e^{-\theta'x}U(d\theta')$ is continuous on
+$(0,\infty)$ by dominated convergence, and a nonincreasing function almost everywhere equal to
+a continuous one equals it everywhere, the good set meeting every subinterval on each side of a
+given point.
+
+The factor $2$ is the folding convention and is checked on the \Matern{} member: the causal
+Gamma data are $U_{\mathrm I} = \gamma\delta_1$, whence $U = 2\gamma\delta_{\sqrt2}$ and
+\ref{eq:thorin} returns
+$\tfrac12\cdot 2\gamma\log(1+\omega^2/2) = \gamma\log(1+\omega^2/2)$, which is
+Proposition~\ref{prop:bridge-families}(2); the image without the factor would return half of it.
+
+\emph{The bridge is onto the symmetric Thorin subclass.} Let $F$ be admissible with data $(a,k)$
+and Thorin measure $U$ on $(0,\infty)$ as in \ref{eq:thorin}. Put $b_0 := 2a$, let
+$U_{\mathrm I}$ be half the image of $U$ under $\theta' \mapsto \theta'^2/2$, and let
+$k_{\mathrm I}(u) := \int e^{-\theta u}\,U_{\mathrm I}(d\theta)$ for $u > 0$. The transform is
+finite: the exponents satisfy
+$u\theta'^2/2 - (u\theta'/2 - u/2) = \tfrac u2\bigl((\theta' - \tfrac12)^2 + \tfrac34\bigr) \ge 0$,
+so $k_{\mathrm I}(u) \le \tfrac12 e^{u/2}\int e^{-u\theta'/2}\,U(d\theta')$, which the three
+regimes of (1) implies (2) make finite. Hence $k_{\mathrm I}$ is nonnegative and nonincreasing on
+$(0,\infty)$, and $U_{\mathrm I}$ is $\sigma$-finite. The exponent of $(b_0, k_{\mathrm I})$ is
+computed rather than identified. For $u > 0$ and $\sigma \ge 0$ one has
+$(1 - e^{-\sigma u})/u = \int_0^\sigma e^{-su}\,ds$, and integrating out $u$ first,
+\[
+  \int_0^\infty (1 - e^{-\sigma u})\,k_{\mathrm I}(u)\,\frac{du}{u}
+  = \int U_{\mathrm I}(d\theta)\int_0^\sigma \frac{ds}{s + \theta}
+  = \int \log\Bigl(1 + \frac{\sigma}{\theta}\Bigr)\,U_{\mathrm I}(d\theta)
+\]
+by Tonelli, twice. At $\sigma = \omega^2/2$ the substitution $\theta = \theta'^2/2$ turns
+$\log(1 + \sigma/\theta)$ into $\log(1 + \omega^2/\theta'^2)$ and $U_{\mathrm I}$ into
+$\tfrac12 U$, and $b_0\sigma = a\omega^2$, so $F_{\mathrm I}(\omega^2/2)$ is the right-hand side
+of \ref{eq:thorin}, which is $F(\omega)$. At $\sigma = 1$ the display gives admissibility. The two
+integrability conditions of the causal cone together say
+$\int_0^\infty \min(1,u)\,k_{\mathrm I}(u)\,du/u < \infty$, and $\min(1,u) \le e\,(1 - e^{-u})$
+for $u \ge 0$: for $u \le 1$ because $e\,(1 - e^{-u}) \ge e^u(1 - e^{-u}) = e^u - 1 \ge u$, and
+for $u \ge 1$ because $e\,(1 - e^{-u}) \ge e - 1 \ge 1$. So the conditions are bounded by
+$e\int \log(1 + 1/\theta)\,U_{\mathrm I}(d\theta)
+= \tfrac e2\int \log(1 + 2/\theta'^2)\,U(d\theta')$, and $\log(1 + 2x) \le 2\log(1 + x)$, which
+is $1 + 2x \le (1 + x)^2$, bounds that by $e$ times the Thorin integral of \ref{eq:thorin} at
+$\omega = 1$, finite because $F(1)$ is. Finally $\sqrt{2\cdot\theta'^2/2} = \theta'$ on
+$(0,\infty)$, so $U$ is twice the image of $U_{\mathrm I}$ under $\theta \mapsto \sqrt{2\theta}$.
+So every symmetric Thorin member is the bridge image of a causal Thorin member, with Gaussian
+coefficient and Thorin measures related as in (3); no uniqueness theorem and no part of
+Bernstein's theorem is used.
+
+\emph{The measure map is a linear bijection.} It is linear because taking an image measure and
+multiplying by $2$ both are. It is injective: if twice the images of $U_{\mathrm I}$ and
+$U_{\mathrm I}'$ under $\theta \mapsto \sqrt{2\theta}$ agree, so do the images, and the image of
+either under $\theta' \mapsto \theta'^2/2$, which inverts $\theta \mapsto \sqrt{2\theta}$ on
+$(0,\infty)$, returns the measure itself. Surjectivity onto the symmetric Thorin measures is the
+previous paragraph.
+
+\emph{A second route to the correspondence.} The two conditions also correspond directly, without
+passing through an exponent. Write
+$C_{\mathrm I} := \int\log(1 + \theta^{-1})\,U_{\mathrm I}(d\theta)$ for the causal condition and
+$C := \int\log(1 + \theta'^{-2})\,U(d\theta')$ for \ref{eq:thorin}'s. Since $U$ is twice the image
+of $U_{\mathrm I}$ under $\theta \mapsto \sqrt{2\theta}$, the substitution $\theta'^2 = 2\theta$
+gives $C = 2\int\log(1 + v)\,U_{\mathrm I}(d\theta)$ with $v := 1/2\theta$, while
+$C_{\mathrm I} = \int\log(1 + 2v)\,U_{\mathrm I}(d\theta)$; and
+$\log(1+v) \le \log(1+2v) \le 2\log(1+v)$, the second inequality being $1 + 2v \le (1+v)^2$. So
+$C_{\mathrm I} \le C \le 2C_{\mathrm I}$, and each condition holds exactly when the other does.
+The route above does not compare the conditions at all: it reads both off the finiteness of one
+exponent value.
+
+\emph{(4).} The causal ray has $k_{\mathrm I} = \mathbf 1_{(0,\tau)}$, and
+\ref{eq:bridge-profile} gives $k(x) = 2x\int_0^\tau g_u(x)\,du/u$. Substituting $v = x^2/2u$,
+so that $du/u = -dv/v$ and $g_u(x) = \sqrt{v/\pi}\,x^{-1}e^{-v}$,
+\[
+  \int_0^\tau g_u(x)\,\frac{du}{u}
+  = \frac{1}{\sqrt\pi\,x}\int_{x^2/2\tau}^\infty v^{-1/2}e^{-v}\,dv
+  = \frac{1}{x}\,\erfc\Bigl(\frac{x}{\sqrt{2\tau}}\Bigr),
+\]
+so $k(x) = 2\,\erfc(x/\sqrt{2\tau})$, identified pointwise by the passage of clause (3) ---
+$\erfc$ is continuous, being an integral over a moving half-line of an integrable function.
+
+It is not completely monotone, and one bound settles it. Suppose it were; then by Bernstein's
+theorem it is $\int e^{-\theta x}\,V(d\theta)$ for a positive $V$ on $[0,\infty)$, and $V \ne 0$
+because $\erfc > 0$. Some window carries mass: $V(-\infty, n] > 0$ for an integer $n$, and that
+mass is finite because the transform is. On that window $e^{-\theta x} \ge e^{-nx}$, so
+\[
+  k(x) \;\ge\; c\,e^{-nx}, \qquad c := V(-\infty,n] > 0,
+\]
+for every $x > 0$. Against that, for $y \ge 1$ the comparison $e^{-v^2} \le e^{-yv}$ on
+$(y,\infty)$ gives $\int_y^\infty e^{-v^2}dv \le e^{-y^2}/y \le e^{-y^2}$, so
+$\erfc y \le 2e^{-y^2}$ and $k(x) \le 4e^{-x^2/2\tau}$ once $x \ge \sqrt{2\tau}$. Take
+$x \ge \max\bigl(\sqrt{2\tau},\,2\tau(n+1),\,4/c + 1\bigr)$. The middle bound gives
+$x^2/2\tau \ge (n+1)x$ and the last gives $4e^{-x} \le 4/x < c$, whence
+\[
+  k(x) \;\le\; 4e^{-x^2/2\tau} \;\le\; 4e^{-x}\,e^{-nx} \;<\; c\,e^{-nx} \;\le\; k(x),
+\]
+which is absurd. Its image is admissible by Lemma~\ref{lem:bridge-exponents}, so it lies in
+$\mathcal{S}$ and not in the Thorin subclass; the other strict inclusion is
+Proposition~\ref{prop:bridge-strictness}(4).
+
+\emph{Remark, not machine-checked.} The direct route reads the same conclusion off the
+asymptotic $\erfc(x/\sqrt{2\tau}) \sim \sqrt{2\tau/\pi}\,x^{-1}e^{-x^2/2\tau}$, which says more
+than the contradiction needs: an upper bound of Gaussian type at one sufficiently large $x$ is
+enough, and the bound above costs a monotone comparison where the asymptotic costs Watson's
+lemma.
+\end{proof}
+
+Where the named families sit in the chain of (4) is said by their own statements. The
+\Matern{} family is the one-atom case of (2), so it lies in the symmetric Thorin subclass. The
+Thorin density of the stable family is Proposition~\ref{prop:stable-family}. The membership of
+the Student-t family is Proposition~\ref{prop:student-t}(3), under the hypothesis stated
+there. The $\Cin$ rays lie outside $\mathcal{S}$ by Proposition~\ref{prop:bridge-strictness}(4).
+
+The bijection in clause (3) is why the causal corners of \sscite{fagerstrom2026hemigroup} land
+on named spatial families with the same organisation. The causal Gamma family is the single
+atom of the causal Thorin subclass, and the \Matern{} family is the single atom of the
+symmetric one. The stable families correspond under $\theta \mapsto \sqrt{2\theta}$. The causal
+Bessel family maps to a Student-t family that is Thorin too, under the hypothesis of
+Remark~\ref{rem:student-ggc}. Clause (4) adds
+that the bridge is a bijection of the \emph{Thorin} subclasses and only an injection of the
+whole cones.
+
+It remains to connect \ref{eq:thorin} with Thorin's own definition, so that the name is
+earned. Bondesson defines the extended generalized gamma convolutions by a two-sided
+exponent: a moment generating function with a measure $V$ on the whole line and a compensating
+term for each $\theta$ (\sscite{bondesson1992generalized}, Chapter~7, the definition on p.~105
+with (7.1.1) and the integrability condition (7.1.2); the generalized gamma convolutions
+themselves are Theorem~3.1.1, \S3.1, p.~30). For a symmetric law the contributions of $\theta$
+and $-\theta$ pair up, the compensating terms cancel, and what is left at imaginary argument
+is the right-hand side of \ref{eq:thorin} with $U$ the fold of $V$. The first lemma is that
+computation, and it is elementary.
+
+% shared with blueprint lem:thorin-two-sided
+\begin{lemma}[Thorin's two-sided exponent at $\sigma = i\omega$]\label{lem:thorin-two-sided}
+Let $V \ge 0$ be a measure on $\RR$ with $V\{0\} = 0$, invariant under $\theta \mapsto -\theta$,
+and let $U := 2\,V|_{(0,\infty)}$ be its fold onto the positive half-line. For $\theta \ne 0$ and
+$\omega \in \RR$,
+\[
+  \frac{\theta}{\theta - i\omega}\cdot\frac{-\theta}{-\theta - i\omega}
+   = \Bigl(1 + \frac{\omega^2}{\theta^2}\Bigr)^{-1},
+  \qquad
+  -\log\Bigl|\frac{\theta}{\theta - i\omega}\Bigr|
+   = \frac12\log\Bigl(1 + \frac{\omega^2}{\theta^2}\Bigr),
+  \qquad
+  \frac{i\omega\,\theta}{1+\theta^2} + \frac{i\omega\,(-\theta)}{1+(-\theta)^2} = 0 ,
+\]
+and consequently
+\[
+  -\int_{\RR}\log\Bigl|\frac{\theta}{\theta - i\omega}\Bigr|\,V(d\theta)
+   = \frac12\int_{(0,\infty)}\log\Bigl(1 + \frac{\omega^2}{\theta^2}\Bigr)\,U(d\theta) .
+\]
+So Thorin's two-sided exponent, read at $\sigma = i\omega$ with $b = 0$ and $V$ symmetric, is the
+right-hand side of \ref{eq:thorin} at $(a, U)$ with $a = \tfrac12c$: the first identity pairs
+$\pm\theta$ without choosing a branch of the logarithm, the third cancels the compensating terms,
+and the second says that the real part alone already supplies the folded integrand.
+\end{lemma}
+
+\begin{proof}
+The three identities are pointwise computations at a fixed $\theta \ne 0$ and $\omega \in \RR$.
+For the first, the two denominators multiply to $(\theta - i\omega)(-\theta - i\omega)
+= -(\theta - i\omega)(\theta + i\omega) = -(\theta^2 + \omega^2)$, and the two numerators to
+$-\theta^2$, so the product is $\theta^2/(\theta^2 + \omega^2) = (1 + \omega^2/\theta^2)^{-1}$,
+a positive real number: no branch of a logarithm is chosen because none is taken. For the
+second, $|\theta - i\omega| = \sqrt{\theta^2 + \omega^2}$, so
+$-\log|\theta/(\theta - i\omega)| = \tfrac12\log\bigl((\theta^2+\omega^2)/\theta^2\bigr)
+= \tfrac12\log(1 + \omega^2/\theta^2)$. The third is $\theta + (-\theta) = 0$ over the common
+denominator $1 + \theta^2$, which is even in $\theta$.
+
+For the fold, the integrand of the left-hand side is, by the second identity,
+$\tfrac12\log(1 + \omega^2/\theta^2)$, an even function of $\theta$ that is finite off the
+origin; $V$ gives the origin no mass and is invariant under $\theta \mapsto -\theta$, so the
+integral over $\RR$ is twice the integral over $(0,\infty)$, and twice $V|_{(0,\infty)}$ is $U$.
+That is the displayed identity. Read at Thorin's exponent with $b = 0$, the compensating terms
+cancel in the pairs $\pm\theta$ by the third identity, the Gaussian term $\tfrac12 c\,\sigma^2$
+at $\sigma = i\omega$ is $-\tfrac12 c\,\omega^2$, and the pairs of logarithms contribute
+$-\log(1 + \omega^2/\theta^2)$ each by the first identity, which is twice the modulus identity;
+so the \Levy{} exponent, minus Thorin's, is $\tfrac12 c\,\omega^2 + \tfrac12\int_{(0,\infty)}
+\log(1 + \omega^2/\theta^2)\,U(d\theta)$, the right-hand side of \ref{eq:thorin} at
+$(\tfrac12 c, U)$.
+\end{proof}
+
+The second lemma is the reading of the definition through that computation, and nothing in the
+paper uses it. The definition as cited is a moment generating function on real $\sigma$, which the
+laws in question do not have at any $\sigma \ne 0$, so what is missing is a formal statement of
+the definition at imaginary argument, which is a reading of the source and not a proof.
+
+% shared with blueprint lem:thorin-ggc
+\begin{lemma}[the Thorin subclass is the symmetric generalized gamma convolutions]
+\label{lem:thorin-ggc}
+A symmetric law is an extended generalized gamma convolution in Thorin's sense exactly when its
+exponent has the two-sided form of Lemma~\ref{lem:thorin-two-sided} --- that is, when it is
+$-\tfrac12c\,\sigma^2 - \int_{\RR\setminus\{0\}}\bigl(\log\tfrac{\theta}{\theta-\sigma}
+- \tfrac{\sigma\theta}{1+\theta^2}\bigr)V(d\theta)$ with $c \ge 0$ and $V \ge 0$ symmetric, read
+at $\sigma = i\omega$. The two minus signs are the convention used here, in which the exponent is
+minus the logarithm of the transform; the source writes the logarithm of the moment generating
+function, without them. Consequently, for an admissible $F$ with data $(a,k)$, the two equivalent
+conditions of Proposition~\ref{prop:thorin-subclass} hold if and only if the kernels of the
+family are symmetric extended generalized gamma convolutions.
+\end{lemma}
+
+\begin{proof}
+By the cited definition a law belongs to the class exactly when its exponent is
+$-b\sigma - \tfrac12 c\sigma^2 - \int\bigl(\log\tfrac{\theta}{\theta-\sigma}
+- \tfrac{\sigma\theta}{1+\theta^2}\bigr)V(d\theta)$ for a positive $V$ on $\RR\setminus\{0\}$,
+and among these the symmetric ones are those with $b = 0$ and $V$ symmetric. Read at
+$\sigma = i\omega$, Lemma~\ref{lem:thorin-two-sided} turns that into
+$\tfrac12 c\,\omega^2 + \tfrac12\int_{(0,\infty)}\log(1 + \omega^2/\theta^2)\,U(d\theta)$ with
+$U$ the fold of $V$: the compensating terms cancel in pairs, and the pairing of $\pm\theta$
+contributes $-\log(1 + \omega^2/\theta^2)$, which is twice the modulus identity there. That is
+\ref{eq:thorin} with $a = \tfrac12 c$.
+
+The source's integrability condition on $V$ and \ref{eq:thorin}'s on $U$ are equivalent, and the
+comparison is not term by term. The source asks for
+$\int_{\RR\setminus\{0\}}(1+\theta^2)^{-1}V(d\theta) < \infty$ and
+$\int_{|\theta|\le1}|\log\theta^2|\,V(d\theta) < \infty$; folded, these read
+$\int_{(0,\infty)}(1+\theta^2)^{-1}U(d\theta) < \infty$ and
+$\int_{(0,1]}2\log(1/\theta)\,U(d\theta) < \infty$. Each direction is an elementary comparison of
+integrands. Forwards: on $(0,1]$ one has $\log(1+\theta^{-2}) \le \log 2 + 2\log(1/\theta)$ and
+$(1+\theta^2)^{-1} \ge \tfrac12$, so the first condition bounds $U((0,1])$ and the second the
+logarithm; on $(1,\infty)$, $\log(1+\theta^{-2}) \le \theta^{-2} \le 2(1+\theta^2)^{-1}$.
+Backwards: $\log(1+\theta^{-2}) \ge \log 2$ on $(0,1]$ and
+$\ge \tfrac12\theta^{-2} \ge \tfrac12(1+\theta^2)^{-1}$ on $(1,\infty)$, while
+$2\log(1/\theta) \le \log(1+\theta^{-2})$ on $(0,1]$. So membership in the class is
+Proposition~\ref{prop:thorin-subclass}(2), which is (1) by that proposition.
+\end{proof}
+
+\subsection{The Student-t family}\label{sec:student}
+
+Student's t laws are the classical heavy-tailed relatives of the normal law: a normal variable
+whose variance is itself random, drawn from an inverse-gamma law. Read through \S\ref{sec:bridge}
+that representation is a subordination, Brownian motion run for an inverse-gamma time, and the
+inverse-gamma laws are the kernels of the causal Bessel family, so the Student-t family is the
+image of that causal corner under the bridge (Proposition~\ref{prop:bridge-families}(3)).
+That the t laws are infinitely divisible for every number of degrees of freedom was proved by
+Grosswald (\sscite{grosswald1976student}; see \sscite{ismail1979special} for the role of
+quotients of Bessel functions). Halgreen proved
+that they are self-decomposable, through the corresponding property of the mixing law
+(\sscite{halgreen1979self}; \sscite{barndorffnielsen1977infinite} for the mixtures in general),
+which is the fact that makes them members of the admissible cone. In the scale-space
+literature the family appears at one point. With one degree of freedom the kernel is the Cauchy
+kernel, which is the Poisson scale space of Felsberg and Sommer (\sscite{felsberg2001scale};
+\sscite{felsberg2004monogenic}) and the member of the $\alpha$-scale spaces that Duits et
+al.\ single out (\sscite{duits2004axioms}); it is also the symmetric stable member of index $1$
+of \S\ref{sec:stable}, the point where two corners meet.
+
+The proposition gives the kernel and its transform in closed form, places the family in the
+Thorin subclass, and counts its moments. The tail is a power, of order $|x|^{-2a-1}$, and the
+shape parameter $a$ is a dial on the number of finite moments, those of order below $2a$,
+twice the count of the causal ancestor. So this is the corner of the cone with polynomial tails of any
+prescribed order, where the \Matern{} corner has exponential tails and every moment, and the
+stable corner fewer than two moments.
+
+% shared with blueprint prop:student-t
+\begin{proposition}[the Student-t family]\label{prop:student-t}
+For $a > 0$ let $T_1$ be the scaled inverse-gamma law of the causal Bessel family, with density
+$p_{T_1}(u) = u^{-a-1}e^{-1/(2u)}/(2^a\Gamma(a))$, and let $X_1 := \BM_{T_1}$. Then:
+\begin{enumerate}
+\item the kernel at canonical scale $1$ is
+$\phi_1(x) = \frac{\Gamma(a+\frac12)}{\sqrt\pi\,\Gamma(a)}\,(1+x^2)^{-a-\frac12}$, the
+Student-t law with $2a$ degrees of freedom in the scale in which the density is proportional to
+$(1+x^2)^{-a-1/2}$, and $\phi_t = t^{-1}\phi_1(\cdot/t)$;
+\item the transform is
+$e^{-F(\omega)} = \frac{2^{1-a}}{\Gamma(a)}\,|\omega|^aK_a(|\omega|)$;
+\item if $T_1$ is a generalized gamma convolution --- Remark~\ref{rem:student-ggc} --- then the
+law is self-decomposable and lies in the symmetric Thorin subclass;
+\item $\mathbb{E}|X_t|^n < \infty$ if and only if $n < 2a$, and the tail is
+$\phi_t(x) \sim c\,t^{2a}|x|^{-2a-1}$, polynomial.
+\end{enumerate}
+Throughout, $a$ is the shape parameter of the causal Bessel family --- the letter that family
+carries in the literature --- and not the Gaussian coefficient of \ref{eq:sd-profile}, which is a
+different number and vanishes for these members, as the proof of clause (3) computes under that
+clause's hypothesis.
+\end{proposition}
+
+The scaling convention, so that the degrees of freedom come out as $2a$ and not $a$, is fixed
+by the density in clause (1) and the rate in $p_{T_1}$, and the two should be read together
+whenever the family is quoted. The shape parameter is therefore a dial on the number of finite
+moments, and the count is twice the causal one, $n < 2a$ against $n < a$ for the delay. Clause (3) is conditional: that the inverse-gamma law is a
+generalized gamma convolution is Halgreen's theorem, recorded as
+Remark~\ref{rem:student-ggc} and taken here as a hypothesis, and under it the clause follows
+from the bridge on Thorin subclasses. Clause (2) is obtained from clause (1) and the Laplace
+transform of the delay law, which after an exponential change of variables is the integral by
+which $K_a$ is defined, so that no asymptotic of the Bessel function enters.
+
+\begin{proof}[Proof of the parts that are this paper's own]
+(1) Conditioning on $T_1$, $\phi_1(x) = \int_0^\infty g_u(x)\,p_{T_1}(u)\,du$; the substitution
+$w = 1/u$ turns this into
+\[
+  \frac{1}{\sqrt{2\pi}\,2^a\Gamma(a)}\int_0^\infty w^{a-\frac12}e^{-w(1+x^2)/2}\,dw
+  = \frac{\Gamma(a+\frac12)}{\sqrt{2\pi}\,2^a\Gamma(a)}\Bigl(\frac{2}{1+x^2}\Bigr)^{a+\frac12}
+  = \frac{\Gamma(a+\frac12)}{\sqrt\pi\,\Gamma(a)}\,(1+x^2)^{-a-\frac12}.
+\]
+The scaling clause is Proposition~\ref{prop:bridge-families}. (2) is the causal transform
+$e^{-F_{\mathrm I}(\sigma)} = \frac{2^{1-a}}{\Gamma(a)}(\sqrt{2\sigma})^aK_a(\sqrt{2\sigma})$
+evaluated at $\sigma = \omega^2/2$; the checked proof computes that Laplace integral rather than
+quoting it, and the computation is one substitution: with $A = 1/2$, $B = \sigma$ and
+$u = c\,e^{v}$, $c = \sqrt{A/B}$, the integral
+$\int_0^\infty u^{-a-1}e^{-1/(2u) - \sigma u}\,du$ becomes
+$2c^{-a}\int_0^\infty\cosh(av)\,e^{-2\sqrt{AB}\cosh v}\,dv$, which is the integral by which
+$K_a$ is defined here. No asymptotic of $K_a$ enters, at this or any order.
+
+\emph{(3).} Let $U_{\mathrm I}$ be a Thorin measure of $T_1$, as the hypothesis provides:
+$\mathbb{E}e^{-\sigma T_1}
+= \exp\{-\int_{(0,\infty)}\log(1 + \sigma/\theta)\,U_{\mathrm I}(d\theta)\}$ for $\sigma \ge 0$,
+with $\int_{(0,\infty)}\log(1 + \theta^{-1})\,U_{\mathrm I}(d\theta) < \infty$. That exponent is
+causally admissible with drift $0$ and delay profile
+$k_{\mathrm I}(u) = \int e^{-\theta u}\,U_{\mathrm I}(d\theta)$: a Laplace transform is
+nonnegative and nonincreasing, and the causal Frullani identity
+$\int_0^\infty(1 - e^{-\sigma u})e^{-\theta u}\,du/u = \log(1 + \sigma/\theta)$ with Tonelli
+turns the exponent of Definition~\ref{def:causal-admissible} into the Thorin integral, so that
+the two integrability windows follow from its finiteness at $\sigma = 1$ --- for
+$1 \wedge u \le e\,(1 - e^{-u})$ bounds the windows by the exponent there. By
+Lemma~\ref{lem:bridge-exponents} the image $F_{\mathrm I}(\omega^2/2)$ is admissible, and by the
+mixture identity with clause (1) it is an exponent of the Student-t family: the law is
+self-decomposable. Complete monotonicity of the spatial profile --- membership in the symmetric
+Thorin subclass by Proposition~\ref{prop:thorin-subclass}(1) iff (2) --- is
+Proposition~\ref{prop:thorin-subclass}(3) read at that datum, which also returns the Thorin
+measure, twice the image of $U_{\mathrm I}$ under $\theta \mapsto \sqrt{2\theta}$, and the
+vanishing Gaussian coefficient.
+
+\emph{(4).} The
+tail of the density in (1) is $|x|^{-2a-1}$, so $\mathbb{E}|X|^n < \infty$ exactly when
+$n < 2a$, which also follows from $\mathbb{E}|\BM_T|^{2n} = (2n-1)!!\;\mathbb{E}T^n$ and
+$\mathbb{E}T_1^n < \infty$ exactly when $a > n$.
+\end{proof}
+
+% blueprint rem:student-ggc, copied; the cited fact's page anchors are Halgreen's own
+\begin{remark}[the inverse-gamma delay law is a generalized gamma convolution]
+\label{rem:student-ggc}
+The hypothesis that Lemma~\ref{lem:student-subordinated} and clause (3) above quantify over is
+a theorem of the literature, and it is the one thing about this corner that the paper does not
+prove. For $a > 0$ the inverse-gamma law $T_1$ of shape $a$ is a generalized gamma convolution:
+there is a positive measure $U_{\mathrm I}$ on $(0,\infty)$ with
+$\int_{(0,\infty)}\log(1 + \theta^{-1})\,U_{\mathrm I}(d\theta) < \infty$ and
+\begin{equation}\label{eq:student-ggc}
+  \mathbb{E}e^{-\sigma T_1}
+   = \exp\Bigl\{-\int_{(0,\infty)}\log\Bigl(1 + \frac{\sigma}{\theta}\Bigr)
+       U_{\mathrm I}(d\theta)\Bigr\}, \qquad \sigma \ge 0 .
+\end{equation}
+That is \sscite{halgreen1979self}, \S2, pp.~14--15, read at $\lambda = -a < 0$, $\chi = 1$,
+$\psi = 0$, the parameters at which the generalized inverse Gaussian density of his (1) is the
+density $p_{T_1}$ of Proposition~\ref{prop:student-t}. His (5) exhibits the measure: it has
+density $u(y) = g_a(2y)$ on $(0,\infty)$, where
+$g_\nu(x) = 2\{\pi^2x(J_\nu^2(\sqrt x) + Y_\nu^2(\sqrt x))\}^{-1}$ is Grosswald's
+(\sscite{grosswald1976student}), and his integrability conditions (3) ---
+$\int_0^1|\log y|\,U_{\mathrm I}(dy) < \infty$ and $\int_1^\infty y^{-1}U_{\mathrm I}(dy) <
+\infty$ --- are the displayed finiteness for a measure finite on the compact subsets of
+$(0,\infty)$; the displayed form is what finiteness of the exponent at $\sigma = 1$ says, and it
+is the form both consumers read. Being a generalized gamma convolution, $T_1$ is in particular
+self-decomposable, which is the weaker hypothesis Lemma~\ref{lem:student-subordinated}
+quantifies over.
+
+Nothing in the paper depends on this remark: both consumers quantify over
+\ref{eq:student-ggc} or over its consequence. The measure Halgreen exhibits is built from the
+Bessel functions $J_\nu$ and $Y_\nu$, and no route to \ref{eq:student-ggc} through the
+elementary theory is known to the author.
+\end{remark}
+
+Which principle cuts the Student-t family out of the cone is a question about locality, and it
+is the subject of the next module. Nothing is stated about it here.
+
+\subsection{The symmetric stable family}\label{sec:stable}
+
+The symmetric stable laws are the laws with exponent $c\,|\omega|^\alpha$, $0 < \alpha \le 2$
+(\sscite{sato1999levy}, Theorem~14.14, p.~86, for $\alpha < 2$, the Gaussian being the case
+$\alpha = 2$): the laws that reproduce themselves under
+addition and rescaling, and the attractors of the generalized central limit theorem. They are
+the earliest non-Gaussian scale spaces in the axiomatic literature. Pauwels et al.\ obtained
+the kernels with transform
+$e^{-t|\omega|^\alpha}$, for every $\alpha > 0$, from recursivity and scale invariance, those
+with $\alpha \le 2$ being the positive ones (\sscite{pauwels1995extended}). Duits et
+al.\ axiomatized them as the $\alpha$-scale spaces, generated by the fractional powers
+$-(-\Delta)^{\alpha/2}$ of the Laplacian in the present index, with the Poisson scale space
+$\alpha = 1$ as the case they single out (\sscite{duits2004axioms};
+\sscite{felsberg2004monogenic}), and Pedersen et al.\ read them as stable \Levy{} motions and
+compared them on natural images (\sscite{pedersen2005alpha}). In the hemigroup theory the
+family is the semigroup corner: Corollary~\ref{cor:semigroup-case} says that it is exactly what
+the axioms give when the stages are required to depend only on the difference of their scales.
+
+The proposition adds the coordinates of the family in this paper's terms. The profile is a pure
+power, and the pure powers are the profiles that a dilation changes only by a constant, which
+is the stationarity of the increments seen in the profile. The family lies in the Thorin
+subclass, with a power-law Thorin density, and it is the image under the bridge of the causal
+stable family of half the index. And the moment count is what the semigroup costs: for a pure
+power, $\int_1^\infty x^{n-1-\alpha}dx$ is finite only for $n < \alpha$, so no member but the
+Gaussian has a variance, whereas every non-power profile with $\int_1^\infty x\,k(x)\,dx$
+finite has one. So the heavy tails of the stable scale spaces come from the semigroup
+requirement: the same axioms without it admit members with every moment finite. The extended
+semigroup class beyond $\alpha = 2$ is not in the cone: positivity fails there.
+
+% DIVERGENCE (2026-09-19, the author's decision D5 at the external review): the blueprint's
+% proof ends with a paragraph saying which steps are machine-checked and which route is the
+% checked one; the paper's copy omits it (section 1.1 owns that account).
+% shared with blueprint prop:stable-family
+\begin{proposition}[the symmetric stable family]\label{prop:stable-family}
+For $0 < \alpha < 2$ the exponent $F(\omega) = |\omega|^\alpha$ is admissible with $a = 0$ and
+profile $k(x) = C_\alpha^{-1}x^{-\alpha}$, where
+$C_\alpha = \int_0^\infty (1-\cos u)\,u^{-1-\alpha}du$; its symmetric Thorin density is
+proportional to $\theta^{\alpha-1}d\theta$; the kernels are the symmetric $\alpha$-stable
+densities; $\mathbb{E}|X_t|^n < \infty$ if and only if $n < \alpha$; and the family is the only
+admissible one-parameter semigroup. It is the image under the bridge of the causal stable family
+of index $\alpha/2$. The Gaussian ray closes the family at $\alpha = 2$, with $k \equiv 0$ and
+$a = 1$.
+\end{proposition}
+
+The phrase ``the kernels are the symmetric $\alpha$-stable densities'' names the classical
+family whose exponent is $|\omega|^\alpha$. No closed form of the density is asserted, and
+outside a few values of $\alpha$ none exists; absolute continuity is
+Proposition~\ref{prop:kernel-regularity}. The moment clause is the cited moment criterion of
+Proposition~\ref{prop:moments-tails}(1) applied to the pure power.
+
+\begin{proof}
+The exponent, the profile and the constant are Corollary~\ref{cor:semigroup-case}, as is the
+statement that this is the only admissible one-parameter semigroup. The moment criterion applied
+to $k(x) = C_\alpha^{-1}x^{-\alpha}$ gives $\int_1^\infty x^{n-1-\alpha}dx < \infty$ exactly
+when $n < \alpha$ (Proposition~\ref{prop:moments-tails}(1)). The causal stable family of index
+$\alpha/2$ has $F_{\mathrm I}(\sigma) = \sigma^{\alpha/2}$, whose image is
+$2^{-\alpha/2}|\omega|^{\alpha}$ by Proposition~\ref{prop:bridge-families}(4), a positive
+multiple of $F$; the causal Thorin density is proportional to $\theta^{\alpha/2-1}d\theta$, and
+its image under $\theta' = \sqrt{2\theta}$, with the Jacobian, is proportional to
+$\theta'^{\alpha-1}d\theta'$ by Proposition~\ref{prop:thorin-subclass}(3).
+
+The Thorin density is also reached directly, without the bridge and without Bernstein's
+theorem: for $c > 0$ the Gamma integral
+$\int_0^\infty e^{-\theta x}c\theta^{\alpha-1}d\theta = c\Gamma(\alpha)x^{-\alpha}$ exhibits the
+stable profile as a Laplace transform at $c = (C_\alpha\Gamma(\alpha))^{-1}$, and the Tonelli of
+Proposition~\ref{prop:thorin-subclass} turns that into \ref{eq:thorin}. Only the positivity of
+$C_\alpha$ is used, not its value: the integrand is nonnegative, integrable --- at most
+$u^{1-\alpha}/2$ near the origin and at most $2u^{-1-\alpha}$ beyond $1$ --- and nonzero on
+$(0,1)$.
+\end{proof}

@@ -1,0 +1,55 @@
+Review response R4a, small paper-side items of the trust-base account and the presentation. Applied with scripts/apply-anchors.py.
+
+@@@ FILE paper-b/01-introduction.tex
+@@@ OLD
+\item Its lemma, typed and priced (Lemma~\ref{lem:filtration-strictness}).
+@@@ NEW
+\item Its lemma, which is stated in the development and not proved there
+(Lemma~\ref{lem:filtration-strictness}).
+@@@ END
+
+@@@ FILE paper-b/01-introduction.tex
+@@@ OLD
+the image determines its ancestor, and it is not onto. A kernel in its image has an exponent
+that increases strictly, and the unit-step members do not, so they have no causal ancestor
+@@@ NEW
+the image determines its ancestor, and it is not onto. A kernel in its image has an exponent
+whose derivative is positive at every positive frequency, and the exponent of a unit-step
+member has stationary points, so the unit-step members have no causal ancestor
+@@@ END
+
+@@@ FILE paper-b/ai-statement.tex
+@@@ OLD
+is introduced where it is first used, with its literature. Nothing outside
+\S\ref{sec:machine-checked} comments on the machine checking. The numerical run of
+@@@ NEW
+is introduced where it is first used, with its literature. The account of the machine checking
+is in \S\ref{sec:machine-checked}, and the body says of a step that it is machine-checked only
+inside a few proofs. The numerical run of
+@@@ END
+
+@@@ FILE paper-b/05-corners.tex
+@@@ OLD
+exponent is the power $|\omega|^\alpha$ and the tails are of order $|x|^{-1-\alpha}$
+(Proposition~\ref{prop:stable-family}).}
+@@@ NEW
+exponent is the power $|\omega|^\alpha$ and, for $\alpha < 2$, the tails are of order
+$|x|^{-1-\alpha}$ (Proposition~\ref{prop:stable-family}). The parameters vary at a fixed
+canonical scale and the bandwidths are not matched, so the panels show the shapes of the
+families and are not a comparison of smoothings; Figure~\ref{fig:experiment-b} compares members
+at equal bandwidth.}
+@@@ END
+
+@@@ FILE paper-b/fig-sections.tex
+@@@ OLD
+followed by $\gamma$ run backward (the labels $\times\,\gamma$ mark the repetition), each with
+@@@ NEW
+followed by $\gamma$ run backward (the labels say how often a section is repeated), each with
+@@@ END
+
+@@@ FILE paper-b/07-implementation.tex
+@@@ OLD
+The four statements of the section follow that thought, a numerical run closes it, and
+@@@ NEW
+The statements of the section follow that thought, a numerical run closes it, and
+@@@ END

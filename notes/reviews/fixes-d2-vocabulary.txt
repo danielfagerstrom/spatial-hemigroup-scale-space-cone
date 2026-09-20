@@ -1,0 +1,41 @@
+Decision D2 (the author's, 2026-09-19), the vocabulary: "machine" goes, "record" is defined where section 1 first uses it, "corner" says at its first use that the named families are not extreme rays. ("Catalogue" restricted to the jump measure is a later pass through sections 2 to 4.) Applied with scripts/apply-anchors.py; the title of a shared statement may differ between paper and blueprint.
+
+@@@ FILE paper-b/07-implementation.tex
+@@@ OLD
+\item \emph{The Thorin subclass as a machine} (\S\ref{sec:thorin-machine}). Every member with a
+@@@ NEW
+\item \emph{Finite Thorin approximations} (\S\ref{sec:thorin-machine}). Every member with a
+@@@ END
+
+@@@ FILE paper-b/07-implementation.tex
+@@@ OLD
+\subsection{The Thorin subclass as a machine}\label{sec:thorin-machine}
+@@@ NEW
+\subsection{Finite Thorin approximations and their realization}\label{sec:thorin-machine}
+@@@ END
+
+@@@ FILE paper-b/07-implementation.tex
+@@@ OLD
+\item \emph{The Thorin subclass as a machine} (Propositions~\ref{prop:thorin-machine}
+@@@ NEW
+\item \emph{Finite Thorin approximations} (Propositions~\ref{prop:thorin-machine}
+@@@ END
+
+@@@ FILE paper-b/01-introduction.tex
+@@@ OLD
+scales, $\Phis{s}{t}$ taking the record at scale $s$ to the record at scale $t$, and they are
+@@@ NEW
+scales. Call the smoothed signal at a scale the \emph{record} at that scale. The operator
+$\Phis{s}{t}$ takes the record at scale $s$ to the record at scale $t$, and the operators are
+@@@ END
+
+@@@ FILE paper-b/01-introduction.tex
+@@@ OLD
+\emph{The named members} (\S\ref{sec:corners}). Three classical families are located in the
+cone (Figure~\ref{fig:corners}). The main result concerns the \Matern{} family. Four
+@@@ NEW
+\emph{The named members} (\S\ref{sec:corners}). Three classical families are located in the
+cone (Figure~\ref{fig:corners}). They are called its corners here, in the sense that each is
+singled out by an extremal property; they are not extreme rays of the cone, which are the
+Gaussian and the unit-step members. The main result concerns the \Matern{} family. Four
+@@@ END

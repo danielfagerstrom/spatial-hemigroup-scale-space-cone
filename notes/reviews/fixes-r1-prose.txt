@@ -1,0 +1,41 @@
+Review response R1, paper-side prose: the class R is "the families realized by lag sections", not "the families with rational stages" (the referee's counterexample). Applied with scripts/apply-anchors.py.
+
+@@@ FILE paper-b/01-introduction.tex
+@@@ OLD
+(Proposition~\ref{prop:thorin-machine}). The families with such stages reach, in the limit,
+@@@ NEW
+(Proposition~\ref{prop:thorin-machine}). The families realized by such sections reach, in the limit,
+@@@ END
+
+@@@ FILE paper-b/05-corners.tex
+@@@ OLD
+contains the families with rational stages, as the members whose Thorin measure is a finite
+@@@ NEW
+contains the families realized by first-order sections, as the members whose Thorin measure is a finite
+@@@ END
+
+@@@ FILE paper-b/07-implementation.tex
+@@@ OLD
+(Proposition~\ref{prop:rational-increments}). The converse of the first statement is expected
+and not proved (Remark~\ref{rem:rational-converse}).
+@@@ NEW
+(Proposition~\ref{prop:rational-increments}). The converse of the first statement is false: a
+family with a complex pole pair can be admissible and have rational stages
+(Remark~\ref{rem:rational-converse}).
+@@@ END
+
+@@@ FILE paper-b/07-implementation.tex
+@@@ OLD
+(Proposition~\ref{prop:thorin-machine}). The families with rational stages reach exactly the
+@@@ NEW
+(Proposition~\ref{prop:thorin-machine}). The families realized by lag sections reach exactly the
+@@@ END
+
+@@@ FILE paper-b/07-implementation.tex
+@@@ OLD
+and only even integer weights give rational stages. Which members can the families with
+rational stages reach? The next proposition answers it: exactly the members whose Thorin
+@@@ NEW
+and only even integer weights give a realization by lag sections. Which members can the
+families realized by lag sections reach? The next proposition answers it: exactly the members whose Thorin
+@@@ END
