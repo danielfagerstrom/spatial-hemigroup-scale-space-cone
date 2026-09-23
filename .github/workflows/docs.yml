@@ -21,8 +21,12 @@ on:
         type: boolean
         default: false
 
+# `contents: write`, even though this caller sets push_artifacts: false and the job that
+# needs it is skipped. A caller cannot grant LESS than the called workflow's jobs request,
+# and that is checked when the run starts, before any `if` is evaluated — so granting only
+# `read` here fails the whole run with a bare "workflow file issue" and no step logs.
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   docs:
