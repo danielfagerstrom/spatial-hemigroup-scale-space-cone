@@ -2,7 +2,7 @@ name: Docs CI
 
 # Publishes this release's three views — the paper, the blueprint, and the blueprint as
 # hypertext with its dependency graph — to the research site, at
-# research.danielfagerstrom.com/papers/hemigroup-spatial-cone/.
+# research.danielfagerstrom.com/papers/hemigroup-spatial-admissible-cone/.
 #
 # This repository is a FROZEN verification artifact: the export of module B's release v0.1,
 # whose sources do not change. So the trigger is manual, `channel` names the release rather
@@ -32,7 +32,7 @@ jobs:
   docs:
     uses: danielfagerstrom/article-kit/.github/workflows/docs.yml@main
     with:
-      slug: hemigroup-spatial-cone
+      slug: hemigroup-spatial-admissible-cone
       channel: v0.1
       push_artifacts: false
       dry_run: ${{ inputs.dry_run }}
